@@ -115,8 +115,6 @@ public class RecipeListActivity extends SigningDriveActivity implements RecipeLi
             if(intent.getAction().equals(Constants.ACTION_BROADCAST_UPLOADED_RECIPE)){
                 if(intent.hasExtra(Constants.KEY_RECIPE)){
                     RecipeItem recipeItem = intent.getParcelableExtra(Constants.KEY_RECIPE);
-                    recipeItem.removeState(Constants.FLAG_PENDING_UPLOAD_TO_DRIVE);
-                    recipeItem.setState(Constants.FLAG_SINCRONIZED_WITH_DRIVE);
                     DatabaseRelatedTools dbTools = new DatabaseRelatedTools();
                     dbTools.updateStateById(getApplicationContext(), recipeItem.get_id(), recipeItem.getState());
                 }
@@ -263,9 +261,6 @@ public class RecipeListActivity extends SigningDriveActivity implements RecipeLi
                 if (resultCode == Constants.RESULT_DELETE_RECIPE && intentData != null && intentData.hasExtra(Constants.KEY_RECIPE)) {
                     RecipeItem recipe = intentData.getParcelableExtra(Constants.KEY_RECIPE);
                     if (recipe != null) {
-                        if((recipe.getState() & Constants.FLAG_SINCRONIZED_WITH_DRIVE) != 0){
-                            deleteRecipeFromDrive(recipe);
-                        }
                         removeRecipeFromDiskAndDatabase(recipe);
                     }
                 }else if(resultCode == Constants.RESULT_UPDATE_RECIPE){
@@ -300,7 +295,6 @@ public class RecipeListActivity extends SigningDriveActivity implements RecipeLi
                     ReadWriteTools readWriteTools = new ReadWriteTools();
                     String path = readWriteTools.saveRecipeOnEditedPath(getApplicationContext(), recipe);
                     recipe.setPathRecipe(path);
-                    uploadRecipeToDrive(recipe);
                     if (mRecipeListFragment != null) {
                         mRecipeListFragment.createRecipe(recipe);
                     }
@@ -635,9 +629,7 @@ public class RecipeListActivity extends SigningDriveActivity implements RecipeLi
             }
         });
 
-        if(!driveRecipesChecked && checkIfCloudBackupAllowed()){
-            driveRecipesChecked = getRecipesFromDrive();
-        }
+
     }
 
     public void onPause(){

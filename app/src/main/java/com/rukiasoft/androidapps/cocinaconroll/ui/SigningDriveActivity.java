@@ -13,7 +13,6 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.drive.Drive;
 import com.rukiasoft.androidapps.cocinaconroll.CocinaConRollApplication;
 import com.rukiasoft.androidapps.cocinaconroll.classes.RecipeItem;
-import com.rukiasoft.androidapps.cocinaconroll.services.DriveService;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.Constants;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.LogHelper;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.Tools;
@@ -162,41 +161,6 @@ public abstract class SigningDriveActivity extends ToolbarAndRefreshActivity imp
         }
     }
 
-    public void uploadRecipeToDrive(RecipeItem recipeItem){
-        if(getMyApplication().getGoogleApiClient() == null){
-            //initializeConnection();
-            connectToDrive(true);
-        }else{
-            if(!getMyApplication().getGoogleApiClient().isConnected()) {
-                connectToDrive(true);
-            }
-            DriveService.startActionUploadRecipe(getApplicationContext(), recipeItem);
-        }
-    }
 
-    protected void deleteRecipeFromDrive(RecipeItem recipeItem){
-        if(getMyApplication().getGoogleApiClient() == null){
-            //initializeConnection();
-            connectToDrive(true);
-        }else{
-            if(!getMyApplication().getGoogleApiClient().isConnected()) {
-                connectToDrive(true);
-            }
-            DriveService.startActionDeleteRecipe(getApplicationContext(), recipeItem);
-        }
-    }
-
-    protected boolean getRecipesFromDrive(){
-        if(getMyApplication().getGoogleApiClient() == null){
-            connectToDrive(true);
-        }else {
-            if(!getMyApplication().getGoogleApiClient().isConnected()) {
-                connectToDrive(true);
-            }
-            DriveService.startActionGetRecipesFromDrive(getApplicationContext());
-            return true;
-        }
-        return false;
-    }
 }
 

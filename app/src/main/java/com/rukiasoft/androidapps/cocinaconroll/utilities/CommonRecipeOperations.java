@@ -48,9 +48,7 @@ public class CommonRecipeOperations {
         String path = rwTools.saveRecipeOnEditedPath(activity.getApplicationContext(), recipe);
         recipe.setPathRecipe(path);
         recipe.setVersion(recipe.getVersion() + 1);
-        if(activity instanceof SigningDriveActivity) {
-            ((SigningDriveActivity)activity).uploadRecipeToDrive(recipe);
-        }
+
         //update database
         DatabaseRelatedTools dbTools = new DatabaseRelatedTools();
         dbTools.updatePathsAndVersion(activity.getApplicationContext(), recipe);

@@ -70,12 +70,10 @@ public class EditRecipeActivity extends AppCompatActivity {
             }
             title = getResources().getString(R.string.edit_recipe);
             recipe.setState(Constants.FLAG_EDITED);
-            recipe.setState(Constants.FLAG_PENDING_UPLOAD_TO_DRIVE);
         }else{
             title = getResources().getString(R.string.create_recipe);
             recipe = new RecipeItem();
             recipe.setState(Constants.FLAG_OWN);
-            recipe.setState(Constants.FLAG_PENDING_UPLOAD_TO_DRIVE);
         }
 
         super.onCreate(savedInstanceState);
