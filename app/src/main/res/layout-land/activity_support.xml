@@ -1,0 +1,114 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/blue_grey_700"
+    android:orientation="horizontal"
+    android:weightSum="5"
+    tools:context=".ui.ShowSigningActivity">
+
+    <ImageView
+        android:id="@+id/support_icon"
+        android:layout_width="@dimen/profile_picture_size"
+        android:layout_height="@dimen/profile_picture_size"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:contentDescription="@string/desc_google_icon"
+        android:src="@mipmap/ic_launcher" />
+
+    <TextView
+        android:id="@+id/support_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:layout_toRightOf="@+id/support_icon"
+        android:layout_marginLeft="@dimen/dimen_lat_inter_support"
+        android:layout_marginStart="@dimen/dimen_lat_inter_support"
+        android:layout_toEndOf="@+id/support_icon"
+        android:text="@string/title_support"
+        android:gravity="center"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:textColor="@android:color/white"
+        android:textSize="@dimen/signing_title_support" />
+
+    <LinearLayout
+        android:id="@+id/pic_plus_body_support"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/support_icon"
+        android:orientation="horizontal"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:weightSum="5">
+        <com.rukiasoft.androidapps.cocinaconroll.classes.ThreeOneImageView
+            android:id="@+id/support_image"
+            android:layout_width="0dp"
+            android:layout_weight="3"
+            android:layout_height="0dp"
+            android:layout_marginTop="@dimen/dimen_inter_support"
+            android:contentDescription="@string/desc_lkona_icon"
+            android:src="@drawable/luikona" />
+
+        <TextView
+            android:id="@+id/support_body_text"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:layout_marginTop="@dimen/dimen_inter_support"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            android:text="@string/body_support"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/signing_body_support" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_below="@+id/pic_plus_body_support"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        android:weightSum="2">
+        <android.support.v7.widget.AppCompatCheckBox
+            android:id="@+id/checkbox_hide_support"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            android:layout_marginTop="@dimen/dimen_inter_support"
+            android:layout_gravity="center"
+            android:textColor="@android:color/white"
+            android:textAppearance="@style/TextAppearance.AppCompat.Title"
+            android:text="@string/hide"
+            app:buttonTint="@android:color/white"/>
+        <TextView
+            android:id="@+id/sign_in_body_text"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dimen_inter_support"
+            android:text="@string/l_feliz_to_kona"
+            android:textColor="#00FFFF"
+            android:textSize="@dimen/signing_body_support" />
+</LinearLayout>
+    <Button
+        android:id="@+id/close_support_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/activity_vertical_margin"
+        android:layout_alignParentBottom="true"
+        android:layout_centerInParent="true"
+        android:text="@string/close"
+        android:textSize="@dimen/signing_body_support"
+        android:textColor="@android:color/white"
+        android:theme="@style/ThemeOverlay.MyDarkButton" />
+
+
+</RelativeLayout>

@@ -1,0 +1,85 @@
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:fitsSystemWindows="true"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:ignore="RtlHardcoded">
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:fitsSystemWindows="true"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:ignore="RtlHardcoded"
+        android:orientation="horizontal">
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:id="@+id/photo_container_recipe_details">
+            <ImageView
+                android:id="@+id/recipe_pic"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:contentDescription="@string/image_of_the_recipe"
+                />
+            <ImageView
+                android:id="@+id/recipe_pic_protection"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/photo_background_protection"
+                android:contentDescription="@string/null_content_description"/>
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar_recipe_details"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="@android:color/transparent"
+                app:contentScrim="@android:color/transparent"
+                android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+                android:layout_alignParentTop="true"/>
+            <TextView
+                android:id="@+id/recipe_name_recipe_details"
+                android:textAppearance="@style/Theme.ExpandedText"
+                android:layout_alignParentBottom="true"
+                app:layout_anchor="@id/appbarlayout_recipe_details"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:layout_marginLeft="@dimen/title_margin_expanded"
+                android:layout_marginEnd="@dimen/title_margin_expanded"
+                android:layout_marginStart="@dimen/title_margin_expanded"
+                android:layout_marginRight="@dimen/title_margin_expanded"/>
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/recipe_description_fab"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:backgroundTint="@color/ColorAccent"
+                app:fabSize="mini"
+                android:elevation="6dp"
+                app:pressedTranslationZ="12dp"
+                android:layout_margin="@dimen/fab_margin"
+                android:layout_centerInParent="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:contentDescription="@string/action_share"
+                app:rippleColor="@android:color/white"
+                app:borderWidth="0dp"/>
+        </RelativeLayout>
+
+        <android.support.v4.widget.NestedScrollView
+            android:id="@+id/scrollview_recipe_details"
+            android:layout_width="0dp"
+            android:layout_weight="2"
+            android:layout_height="match_parent">
+            <include layout="@layout/recipe_details_cards"/>
+        </android.support.v4.widget.NestedScrollView>
+
+
+
+    </LinearLayout>
+</android.support.design.widget.CoordinatorLayout>

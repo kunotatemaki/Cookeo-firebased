@@ -1,0 +1,65 @@
+<resources>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+
+    <!-- list -->
+    <dimen name="list_side_margin">4dp</dimen>
+    <dimen name="list_top_margin">4dp</dimen>
+    <dimen name="list_bottom_margin">4dp</dimen>
+    <dimen name="list_toolbar_side_margin">24dp</dimen>
+    <integer name="list_column_count">2</integer>
+
+
+    <dimen name="search_elevation">8dp</dimen>
+    <dimen name="margin_recipe_icon_type">4dp</dimen>
+
+
+    <!-- fast scroller -->
+    <dimen name="fastscroller_handle_corner">20dp</dimen>
+    <dimen name="fastscroller_handle_size">50dp</dimen>
+    <dimen name="fastscroller_reack_corner">3dp</dimen>
+    <dimen name="fastscroller_track_height">30dp</dimen>
+    <dimen name="fastscroller_track_width">4dp</dimen>
+    <dimen name="fastscroller_track_padding">2dp</dimen>
+
+    <dimen name="fab_elevation">2dp</dimen>
+    <dimen name="fab_press_translation_z">6dp</dimen>
+
+    <dimen name="title_margin_expanded">16dp</dimen>
+    <dimen name="title_margin_collapsed">72dp</dimen>
+
+    <dimen name="title_toolbar_collapsed">18sp</dimen>
+    <dimen name="title_toolbar_expanded">32sp</dimen>
+    <dimen name="activity_horizontal_title">72dp</dimen>
+
+    <dimen name="detail_card_max_width">10000dp</dimen> <!-- force match_parent -->
+    <dimen name="margin_cardview">8dp</dimen>
+    <dimen name="margin_below_cardview">16dp</dimen>
+    <dimen name="margin_text_cardview">8dp</dimen>
+    <dimen name="circle_space">5dp</dimen>
+    <dimen name="margin_rukia">10dp</dimen>
+    <dimen name="rukiasoft_sp">45dp</dimen>
+    <dimen name="imaginecreate_sp">35dp</dimen>
+    <dimen name="margin_imagine_right">10dp</dimen>
+    <dimen name="margin_create_left">5dp</dimen>
+    <dimen name="margin_create_right">5dp</dimen>
+    <dimen name="circle_radius">40dp</dimen>
+    <dimen name="smart_add">32dp</dimen>
+
+    <dimen name="g_top_margin">30dp</dimen>
+    <dimen name="signing_title">30sp</dimen>
+    <dimen name="signing_body">20sp</dimen>
+    <dimen name="profile_picture_size">64dp</dimen>
+    <dimen name="options_title">24sp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
+
+    <!-- support -->
+    <dimen name="signing_title_support">30sp</dimen>
+    <dimen name="signing_body_support">20sp</dimen>
+    <dimen name="dimen_inter_support">5dp</dimen>
+    <dimen name="dimen_lat_support">5dp</dimen>
+    <dimen name="dimen_lat_inter_support">5dp</dimen>
+
+
+</resources>

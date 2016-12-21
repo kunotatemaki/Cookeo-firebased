@@ -1,0 +1,25 @@
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:src="@drawable/kitchen"
+        android:scaleType="centerCrop"
+        android:contentDescription="@string/null_content_description"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/designed_by"
+        android:textAppearance="?attr/subtitle"
+        android:textColor="@android:color/white"
+        android:layout_gravity="bottom|end"
+        android:layout_marginBottom="2dp"
+        android:layout_marginEnd="30dp"
+        android:layout_marginRight="30dp"
+
+        />
+</FrameLayout>

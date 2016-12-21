@@ -1,0 +1,131 @@
+<resources>
+    <string name="app_name">Cocinando con mi Cookeo</string>
+    <string name="action_settings">Ajustes</string>
+
+    <string name="no_storage_available">No se puede acceder a la memoria del dispositivo</string>
+    <string name="category_application">Ajustes de la aplicación</string>
+    <string name="screen_on">Pantalla siempre encendida</string>
+    <string name="screen_on_description">La pantalla nunca se apaga mientras se muestra la descripción de una receta. Puede aumentar el consumo de batería.</string>
+    <string name="screen_of_description">La pantalla se apagará transcurrido un tiempo de inactividad, según la configuración del dispositivo </string>
+    <string name="update_wifi">Actualizar sólo con Wifi</string>
+    <string name="update_with_wifi_description">Descargar automáticamente nuevas recetas sólo cuando el dispositivo esté conectado a una red Wifi</string>
+    <string name="update_wihtout_wifi_description">Descargar automáticamente nuevas recetas en cualquier momento</string>
+    <string name="notifications">Notificaciones de nuevas recetas</string>
+    <string name="vibrate">Vibrar</string>
+    <string name="description_vibrate">El dispositivo vibrará cuando reciba una notificación de nuevas recetas</string>
+    <string name="description_not_vibrate">El dispositivo no vibrará cuando reciba una notificación de nuevas recetas</string>
+    <string name="audio_notification">Tono de notificación</string>
+    <string name="audio_notification_description">Selecciona un sonido para las notificaciones de nuevas recetas</string>
+    <string name="all_recipes">Todas las recetas</string>
+    <string name="starters">Entrantes</string>
+    <string name="main_courses">Platos principales</string>
+    <string name="desserts">Postres</string>
+    <string name="vegetarians">Platos vegetarianos</string>
+    <string name="favourites">Favoritos</string>
+    <string name="favourite">Favorito</string>
+    <string name="search_by_ingredients">Búsqueda por ingredientes</string>
+    <string name="own_recipes">Recetas propias</string>
+    <string name="last_downloaded">Últimas recetas descargadas</string>
+    <string name="action_share">Compartir</string>
+    <string name="designed_by">diseñado por Freepik.com</string>
+    <string name="matches">Coincidencias</string>
+    <string name="no_matches">Sin coincidencias</string>
+    <string name="recipes">%1$d recetas</string>
+    <string name="search_hint">Buscar recetas</string>
+    <string name="search_settings">Ajustes de búsqueda</string>
+    <string name="restore_recipe_confirmation">¿Recuperar receta original? Esta operación no puede deshacerse.</string>
+    <string name="ingredients">Ingredientes</string>
+    <string name="default_author">Programada en Cookeo</string>
+    <string name="exit_application_title">Salir</string>
+    <string name="exit_application">¿Desea salir de %1$s</string>
+    <string name="edit_recipe">Editar receta</string>
+    <string name="No">No</string>
+    <string name="Yes">Sí</string>
+    <string name="aceptar">Aceptar</string>
+    <string name="email_alert_body">Selecciona tu cliente de correo favorito</string>
+    <string name="email_alert_title">Enviar receta</string>
+    <string name="remove_recipe">Eliminar receta</string>
+    <string name="sender">Enviado por %1$s</string>
+    <string name="steps">Pasos</string>
+    <string name="thanks">Agradecimientos</string>
+    <string name="support_recipes">Si tienes un blog de cocina y quieres ver tus recetas en %1$s, manda un email a %2$s!</string>
+    <string name="thanks_intro">Esta aplicación es posible gracias a los creadores de los siguientes blogs de cocina, que ceden sus recetas desinteresadamente. ¡No dudes en visitarlos!</string>
+    <string name="portions">raciones</string>
+    <string name="minutes">minutos</string>
+    <string name="support_girl_title">A mi novia:</string>
+    <string name="support_girl_body">Me dio la idea, me ayudó eligiendo y dando formato a las recetas y, sobre todo, ha sido increiblemente paciente cuando pasaba tantas horas delante del ordenador desarrollando la aplicación. ¡Te quiero!</string>
+    <string name="create_recipe">Crear receta</string>
+    <string name="delete_recipe_confirmation">¿Borrar la receta? Esta operación no puede deshacerse</string>
+    <string name="duplicated_recipe">Existe una receta con ese nombre</string>
+    <string name="edit_recipe_picture_text">Pulsa para editar</string>
+    <string name="exit_edit">¡Descartar los cambios y volver a la pantalla anterior?</string>
+    <string name="exit_edit_title">Descartar</string>
+    <string name="hint_create_recipe_author">Autor</string>
+    <string name="hint_create_recipe_name">Nombre de la receta</string>
+    <string name="indredients_intructions">Escribe un nuevo ingrediente y pulsa el botón para añadirlo a la receta</string>
+    <string name="menu_save_text">Salvar</string>
+    <string name="my_widget">Cocinando con mi Cookeo</string>
+    <string name="new_recipes">Recetas nuevas</string>
+    <string name="next">Siguiente</string>
+    <string name="no_camera">No se puede abrir la cámara</string>
+    <string name="no_crop_app">No hay aplicación para recortar la foto</string>
+    <string name="no_recipe_name">Añade un nombre a la receta</string>
+    <string name="no_value">Introduce un valor válido</string>
+    <string name="pick_from_camera">Usar la cámara</string>
+    <string name="pick_from_gallery">Elegir de la galería</string>
+    <string name="pick_photo">Selecciona una foto</string>
+    <string name="share_confirmation">¿Quieres compartir la receta?</string>
+    <string name="ticker">Nuevas recetas para tu Cookeo</string>
+    <string name="time">Tiempo</string>
+    <string name="tip">Consejo</string>
+    <string name="type_dish">Tipo de plato</string>
+    <string name="tutorial">Tutorial</string>
+    <string name="drag_drop_content_description">icono para arrastrar la fila</string>
+    <string name="hide">Ocultar</string>
+    <string name="image_of_the_recipe">Foto de la receta</string>
+    <string name="swipe_horizontal">Desliza hacia un lado para eliminar un elemento</string>
+    <string name="swipe_vertical">Arrastra vericalmente para reordenar un elemento</string>
+    <string name="init_database_firstboot">Espere mientras se configura la lista de recetas en el primer arranque</string>
+    <string name="thanks_blogs_title">Blogs de cocina:</string>
+    <string name="cloud_backup">Almacenamiento en la nube</string>
+    <string name="cloud_backup_off_description">Deshabilitada copia de seguridad en la cuenta personal de Google Drive</string>
+    <string name="cloud_backup_on_description">Habilitada copia de seguridad en la cuenta personal de Google Drive</string>
+
+
+    <!-- Sign-in status messages -->
+    <string name="signed_in_fmt">Conectado como: %s</string>
+    <string name="signing_in">Conectando…</string>
+    <string name="signed_out">No conectado</string>
+    <string name="signed_in_err">"Error al intentar conectar"</string>
+    <string name="error_null_person">
+        Error: Plus.PeopleApi.getCurrentPerson returned null. Ensure that the Google+ API is
+        enabled for your project, you have a properly configured google-services.json file
+        and that your device has an internet connection.
+    </string>
+
+    <!-- Google Play Services error for Toast -->
+    <string name="play_services_error_fmt">Google Play Services Error: %i</string>
+
+    <!-- Button labels -->
+    <string name="sign_in_discard">No, gracias</string>
+
+    <!-- Content Description for images -->
+    <string name="desc_google_icon">Logo de Cocinando con mi Cookeo</string>
+    <string name="title_signing">Almacena tus recetas\nen la nube</string>
+    <string name="exit">Salir</string>
+    <string name="loading">Cargando…</string>
+    <string name="sign_out">Desconectar cuenta</string>
+    <string name="body_signing">Identificate con tu cuenta de Gmail y mantén tus recetas sincronizadas en la nube.\n¡Todas tus creaciones estarán disponibles en todos tus dispositivos!</string>
+    <string name="anonymous">anónimo</string>
+    <string name="camera_explanation">Este permiso es necesario para poder usar la cámara de tu dispositivo para adjuntar una foto de tu receta</string>
+    <string name="crash_toast_text">¡Vaya! La aplicación ha fallado, pero se ha enviado un informe al desarrollador para corregir el fallo</string>
+    <string name="permissions_title">Permiso</string>
+    <string name="read_external_denied">No se podran mostrar las recetas creadas o editadas por ti hasta que aceptes este permiso</string>
+    <string name="read_external_explanation">Es necesario que aceptes este permiso para mostrar las recetas creadas o editadas por ti</string>
+    <string name="write_external_denied">No podrás usar esta opción hasta que aceptes el permiso de escritura en la memoria del dispositivo</string>
+    <string name="write_external_explanation">Necesitas aceptar este permiso para poder almacenar en tu dispositivo las recetas que hayas creado o editado</string>
+    <string name="title_support">Cocinando con mi Cookeo apoya a <a href="https://twitter.com/LUISFELIZtri">@LUISFELIZtri</a></string>
+    <string name="body_support">En su sueño de competir en el campeonato del mundo de triatlón de Hawai. ¡Ánimo campeón!</string>
+    <string name="close">Cerrar</string>
+
+</resources>
