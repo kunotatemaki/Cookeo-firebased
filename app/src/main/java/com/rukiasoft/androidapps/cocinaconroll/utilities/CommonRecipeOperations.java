@@ -8,7 +8,6 @@ import android.os.Bundle;
 import com.rukiasoft.androidapps.cocinaconroll.classes.RecipeItem;
 import com.rukiasoft.androidapps.cocinaconroll.database.DatabaseRelatedTools;
 import com.rukiasoft.androidapps.cocinaconroll.ui.EditRecipeActivity;
-import com.rukiasoft.androidapps.cocinaconroll.ui.SigningDriveActivity;
 
 /**
  * Created by iRuler on 30/12/15.

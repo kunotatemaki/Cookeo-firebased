@@ -5,7 +5,7 @@
     android:background="@color/blue_grey_700"
     android:orientation="vertical"
     android:weightSum="4"
-    tools:context=".ui.ShowSigningActivity">
+    tools:context=".ui.SignInActivity">
 
     <ScrollView
         android:layout_width="match_parent"

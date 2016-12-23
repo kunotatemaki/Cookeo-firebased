@@ -19,7 +19,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
-public class RecipeDetailActivity extends SigningDriveActivity {
+public class RecipeDetailActivityBase extends SignInActivityBase {
 
 
 

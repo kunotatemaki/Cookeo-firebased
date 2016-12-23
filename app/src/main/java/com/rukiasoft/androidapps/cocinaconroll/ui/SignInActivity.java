@@ -24,6 +24,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -33,6 +34,11 @@ import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.GoogleAuthProvider;
 import com.rukiasoft.androidapps.cocinaconroll.CocinaConRollApplication;
 import com.rukiasoft.androidapps.cocinaconroll.R;
 import com.rukiasoft.androidapps.cocinaconroll.gcm.QuickstartPreferences;
@@ -44,12 +50,9 @@ import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
 
-/**
- * Minimal activity demonstrating basic Google Sign-In.
- */
-public class ShowSigningActivity extends SigningDriveActivity {
+public class SignInActivity extends SignInActivityBase {
 
-    private static final String TAG = "ShowSigningActivity";
+    private static final String TAG = "SignInActivity";
 
     /* View to display current status (signed-in, signed-out, disconnected, etc) */
     @BindView(R.id.sign_in_status) TextView mStatus;
@@ -81,13 +84,6 @@ public class ShowSigningActivity extends SigningDriveActivity {
         signInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                /*// User clicked the sign-in button, so begin the sign-in process and automatically
-                // attempt to resolve any errors that occur.
-                mStatus.setText(R.string.signing_in);
-                // [START sign_in_clicked]
-                mShouldResolve = true;
-                getMyApplication().getGoogleApiClient().connect();
-                // [END sign_in_clicked]*/
                 v.setEnabled(false);
                 mProgressBar.setVisibility(View.VISIBLE);
                 signIn();
@@ -184,7 +180,8 @@ public class ShowSigningActivity extends SigningDriveActivity {
         }
     }
 
-    // [START onActivityResult]
+
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -192,12 +189,14 @@ public class ShowSigningActivity extends SigningDriveActivity {
         // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
         if (requestCode == RC_SIGN_IN) {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-            handleSignInResult(result);
-            if(result.isSuccess()){
-                finish();
+            if (result.isSuccess()) {
+                // Google Sign In was successful, authenticate with Firebase
+                GoogleSignInAccount account = result.getSignInAccount();
+                firebaseAuthWithGoogle(account);
+            } else {
+                // Google Sign In failed, update UI appropriately
+                // ...
             }
-            signInButton.setEnabled(true);
-            mProgressBar.setVisibility(View.GONE);
         }
     }
 
@@ -209,6 +208,7 @@ public class ShowSigningActivity extends SigningDriveActivity {
         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(getMyApplication().getGoogleApiClient());
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }
+
     // [END signIn]
 
     // [START signOut]
@@ -260,5 +260,28 @@ public class ShowSigningActivity extends SigningDriveActivity {
     }
     // [END on_connection_failed]
 
+
+    private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
+        Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());
+
+        AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
+        mAuth.signInWithCredential(credential)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        Log.d(TAG, "signInWithCredential:onComplete:" + task.isSuccessful());
+
+                        // If sign in fails, display a message to the user. If sign in succeeds
+                        // the auth state listener will be notified and logic to handle the
+                        // signed in user can be handled in the listener.
+                        if (!task.isSuccessful()) {
+                            Log.w(TAG, "signInWithCredential", task.getException());
+                            Toast.makeText(SignInActivity.this, "Authentication failed.",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                        // ...
+                    }
+                });
+    }
 
 }

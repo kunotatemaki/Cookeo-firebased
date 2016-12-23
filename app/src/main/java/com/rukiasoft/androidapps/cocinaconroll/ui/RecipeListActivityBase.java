@@ -5,7 +5,6 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.SearchManager;
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -14,10 +13,10 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -36,6 +35,8 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.rukiasoft.androidapps.cocinaconroll.R;
 import com.rukiasoft.androidapps.cocinaconroll.classes.RecipeItem;
 import com.rukiasoft.androidapps.cocinaconroll.classes.ZipItem;
@@ -57,16 +58,14 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
-public class RecipeListActivity extends SigningDriveActivity implements RecipeListFragment.TaskCallback{
+public class RecipeListActivityBase extends SignInActivityBase implements RecipeListFragment.TaskCallback{
 
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
-    private static final String TAG = LogHelper.makeLogTag(RecipeListActivity.class);
+    private static final String TAG = LogHelper.makeLogTag(RecipeListActivityBase.class);
     private static final int REQUEST_CODE_SETTINGS = 20;
     private static final int REQUEST_CODE_ANIMATION = 21;
-    private static final int REQUEST_CODE_DRIVE = 22;
-    private static final String KEY_DRIVE_RECIPES_CHECKED = Constants.PACKAGE_NAME + ".drive_recipes_checked";
+    private static final int REQUEST_CODE_SIGNING = 22;
     private static final String KEY_STARTED = Constants.PACKAGE_NAME + ".started";
-    //private static final String KEY_NEED_TO_SEND_RECIPES_TO_DRIVE = Constants.PACKAGE_NAME + ".need_to_send_recipes_to_drive";
 
 
     @BindView(R.id.drawer_layout)
@@ -85,8 +84,10 @@ public class RecipeListActivity extends SigningDriveActivity implements RecipeLi
     private boolean started = false;
     private boolean animate;
     private String lastFilter;
-    private boolean driveRecipesChecked = false;
-    DriveServiceReceiver driveServiceReceiver;
+
+
+
+
 
     private final DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
         @Override
@@ -106,32 +107,32 @@ public class RecipeListActivity extends SigningDriveActivity implements RecipeLi
         restartLoader();
     }
 
-    // Broadcast receiver for receiving status updates from the IntentService
-    private class DriveServiceReceiver extends BroadcastReceiver
-    {
 
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if(intent.getAction().equals(Constants.ACTION_BROADCAST_UPLOADED_RECIPE)){
-                if(intent.hasExtra(Constants.KEY_RECIPE)){
-                    RecipeItem recipeItem = intent.getParcelableExtra(Constants.KEY_RECIPE);
-                    DatabaseRelatedTools dbTools = new DatabaseRelatedTools();
-                    dbTools.updateStateById(getApplicationContext(), recipeItem.get_id(), recipeItem.getState());
-                }
-            }else if(intent.getAction().equals(Constants.ACTION_BROADCAST_DELETED_RECIPE)){
-                if(intent.hasExtra(Constants.KEY_RECIPE)){
-                    RecipeItem recipeItem = intent.getParcelableExtra(Constants.KEY_RECIPE);
-                    removeRecipeFromDiskAndDatabase(recipeItem);
-                }
-            }
-        }
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recipe_list);
         unbinder = ButterKnife.bind(this);
+
+        mAuth = FirebaseAuth.getInstance();
+
+        mAuthListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                if (user != null) {
+                    // User is signed in
+                    Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
+                } else {
+                    // User is signed out
+                    Intent intent = new Intent(RecipeListActivityBase.this, SignInActivity.class);
+                    startActivityForResult(intent, REQUEST_CODE_SIGNING);
+                }
+
+            }
+        };
+        // [END auth_state_listener]
 
         if(savedInstanceState != null){
             if(savedInstanceState.containsKey(KEY_STARTED)) {
@@ -140,9 +141,7 @@ public class RecipeListActivity extends SigningDriveActivity implements RecipeLi
             if(savedInstanceState.containsKey(Constants.KEY_TYPE)) {
                 lastFilter = savedInstanceState.getString(Constants.KEY_TYPE);
             }
-            if(savedInstanceState.containsKey(KEY_DRIVE_RECIPES_CHECKED)) {
-                driveRecipesChecked = savedInstanceState.getBoolean(KEY_DRIVE_RECIPES_CHECKED);
-            }
+
            // shownToAllowDrive = savedInstanceState.getBoolean(KEY_ALLOWED_DRIVE);
         }
 
@@ -157,7 +156,7 @@ public class RecipeListActivity extends SigningDriveActivity implements RecipeLi
         //start animation if needed
         if(!started){
             Intent animationIntent = new Intent(this, AnimationActivity.class);
-            //Intent animationIntent = new Intent(this, ShowSigningActivity.class);
+            //Intent animationIntent = new Intent(this, SignInActivity.class);
             startActivityForResult(animationIntent, REQUEST_CODE_ANIMATION);
         }
 
@@ -207,13 +206,7 @@ public class RecipeListActivity extends SigningDriveActivity implements RecipeLi
         mStatusIntentFilter.addAction(Constants.ACTION_BROADCAST_DELETED_RECIPE);
 
 
-        // Instantiates a new DownloadStateReceiver
-        driveServiceReceiver =
-                new DriveServiceReceiver();
-        // Registers the DownloadStateReceiver and its intent filters
-        LocalBroadcastManager.getInstance(this).registerReceiver(
-                driveServiceReceiver,
-                mStatusIntentFilter);
+
         if(savedInstanceState == null) {
             clearGarbage();
         }
@@ -224,14 +217,12 @@ public class RecipeListActivity extends SigningDriveActivity implements RecipeLi
     @Override
     public void onSaveInstanceState(Bundle bundle){
         bundle.putBoolean(KEY_STARTED, true);
-        bundle.putBoolean(KEY_DRIVE_RECIPES_CHECKED, driveRecipesChecked);
         bundle.putString(Constants.KEY_TYPE, lastFilter);
         super.onSaveInstanceState(bundle);
     }
 
     @Override
     public void onDestroy(){
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(driveServiceReceiver);
         super.onDestroy();
         unbinder.unbind();
     }
@@ -310,15 +301,15 @@ public class RecipeListActivity extends SigningDriveActivity implements RecipeLi
 
                 if(!tools.getBooleanFromPreferences(this, Constants.PROPERTY_AVOID_FIRST_CHECK_GOOGLE_ACCOUNT)) {
                     tools.savePreferences(this, Constants.PROPERTY_AVOID_FIRST_CHECK_GOOGLE_ACCOUNT, true);
-                    Intent intent = new Intent(this, ShowSigningActivity.class);
-                    startActivityForResult(intent, REQUEST_CODE_DRIVE);
+                    Intent intent = new Intent(this, SignInActivity.class);
+                    startActivityForResult(intent, REQUEST_CODE_SIGNING);
                 }else{
                     if(!tools.getBooleanFromPreferences(this, Constants.PROPERTY_INIT_DATABASE_WITH_EDITED_PATH)) {
                         askForPermissionAndLoadEditedRecipes();
                     }
                 }
                 break;
-            case REQUEST_CODE_DRIVE:
+            case REQUEST_CODE_SIGNING:
                 if(!tools.getBooleanFromPreferences(this, Constants.PROPERTY_INIT_DATABASE_WITH_EDITED_PATH)) {
                     askForPermissionAndLoadEditedRecipes();
                 }
@@ -344,7 +335,7 @@ public class RecipeListActivity extends SigningDriveActivity implements RecipeLi
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int id) {
                                         dialog.cancel();
-                                        ActivityCompat.requestPermissions(RecipeListActivity.this,
+                                        ActivityCompat.requestPermissions(RecipeListActivityBase.this,
                                                 new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
                                                 Constants.MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
                                     }
@@ -753,5 +744,7 @@ public class RecipeListActivity extends SigningDriveActivity implements RecipeLi
 
 
     }
+
+
 
 }

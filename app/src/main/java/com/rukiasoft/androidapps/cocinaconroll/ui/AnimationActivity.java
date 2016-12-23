@@ -246,12 +246,7 @@ public class AnimationActivity extends AppCompatActivity {
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        if(showSupportScreen()) {
-                            Intent supportIntent = new Intent(activity, SupportActivity.class);
-                            activity.startActivityForResult(supportIntent, REQUEST_CODE_SUPPORT);
-                        }else {
-                            finish();
-                        }
+                        finish();
                     }
                 }, 200);
             }
@@ -306,8 +301,5 @@ public class AnimationActivity extends AppCompatActivity {
         unbinder.unbind();
     }
 
-    private Boolean showSupportScreen(){
-        Tools mTools = new Tools();
-        return !mTools.getBooleanFromPreferences(this, Constants.PROPERTY_HIDE_SUPPORT_SCREEN);
-    }
+
 }

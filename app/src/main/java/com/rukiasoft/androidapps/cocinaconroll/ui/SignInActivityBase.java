@@ -10,9 +10,9 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.drive.Drive;
+import com.google.firebase.auth.FirebaseAuth;
 import com.rukiasoft.androidapps.cocinaconroll.CocinaConRollApplication;
-import com.rukiasoft.androidapps.cocinaconroll.classes.RecipeItem;
+import com.rukiasoft.androidapps.cocinaconroll.R;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.Constants;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.LogHelper;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.Tools;
@@ -20,10 +20,10 @@ import com.rukiasoft.androidapps.cocinaconroll.utilities.Tools;
 /**
  * Created by iRuler on 10/11/15.
  */
-public abstract class SigningDriveActivity extends ToolbarAndRefreshActivity implements /*GoogleApiClient.ConnectionCallbacks,*/
+public abstract class SignInActivityBase extends ToolbarAndRefreshActivity implements /*GoogleApiClient.ConnectionCallbacks,*/
         GoogleApiClient.OnConnectionFailedListener {
 
-    private static final String TAG = LogHelper.makeLogTag(SigningDriveActivity.class);
+    private static final String TAG = LogHelper.makeLogTag(SignInActivityBase.class);
     /* RequestCode for resolutions involving sign-in */
     protected static final int RC_SIGN_IN = 9001;
 
@@ -36,6 +36,10 @@ public abstract class SigningDriveActivity extends ToolbarAndRefreshActivity imp
 
     /* Should we automatically resolve ConnectionResults when possible? */
     protected boolean mShouldResolve = false;
+
+    //Firebase
+    protected FirebaseAuth mAuth;
+    protected FirebaseAuth.AuthStateListener mAuthListener;
 
 
     /**
@@ -76,19 +80,15 @@ public abstract class SigningDriveActivity extends ToolbarAndRefreshActivity imp
 
     protected void initializeConnection(){
         if (getMyApplication().getGoogleApiClient() == null) {
-            // Create the API client and bind it to an instance variable.
-            // We use this instance as the callback for connection and connection
-            // failures.
-            // Since no account name is passed, the user is prompted to choose.
+
             GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                    .requestIdToken(getString(R.string.default_web_client_id))
                     .requestEmail()
-                    .requestScopes(Drive.SCOPE_FILE, Drive.SCOPE_APPFOLDER)
                     .build();
 
             getMyApplication().setGoogleApiClient(new GoogleApiClient.Builder(this)
                     .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
                     .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-                    .addApi(Drive.API)
                     .build());
         }else{
             //getMyApplication().getGoogleApiClient().registerConnectionCallbacks(this);

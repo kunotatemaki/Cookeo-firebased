@@ -369,12 +369,12 @@ public class RecipeListFragment extends Fragment implements
             ReadWriteTools rwTools = new ReadWriteTools();
             rwTools.loadNewFilesAndInsertInDatabase(getActivity().getApplicationContext());
             mTools.savePreferences(getActivity(), Constants.PROPERTY_RELOAD_NEW_ORIGINALS, false);
-            ((RecipeListActivity)getActivity()).restartLoader();
+            ((RecipeListActivityBase)getActivity()).restartLoader();
             return;
         }
 
         setData();
-        ((RecipeListActivity)getActivity()).performClickInDrawerIfNecessary();
+        ((RecipeListActivityBase)getActivity()).performClickInDrawerIfNecessary();
 
         if(!mTools.getBooleanFromPreferences(getActivity(), Constants.PROPERTY_UPLOADED_RECIPES_ON_FIRST_BOOT)){
             for(RecipeItem recipe : mRecipes){
@@ -479,7 +479,7 @@ public class RecipeListFragment extends Fragment implements
     }
 
     private void launchActivityDetails(){
-        Intent intent = new Intent(getActivity(), RecipeDetailActivity.class);
+        Intent intent = new Intent(getActivity(), RecipeDetailActivityBase.class);
         Bundle bundle = new Bundle();
         bundle.putParcelable(Constants.KEY_RECIPE, recipeToShow);
         intent.putExtras(bundle);
@@ -583,8 +583,8 @@ public class RecipeListFragment extends Fragment implements
         int maxScroll = appBarLayout.getTotalScrollRange();
         float percentage = (float) Math.abs(offset) / (float) maxScroll;
         if(percentage > 0.5f){
-            if(getActivity() instanceof RecipeListActivity){
-                ((RecipeListActivity) getActivity()).closeSearchView();
+            if(getActivity() instanceof RecipeListActivityBase){
+                ((RecipeListActivityBase) getActivity()).closeSearchView();
             }
         }
     }

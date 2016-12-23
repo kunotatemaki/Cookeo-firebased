@@ -30,7 +30,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".ui.RecipeListActivity"
+            android:name=".ui.RecipeListActivityBase"
             android:label="@string/app_name"
             android:launchMode="singleTop"
             android:theme="@style/Theme.Recipe.List">
@@ -65,7 +65,7 @@
             android:launchMode="standard"
             android:theme="@style/SettingsTheme" />
         <activity
-            android:name=".ui.ShowSigningActivity"
+            android:name=".ui.SignInActivity"
             android:label="@string/app_name"
             android:launchMode="standard"
             android:theme="@style/Theme.Signing">
@@ -88,19 +88,19 @@
 
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ui.RecipeListActivity" />
+                android:value=".ui.RecipeListActivityBase" />
             <meta-data
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
         </activity>
         <activity
-            android:name=".ui.RecipeDetailActivity"
+            android:name=".ui.RecipeDetailActivityBase"
             android:label="@string/app_name"
             android:launchMode="standard"
             android:theme="@style/Theme.Recipe.Detail">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ui.RecipeListActivity" />
+                android:value=".ui.RecipeListActivityBase" />
         </activity>
 
         <receiver
@@ -197,10 +197,6 @@
             android:name="com.google.android.gms.analytics.globalConfigResource"
             android:resource="@xml/track_app" />
 
-        <activity
-            android:name=".ui.SupportActivity"
-            android:label="@string/app_name"
-            android:theme="@style/AppTheme"></activity>
     </application>
 
 </manifest>
