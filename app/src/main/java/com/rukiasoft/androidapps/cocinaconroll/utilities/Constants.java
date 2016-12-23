@@ -94,4 +94,7 @@ public class Constants {
     public static final int MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 11;
     public static final int MY_PERMISSIONS_REQUEST_CAMERA = 12;
     public static final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 13;
+
+    //request constants
+    public static final int REQUEST_CODE_ANIMATION = 21;
 }

@@ -369,12 +369,12 @@ public class RecipeListFragment extends Fragment implements
             ReadWriteTools rwTools = new ReadWriteTools();
             rwTools.loadNewFilesAndInsertInDatabase(getActivity().getApplicationContext());
             mTools.savePreferences(getActivity(), Constants.PROPERTY_RELOAD_NEW_ORIGINALS, false);
-            ((RecipeListActivityBase)getActivity()).restartLoader();
+            ((RecipeListActivity)getActivity()).restartLoader();
             return;
         }
 
         setData();
-        ((RecipeListActivityBase)getActivity()).performClickInDrawerIfNecessary();
+        ((RecipeListActivity)getActivity()).performClickInDrawerIfNecessary();
 
         if(!mTools.getBooleanFromPreferences(getActivity(), Constants.PROPERTY_UPLOADED_RECIPES_ON_FIRST_BOOT)){
             for(RecipeItem recipe : mRecipes){
@@ -583,8 +583,8 @@ public class RecipeListFragment extends Fragment implements
         int maxScroll = appBarLayout.getTotalScrollRange();
         float percentage = (float) Math.abs(offset) / (float) maxScroll;
         if(percentage > 0.5f){
-            if(getActivity() instanceof RecipeListActivityBase){
-                ((RecipeListActivityBase) getActivity()).closeSearchView();
+            if(getActivity() instanceof RecipeListActivity){
+                ((RecipeListActivity) getActivity()).closeSearchView();
             }
         }
     }

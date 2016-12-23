@@ -150,6 +150,6 @@
     <string name="read_external_explanation">You need to allow this permission in order to read your new or edited recipe from the device\'s storage</string>
     <string name="read_external_denied">You wont be able to load your created and edited recipes until this permission is allowed</string>
 
-    <string name="default_web_client_id" translatable="false">206065014775-hoi6l87v4u5o1dd42tlttmbceblskl03.apps.googleusercontent.com</string>
+    <string name="web_client_id" translatable="false">206065014775-hoi6l87v4u5o1dd42tlttmbceblskl03.apps.googleusercontent.com</string>
 
 </resources>

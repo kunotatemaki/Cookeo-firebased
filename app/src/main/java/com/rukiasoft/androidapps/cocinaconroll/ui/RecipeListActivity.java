@@ -58,14 +58,12 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
-public class RecipeListActivityBase extends SignInActivityBase implements RecipeListFragment.TaskCallback{
+public class RecipeListActivity extends SignInActivityBase implements RecipeListFragment.TaskCallback{
 
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
-    private static final String TAG = LogHelper.makeLogTag(RecipeListActivityBase.class);
+    private static final String TAG = LogHelper.makeLogTag(RecipeListActivity.class);
     private static final int REQUEST_CODE_SETTINGS = 20;
-    private static final int REQUEST_CODE_ANIMATION = 21;
     private static final int REQUEST_CODE_SIGNING = 22;
-    private static final String KEY_STARTED = Constants.PACKAGE_NAME + ".started";
 
 
     @BindView(R.id.drawer_layout)
@@ -81,12 +79,8 @@ public class RecipeListActivityBase extends SignInActivityBase implements Recipe
     private int magnifyingY;
     private int openCircleRevealX;
     private int openCircleRevealY;
-    private boolean started = false;
     private boolean animate;
     private String lastFilter;
-
-
-
 
 
     private final DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
@@ -126,7 +120,7 @@ public class RecipeListActivityBase extends SignInActivityBase implements Recipe
                     Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
                 } else {
                     // User is signed out
-                    Intent intent = new Intent(RecipeListActivityBase.this, SignInActivity.class);
+                    Intent intent = new Intent(RecipeListActivity.this, SignInActivity.class);
                     startActivityForResult(intent, REQUEST_CODE_SIGNING);
                 }
 
@@ -135,9 +129,6 @@ public class RecipeListActivityBase extends SignInActivityBase implements Recipe
         // [END auth_state_listener]
 
         if(savedInstanceState != null){
-            if(savedInstanceState.containsKey(KEY_STARTED)) {
-                started = savedInstanceState.getBoolean(KEY_STARTED);
-            }
             if(savedInstanceState.containsKey(Constants.KEY_TYPE)) {
                 lastFilter = savedInstanceState.getString(Constants.KEY_TYPE);
             }
@@ -152,14 +143,6 @@ public class RecipeListActivityBase extends SignInActivityBase implements Recipe
             mTools.savePreferences(this, QuickstartPreferences.SENT_TOKEN_TO_SERVER, false);
             mTools.savePreferences(this, Constants.PROPERTY_APP_VERSION_STORED, mTools.getAppVersion(getApplication()));
         }
-
-        //start animation if needed
-        if(!started){
-            Intent animationIntent = new Intent(this, AnimationActivity.class);
-            //Intent animationIntent = new Intent(this, SignInActivity.class);
-            startActivityForResult(animationIntent, REQUEST_CODE_ANIMATION);
-        }
-
 
         lastFilter = Constants.FILTER_ALL_RECIPES;
         if(getIntent() != null && getIntent().hasExtra(Constants.KEY_TYPE)){
@@ -216,7 +199,6 @@ public class RecipeListActivityBase extends SignInActivityBase implements Recipe
 
     @Override
     public void onSaveInstanceState(Bundle bundle){
-        bundle.putBoolean(KEY_STARTED, true);
         bundle.putString(Constants.KEY_TYPE, lastFilter);
         super.onSaveInstanceState(bundle);
     }
@@ -297,18 +279,6 @@ public class RecipeListActivityBase extends SignInActivityBase implements Recipe
                     connectToDrive(true);
                 }
                 break;
-            case REQUEST_CODE_ANIMATION:
-
-                if(!tools.getBooleanFromPreferences(this, Constants.PROPERTY_AVOID_FIRST_CHECK_GOOGLE_ACCOUNT)) {
-                    tools.savePreferences(this, Constants.PROPERTY_AVOID_FIRST_CHECK_GOOGLE_ACCOUNT, true);
-                    Intent intent = new Intent(this, SignInActivity.class);
-                    startActivityForResult(intent, REQUEST_CODE_SIGNING);
-                }else{
-                    if(!tools.getBooleanFromPreferences(this, Constants.PROPERTY_INIT_DATABASE_WITH_EDITED_PATH)) {
-                        askForPermissionAndLoadEditedRecipes();
-                    }
-                }
-                break;
             case REQUEST_CODE_SIGNING:
                 if(!tools.getBooleanFromPreferences(this, Constants.PROPERTY_INIT_DATABASE_WITH_EDITED_PATH)) {
                     askForPermissionAndLoadEditedRecipes();
@@ -335,7 +305,7 @@ public class RecipeListActivityBase extends SignInActivityBase implements Recipe
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int id) {
                                         dialog.cancel();
-                                        ActivityCompat.requestPermissions(RecipeListActivityBase.this,
+                                        ActivityCompat.requestPermissions(RecipeListActivity.this,
                                                 new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
                                                 Constants.MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
                                     }
@@ -745,6 +715,18 @@ public class RecipeListActivityBase extends SignInActivityBase implements Recipe
 
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mAuth.addAuthStateListener(mAuthListener);
+    }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (mAuthListener != null) {
+            mAuth.removeAuthStateListener(mAuthListener);
+        }
 
+    }
 }

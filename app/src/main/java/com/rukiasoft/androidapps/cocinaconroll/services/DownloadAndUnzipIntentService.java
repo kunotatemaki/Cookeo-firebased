@@ -16,7 +16,7 @@ import android.util.Log;
 import com.rukiasoft.androidapps.cocinaconroll.R;
 import com.rukiasoft.androidapps.cocinaconroll.classes.ZipItem;
 import com.rukiasoft.androidapps.cocinaconroll.database.DatabaseRelatedTools;
-import com.rukiasoft.androidapps.cocinaconroll.ui.RecipeListActivityBase;
+import com.rukiasoft.androidapps.cocinaconroll.ui.RecipeListActivity;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.Constants;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.LogHelper;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.ReadWriteTools;
@@ -177,7 +177,7 @@ public class DownloadAndUnzipIntentService extends IntentService {
         int stringId = getApplicationContext().getApplicationInfo().labelRes;
         String title = getApplicationContext().getString(stringId);
 
-        Intent notIntent = new Intent(this, RecipeListActivityBase.class);
+        Intent notIntent = new Intent(this, RecipeListActivity.class);
         notIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         notIntent.putExtra(Constants.KEY_TYPE, type);
 
