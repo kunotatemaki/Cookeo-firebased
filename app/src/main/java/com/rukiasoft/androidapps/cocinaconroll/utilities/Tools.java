@@ -16,8 +16,7 @@ import android.view.inputmethod.InputMethodManager;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.rukiasoft.androidapps.cocinaconroll.CocinaConRollApplication;
-import com.rukiasoft.androidapps.cocinaconroll.ui.ToolbarAndRefreshActivity;
+import com.rukiasoft.androidapps.cocinaconroll.ui.ToolbarAndProgressActivity;
 import com.rukiasoft.androidapps.cocinaconroll.wifi.WifiHandler;
 
 import org.acra.ACRA;
@@ -57,40 +56,6 @@ public class Tools {
             String vs = Context.VIBRATOR_SERVICE;
             Vibrator mVibrator = (Vibrator) context.getSystemService(vs);
             return mVibrator.hasVibrator();
-        }
-    }
-
-    /**
-     * set the refresh layout to be shown in the activity
-     * @param activity activity having refresh layout
-     * @param refreshLayout refresh layout
-     */
-    public void setRefreshLayout(Activity activity, SwipeRefreshLayout refreshLayout){
-        if(activity instanceof ToolbarAndRefreshActivity) {
-            ((ToolbarAndRefreshActivity) activity).setRefreshLayout(refreshLayout);
-            ((ToolbarAndRefreshActivity) activity).disableRefreshLayoutSwipe();
-        }
-    }
-
-
-
-    /**
-     * set the refresh layout to be shown in the activity
-     * @param activity activity having refresh layout
-     */
-    public void showRefreshLayout(Activity activity){
-        if(activity instanceof ToolbarAndRefreshActivity) {
-            ((ToolbarAndRefreshActivity) activity).showRefreshLayoutSwipeProgress();
-        }
-    }
-
-    /**
-    * set the refresh layout to be hidden in the activity
-    * @param activity activity having refresh layout
-    */
-    public void hideRefreshLayout(Activity activity){
-        if(activity instanceof ToolbarAndRefreshActivity) {
-            ((ToolbarAndRefreshActivity) activity).hideRefreshLayoutSwipeProgress();
         }
     }
 

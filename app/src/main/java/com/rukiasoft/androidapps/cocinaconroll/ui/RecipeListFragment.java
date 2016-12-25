@@ -191,13 +191,13 @@ public class RecipeListFragment extends Fragment implements
         unbinder = ButterKnife.bind(this, view);
 
         //Set the mToolbarRecipeListFragment
-        if(getActivity() instanceof ToolbarAndRefreshActivity){
-            ((ToolbarAndRefreshActivity) getActivity()).setToolbar(mToolbarRecipeListFragment);
+        if(getActivity() instanceof ToolbarAndProgressActivity){
+            ((ToolbarAndProgressActivity) getActivity()).setToolbar(mToolbarRecipeListFragment);
         }
 
         //Set the refresh layout
         Tools tools = new Tools();
-        tools.setRefreshLayout(getActivity(), refreshLayout);
+        //tools.setRefreshLayout(getActivity(), refreshLayout);
 
         savedScrollPosition = 0;
         if(savedInstanceState != null){
@@ -280,12 +280,12 @@ public class RecipeListFragment extends Fragment implements
     public void onResume(){
         super.onResume();
         Tools tools = new Tools();
-        if(getActivity() instanceof ToolbarAndRefreshActivity){
-            if(((ToolbarAndRefreshActivity) getActivity()).needToShowRefresh){
+        if(getActivity() instanceof ToolbarAndProgressActivity){
+            /*if(((ToolbarAndProgressActivity) getActivity()).needToShowRefresh){
                 tools.showRefreshLayout(getActivity());
             }else{
                 tools.hideRefreshLayout(getActivity());
-            }
+            }*/
         }
         Tools mTools = new Tools();
 
@@ -337,12 +337,12 @@ public class RecipeListFragment extends Fragment implements
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        if(getActivity() instanceof ToolbarAndRefreshActivity){
+        if(getActivity() instanceof ToolbarAndProgressActivity){
             if(isResumed()){
                 Tools tools = new Tools();
-                tools.showRefreshLayout(getActivity());
+                //tools.showRefreshLayout(getActivity());
             }else {
-                ((ToolbarAndRefreshActivity) getActivity()).needToShowRefresh = true;
+                //((ToolbarAndProgressActivity) getActivity()).needToShowRefresh = true;
             }
         }
         //return new RecipeListLoader(getActivity().getApplicationContext());
@@ -395,17 +395,17 @@ public class RecipeListFragment extends Fragment implements
         if(mRecyclerView != null) {
             mRecyclerView.setAdapter(null);
             Tools tools = new Tools();
-            tools.hideRefreshLayout(getActivity());
+            //tools.hideRefreshLayout(getActivity());
         }
     }
 
     private void setData(){
         initDatabaseText.setVisibility(View.GONE);
         //orderRecipesByName();
-        ((ToolbarAndRefreshActivity) getActivity()).needToShowRefresh = false;
+        //((ToolbarAndProgressActivity) getActivity()).needToShowRefresh = false;
         if(isResumed()) {
             Tools tools = new Tools();
-            tools.hideRefreshLayout(getActivity());
+            //tools.hideRefreshLayout(getActivity());
         }
 
         RecipeListRecyclerViewAdapter adapter = new RecipeListRecyclerViewAdapter(getActivity(), mRecipes);

@@ -258,7 +258,6 @@ public class EditRecipePhotoFragment extends Fragment {
             type = getResources().getString(R.string.desserts);
         spinner1.setSelection(dataAdapter.getPosition(type));
 
-        mTools.hideRefreshLayout(getActivity());
         return view;
     }
 

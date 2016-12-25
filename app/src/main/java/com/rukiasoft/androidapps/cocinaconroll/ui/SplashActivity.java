@@ -11,7 +11,8 @@ public class SplashActivity extends AppCompatActivity {
 
     private boolean started = false;
     private static final String KEY_STARTED = Constants.PACKAGE_NAME + ".started";
-
+    //request constants
+    private static final int REQUEST_CODE_ANIMATION = 21;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,7 +35,7 @@ public class SplashActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
-            case Constants.REQUEST_CODE_ANIMATION:
+            case REQUEST_CODE_ANIMATION:
                 launchMainScreen();
                 break;
             default:
@@ -55,6 +56,6 @@ public class SplashActivity extends AppCompatActivity {
 
     private void launchAnimation(){
         Intent animationIntent = new Intent(this, AnimationActivity.class);
-        startActivityForResult(animationIntent, Constants.REQUEST_CODE_ANIMATION);
+        startActivityForResult(animationIntent, REQUEST_CODE_ANIMATION);
     }
 }

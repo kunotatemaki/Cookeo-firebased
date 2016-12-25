@@ -24,7 +24,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
-public class SearchableActivity extends ToolbarAndRefreshActivity implements LoaderCallbacks<Cursor> {
+public class SearchableActivity extends ToolbarAndProgressActivity implements LoaderCallbacks<Cursor> {
 	
 	private ListView mLVRecipes;
 	private SimpleCursorAdapter mCursorAdapter;

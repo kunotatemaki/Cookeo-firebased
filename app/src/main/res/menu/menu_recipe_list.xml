@@ -12,8 +12,19 @@
     <item android:id="@+id/action_settings" android:title="@string/action_settings"
         android:orderInCategory="100" app:showAsAction="never" />
     <item
-        android:id="@+id/menu_thanks"
-        android:title="@string/thanks"
+        android:id="@+id/menu_sign_in"
+        android:title="@string/sign_in"
+        android:orderInCategory="101"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/menu_sign_out"
+        android:title="@string/sign_out"
         android:orderInCategory="102"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/menu_thanks"
+        android:title="@string/thanks"
+        android:orderInCategory="103"
+        app:showAsAction="never" />
+
 </menu>

@@ -96,7 +96,7 @@
     <string name="signed_in_fmt">Conectado como: %s</string>
     <string name="signing_in">Conectando…</string>
     <string name="signed_out">No conectado</string>
-    <string name="signed_in_err">"Error al intentar conectar"</string>
+    <string name="signed_in_err">"Error al iniciar sesión"</string>
     <string name="error_null_person">
         Error: Plus.PeopleApi.getCurrentPerson returned null. Ensure that the Google+ API is
         enabled for your project, you have a properly configured google-services.json file
@@ -114,7 +114,7 @@
     <string name="title_signing">Almacena tus recetas\nen la nube</string>
     <string name="exit">Salir</string>
     <string name="loading">Cargando…</string>
-    <string name="sign_out">Desconectar cuenta</string>
+    <string name="sign_out">Cerrar sesión</string>
     <string name="body_signing">Identificate con tu cuenta de Gmail y mantén tus recetas sincronizadas en la nube.\n¡Todas tus creaciones estarán disponibles en todos tus dispositivos!</string>
     <string name="anonymous">anónimo</string>
     <string name="camera_explanation">Este permiso es necesario para poder usar la cámara de tu dispositivo para adjuntar una foto de tu receta</string>
@@ -125,5 +125,6 @@
     <string name="write_external_denied">No podrás usar esta opción hasta que aceptes el permiso de escritura en la memoria del dispositivo</string>
     <string name="write_external_explanation">Necesitas aceptar este permiso para poder almacenar en tu dispositivo las recetas que hayas creado o editado</string>
     <string name="close">Cerrar</string>
+    <string name="sign_in">Iniciar sesión</string>
 
 </resources>

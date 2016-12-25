@@ -62,21 +62,8 @@ public class CocinaConRollApplication  extends MultiDexApplication {
         return tracker;
     }
 
-    /**
-     * Google API client.
-     */
-    private GoogleApiClient mGoogleApiClient;
 
-    /**
-     * Getter for the {@code GoogleApiClient}.
-     */
-    public GoogleApiClient getGoogleApiClient() {
-        return mGoogleApiClient;
-    }
 
-    public void setGoogleApiClient(GoogleApiClient googleApiClient) {
-        mGoogleApiClient = googleApiClient;
-    }
 
     public static RefWatcher getRefWatcher(Context context) {
         CocinaConRollApplication application = (CocinaConRollApplication) context.getApplicationContext();
@@ -89,7 +76,7 @@ public class CocinaConRollApplication  extends MultiDexApplication {
     public void onCreate() {
         super.onCreate();
         analytics = GoogleAnalytics.getInstance(this);
-        ACRA.init(this);
+        //ACRA.init(this);
         refWatcher = LeakCanary.install(this);
 
         //analytics.getLogger().setLogLevel(Logger.LogLevel.VERBOSE);
@@ -126,20 +113,5 @@ public class CocinaConRollApplication  extends MultiDexApplication {
         //}
     }
 
-    int nActivityConnected = 0;
-    public void addActivity(){
-        nActivityConnected++;
-    }
-    public void popActivity(){
-        nActivityConnected--;
-        if(nActivityConnected < 0){
-            nActivityConnected = 0;
-        }
-        if(nActivityConnected == 0){
-            if(mGoogleApiClient != null /*&& mGoogleApiClient.isConnected()*/){
-                mGoogleApiClient.disconnect();
-            }
-        }
-    }
 
 }

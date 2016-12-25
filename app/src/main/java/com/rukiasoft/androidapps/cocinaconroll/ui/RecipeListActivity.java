@@ -58,7 +58,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
-public class RecipeListActivity extends SignInActivityBase implements RecipeListFragment.TaskCallback{
+public class RecipeListActivity extends FirebaseAuthBase implements RecipeListFragment.TaskCallback{
 
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     private static final String TAG = LogHelper.makeLogTag(RecipeListActivity.class);
@@ -75,12 +75,17 @@ public class RecipeListActivity extends SignInActivityBase implements RecipeList
     private Unbinder unbinder;
 
     private MenuItem searchMenuItem;
+    private boolean showMenuSignOut = false;
     private int magnifyingX;
     private int magnifyingY;
     private int openCircleRevealX;
     private int openCircleRevealY;
     private boolean animate;
     private String lastFilter;
+
+    private FirebaseAuth mAuth;
+    private FirebaseAuth.AuthStateListener mAuthListener;
+
 
 
     private final DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
@@ -109,19 +114,22 @@ public class RecipeListActivity extends SignInActivityBase implements RecipeList
         setContentView(R.layout.activity_recipe_list);
         unbinder = ButterKnife.bind(this);
 
-        mAuth = FirebaseAuth.getInstance();
+        final Tools mTools = new Tools();
 
+        mAuth = FirebaseAuth.getInstance();
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {
                     // User is signed in
-                    Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
+                    showMenuSignOut = true;
                 } else {
                     // User is signed out
-                    Intent intent = new Intent(RecipeListActivity.this, SignInActivity.class);
-                    startActivityForResult(intent, REQUEST_CODE_SIGNING);
+                    showMenuSignOut = false;
+                    if(!mTools.getBooleanFromPreferences(getApplicationContext(), Constants.PROPERTY_AVOID_GOOGLE_SIGN_IN)){
+                        launchSignInActivity();
+                    }
                 }
 
             }
@@ -132,11 +140,13 @@ public class RecipeListActivity extends SignInActivityBase implements RecipeList
             if(savedInstanceState.containsKey(Constants.KEY_TYPE)) {
                 lastFilter = savedInstanceState.getString(Constants.KEY_TYPE);
             }
+            if(savedInstanceState.containsKey(Constants.KEY_SIGN_OUT)) {
+                showMenuSignOut = savedInstanceState.getBoolean(Constants.KEY_SIGN_OUT);
+            }
 
            // shownToAllowDrive = savedInstanceState.getBoolean(KEY_ALLOWED_DRIVE);
         }
 
-        Tools mTools = new Tools();
 
         if(mTools.getAppVersion(getApplication()) > mTools.getIntegerFromPreferences(this, Constants.PROPERTY_APP_VERSION_STORED)){
             //first instalation, or recently updated app
@@ -200,6 +210,7 @@ public class RecipeListActivity extends SignInActivityBase implements RecipeList
     @Override
     public void onSaveInstanceState(Bundle bundle){
         bundle.putString(Constants.KEY_TYPE, lastFilter);
+        bundle.putBoolean(Constants.KEY_SIGN_OUT, showMenuSignOut);
         super.onSaveInstanceState(bundle);
     }
 
@@ -273,12 +284,12 @@ public class RecipeListActivity extends SignInActivityBase implements RecipeList
                     }
                 }
                 break;
-            case REQUEST_CODE_RESOLUTION:
+            /*case REQUEST_CODE_RESOLUTION:
                 // Called after a file is saved to Drive.
                 if (resultCode == RESULT_OK) {
                     connectToDrive(true);
                 }
-                break;
+                break;*/
             case REQUEST_CODE_SIGNING:
                 if(!tools.getBooleanFromPreferences(this, Constants.PROPERTY_INIT_DATABASE_WITH_EDITED_PATH)) {
                     askForPermissionAndLoadEditedRecipes();
@@ -453,6 +464,12 @@ public class RecipeListActivity extends SignInActivityBase implements RecipeList
             case R.id.menu_thanks:
                 finalIntent = new Intent(this, ThanksActivity.class);
                 startActivity(finalIntent);
+                return true;
+            case R.id.menu_sign_in:
+                launchSignInActivity();
+                return true;
+            case R.id.menu_sign_out:
+                revokeAccess();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -722,11 +739,30 @@ public class RecipeListActivity extends SignInActivityBase implements RecipeList
     }
 
     @Override
-    protected void onStop() {
+    public void onStop() {
         super.onStop();
         if (mAuthListener != null) {
             mAuth.removeAuthStateListener(mAuthListener);
         }
 
     }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        if(showMenuSignOut){
+            menu.findItem(R.id.menu_sign_out).setVisible(true);
+            menu.findItem(R.id.menu_sign_in).setVisible(false);
+        }else{
+            menu.findItem(R.id.menu_sign_in).setVisible(true);
+            menu.findItem(R.id.menu_sign_out).setVisible(false);
+        }
+        return true;
+    }
+
+    private void launchSignInActivity(){
+        Intent intent = new Intent(RecipeListActivity.this, SignInActivity.class);
+        startActivityForResult(intent, REQUEST_CODE_SIGNING);
+    }
+
+
 }

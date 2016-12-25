@@ -120,7 +120,7 @@
     <string name="signed_in_fmt">Signed in as: %s</string>
     <string name="signing_in">Signing in…</string>
     <string name="signed_out">Signed out</string>
-    <string name="signed_in_err">"Error: please check logs."</string>
+    <string name="signed_in_err">"Authentication failed."</string>
     <string name="error_null_person">
         Error: Plus.PeopleApi.getCurrentPerson returned null. Ensure that the Google+ API is
         enabled for your project, you have a properly configured google-services.json file
@@ -139,7 +139,7 @@
     <string name="title_signing">Backup your recipe\nin your Drive Account</string>
     <string name="body_signing">Sign in  with your Gmail account and get a Google Drive sincronization.\nAll your recipes will be available in all your devices!</string>
     <string name="exit">Exit</string>
-    <string name="sign_out">Disconnect account</string>
+    <string name="sign_out">Close session</string>
     <string name="loading">Loading…</string>
     <string name="anonymous">anonymous</string>
     <string name="write_external_explanation">You need to allow this permission in order to save your new or edited recipe in the device\'s storage</string>
@@ -150,6 +150,7 @@
     <string name="read_external_explanation">You need to allow this permission in order to read your new or edited recipe from the device\'s storage</string>
     <string name="read_external_denied">You wont be able to load your created and edited recipes until this permission is allowed</string>
 
-    <string name="web_client_id" translatable="false">206065014775-hoi6l87v4u5o1dd42tlttmbceblskl03.apps.googleusercontent.com</string>
+    <string name="web_client_id" translatable="false">962580870211-67gs2sopg9l6v1bc36ed19rdc1dlj407.apps.googleusercontent.com</string>
+    <string name="sign_in">Sign in</string>
 
 </resources>
