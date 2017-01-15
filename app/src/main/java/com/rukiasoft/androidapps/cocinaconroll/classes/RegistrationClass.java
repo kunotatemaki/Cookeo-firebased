@@ -5,7 +5,7 @@ import android.provider.Settings;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-import com.rukiasoft.androidapps.cocinaconroll.utilities.Constants;
+import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -29,7 +29,7 @@ public class RegistrationClass {
 
     public RegistrationClass(Context context){
         Calendar c = Calendar.getInstance();
-        SimpleDateFormat df = new SimpleDateFormat(Constants.FORMAT_DATE_TIME,
+        SimpleDateFormat df = new SimpleDateFormat(RecetasCookeoConstants.FORMAT_DATE_TIME,
                 context.getResources().getConfiguration().locale);
         date = df.format(c.getTime());
 

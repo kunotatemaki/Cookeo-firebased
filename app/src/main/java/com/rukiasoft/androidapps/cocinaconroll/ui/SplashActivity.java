@@ -4,13 +4,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
-import com.rukiasoft.androidapps.cocinaconroll.utilities.Constants;
+import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 
 
 public class SplashActivity extends AppCompatActivity {
 
     private boolean started = false;
-    private static final String KEY_STARTED = Constants.PACKAGE_NAME + ".started";
+    private static final String KEY_STARTED = RecetasCookeoConstants.PACKAGE_NAME + ".started";
     //request constants
     private static final int REQUEST_CODE_ANIMATION = 21;
 

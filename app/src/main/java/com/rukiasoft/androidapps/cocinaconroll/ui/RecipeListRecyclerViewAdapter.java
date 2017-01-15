@@ -38,7 +38,7 @@ import android.widget.TextView;
 
 import com.rukiasoft.androidapps.cocinaconroll.classes.LikeButtonView;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.CommonRecipeOperations;
-import com.rukiasoft.androidapps.cocinaconroll.utilities.Constants;
+import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 import com.rukiasoft.androidapps.cocinaconroll.R;
 import com.rukiasoft.androidapps.cocinaconroll.database.DatabaseRelatedTools;
 import com.rukiasoft.androidapps.cocinaconroll.classes.RecipeItem;
@@ -296,7 +296,7 @@ public class RecipeListRecyclerViewAdapter extends RecyclerView.Adapter<RecipeLi
             }else{
                 favoriteIcon.setVisibility(View.GONE);
             }
-            if((item.getState() & (Constants.FLAG_OWN | Constants.FLAG_EDITED)) !=0){
+            if((item.getState() & (RecetasCookeoConstants.FLAG_OWN | RecetasCookeoConstants.FLAG_EDITED)) !=0){
                 visibilityProtection = View.VISIBLE;
                 ownRecipeIcon.setVisibility(View.VISIBLE);
             }else{
@@ -311,13 +311,13 @@ public class RecipeListRecyclerViewAdapter extends RecyclerView.Adapter<RecipeLi
             backgroundProtection.setVisibility(visibilityProtection);
 
             switch (item.getType()) {
-                case Constants.TYPE_DESSERTS:
+                case RecetasCookeoConstants.TYPE_DESSERTS:
                     typeIcon.setImageDrawable(ContextCompat.getDrawable(context, (R.drawable.ic_dessert_18)));
                     break;
-                case Constants.TYPE_MAIN:
+                case RecetasCookeoConstants.TYPE_MAIN:
                     typeIcon.setImageDrawable(ContextCompat.getDrawable(context, (R.drawable.ic_main_18)));
                     break;
-                case Constants.TYPE_STARTERS:
+                case RecetasCookeoConstants.TYPE_STARTERS:
                     typeIcon.setImageDrawable(ContextCompat.getDrawable(context, (R.drawable.ic_starters_18)));
                     break;
             }

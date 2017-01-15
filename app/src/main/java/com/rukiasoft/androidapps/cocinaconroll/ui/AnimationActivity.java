@@ -16,8 +16,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.rukiasoft.androidapps.cocinaconroll.R;
-import com.rukiasoft.androidapps.cocinaconroll.utilities.Constants;
-import com.rukiasoft.androidapps.cocinaconroll.utilities.Tools;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;

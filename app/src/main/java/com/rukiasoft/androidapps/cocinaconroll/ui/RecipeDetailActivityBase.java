@@ -12,7 +12,7 @@ import com.google.android.gms.ads.AdView;
 import com.rukiasoft.androidapps.cocinaconroll.R;
 import com.rukiasoft.androidapps.cocinaconroll.classes.RecipeItem;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.CommonRecipeOperations;
-import com.rukiasoft.androidapps.cocinaconroll.utilities.Constants;
+import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.Tools;
 
 import butterknife.BindView;
@@ -34,8 +34,8 @@ public class RecipeDetailActivityBase extends ToolbarAndProgressActivity {
         unbinder = ButterKnife.bind(this);
         RecipeItem recipeItem = new RecipeItem();
         Intent intent = getIntent();
-        if(intent != null && intent.hasExtra(Constants.KEY_RECIPE))
-            recipeItem = getIntent().getExtras().getParcelable(Constants.KEY_RECIPE);
+        if(intent != null && intent.hasExtra(RecetasCookeoConstants.KEY_RECIPE))
+            recipeItem = getIntent().getExtras().getParcelable(RecetasCookeoConstants.KEY_RECIPE);
         else{
             finish();
         }
@@ -99,25 +99,25 @@ public class RecipeDetailActivityBase extends ToolbarAndProgressActivity {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent intentData) {
-        if(requestCode == Constants.REQUEST_EDIT_RECIPE){
-            if(resultCode == Constants.RESULT_UPDATE_RECIPE && intentData != null && intentData.hasExtra(Constants.KEY_RECIPE)){
-                RecipeItem recipe = intentData.getParcelableExtra(Constants.KEY_RECIPE);
+        if(requestCode == RecetasCookeoConstants.REQUEST_EDIT_RECIPE){
+            if(resultCode == RecetasCookeoConstants.RESULT_UPDATE_RECIPE && intentData != null && intentData.hasExtra(RecetasCookeoConstants.KEY_RECIPE)){
+                RecipeItem recipe = intentData.getParcelableExtra(RecetasCookeoConstants.KEY_RECIPE);
                 RecipeDetailsFragment recipeDetailsFragment = (RecipeDetailsFragment) getSupportFragmentManager().findFragmentById(R.id.details_recipes_fragment);
                 if(recipeDetailsFragment != null)
                     recipeDetailsFragment.updateRecipe(recipe);
                 //save recipe
                 CommonRecipeOperations commonRecipeOperations = new CommonRecipeOperations(this, recipe);
                 String oldPicture = "";
-                if(intentData.hasExtra(Constants.KEY_DELETE_OLD_PICTURE)){
-                    oldPicture = intentData.getStringExtra(Constants.KEY_DELETE_OLD_PICTURE);
+                if(intentData.hasExtra(RecetasCookeoConstants.KEY_DELETE_OLD_PICTURE)){
+                    oldPicture = intentData.getStringExtra(RecetasCookeoConstants.KEY_DELETE_OLD_PICTURE);
                 }
                 commonRecipeOperations.updateRecipe(oldPicture);
                 //set results
                 Intent returnIntent = new Intent();
                 Bundle bundle = new Bundle();
-                bundle.putParcelable(Constants.KEY_RECIPE, recipe);
+                bundle.putParcelable(RecetasCookeoConstants.KEY_RECIPE, recipe);
                 returnIntent.putExtras(bundle);
-                setResult(Constants.RESULT_UPDATE_RECIPE, returnIntent);
+                setResult(RecetasCookeoConstants.RESULT_UPDATE_RECIPE, returnIntent);
             }
         }
     }
@@ -126,7 +126,7 @@ public class RecipeDetailActivityBase extends ToolbarAndProgressActivity {
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[], int[] grantResults) {
         switch (requestCode) {
-            case Constants.MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE: {
+            case RecetasCookeoConstants.MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE: {
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     RecipeDetailsFragment mRecipeDetailsFragment = (RecipeDetailsFragment) getSupportFragmentManager().

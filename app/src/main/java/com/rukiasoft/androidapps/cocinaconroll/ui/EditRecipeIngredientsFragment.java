@@ -21,7 +21,7 @@ import com.rukiasoft.androidapps.cocinaconroll.R;
 import com.rukiasoft.androidapps.cocinaconroll.dragandswipehelper.OnStartDragListener;
 import com.rukiasoft.androidapps.cocinaconroll.dragandswipehelper.SimpleItemTouchHelperCallback;
 import com.rukiasoft.androidapps.cocinaconroll.classes.RecipeItem;
-import com.rukiasoft.androidapps.cocinaconroll.utilities.Constants;
+import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.Tools;
 import com.squareup.leakcanary.RefWatcher;
 
@@ -32,7 +32,7 @@ import butterknife.Unbinder;
 
 public class EditRecipeIngredientsFragment extends Fragment implements OnStartDragListener {
 
-    private static final String KEY_ITEM_TO_ADD = Constants.PACKAGE_NAME + ".itemtoadd";
+    private static final String KEY_ITEM_TO_ADD = RecetasCookeoConstants.PACKAGE_NAME + ".itemtoadd";
     private RecipeItem recipeItem;
     //private static final String TAG = "EditRecipeIngredientsFragment";
     private Boolean showSwipe = true;
@@ -157,12 +157,12 @@ public class EditRecipeIngredientsFragment extends Fragment implements OnStartDr
 
     private Boolean showSwipeDialog(){
         Tools mTools = new Tools();
-        return !mTools.getBooleanFromPreferences(getActivity(), Constants.PROPERTY_HIDE_SWIPE_DIALOG);
+        return !mTools.getBooleanFromPreferences(getActivity(), RecetasCookeoConstants.PROPERTY_HIDE_SWIPE_DIALOG);
     }
 
     private void hideSwipeDialog(Boolean state){
         Tools mTools = new Tools();
-        mTools.savePreferences(getActivity(), Constants.PROPERTY_HIDE_SWIPE_DIALOG, state);
+        mTools.savePreferences(getActivity(), RecetasCookeoConstants.PROPERTY_HIDE_SWIPE_DIALOG, state);
     }
 }
 

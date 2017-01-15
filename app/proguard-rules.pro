@@ -323,21 +323,29 @@
 -keep interface android.support.design.** { *; }
 -keep public class android.support.design.R$* { *; }
 
-#ACRA specifics
-# Restore some Source file names and restore approximate line numbers in the stack traces,
-# otherwise the stack traces are pretty useless
--keepattributes SourceFile,LineNumberTable
-
-# ACRA needs "annotations" so add this...
-# Note: This may already be defined in the default "proguard-android-optimize.txt"
-# file in the SDK. If it is, then you don't need to duplicate it. See your
-# "project.properties" file to get the path to the default "proguard-android-optimize.txt".
--keepattributes *Annotation*
-
-# Keep all the ACRA classes
--keep class org.acra.** { *; }
 
 # Don't warn about removed methods from AppCompat
 -dontwarn android.support.v4.app.NotificationCompat*
 
 -dontskipnonpubliclibraryclassmembers
+
+
+#ICEPICK libary
+-dontwarn icepick.**
+-keep class icepick.** { *; }
+-keep class **$$Icepick { *; }
+-keepclasseswithmembernames class * {
+    @icepick.* <fields>;
+}
+-keepnames class * { @icepick.State *;}
+
+#FIREBASE DATABASE
+# Add this global rule
+-keepattributes Signature
+
+# This rule will properly ProGuard all the model classes in
+# the package com.yourcompany.models. Modify to fit the structure
+# of your app.
+-keepclassmembers class com.rukiasoft.androidapps.cocinaconroll.entitiesdao.** {
+  *;
+}

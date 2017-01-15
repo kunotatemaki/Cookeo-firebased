@@ -26,7 +26,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.SignInButton;
 import com.rukiasoft.androidapps.cocinaconroll.R;
-import com.rukiasoft.androidapps.cocinaconroll.utilities.Constants;
+import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.Tools;
 
 import butterknife.BindView;
@@ -61,7 +61,7 @@ public class SignInActivity extends FirebaseAuthBase{
             @Override
             public void onClick(View v) {
                 Tools mTools = new Tools();
-                mTools.savePreferences(SignInActivity.this, Constants.PROPERTY_AVOID_GOOGLE_SIGN_IN, true);
+                mTools.savePreferences(SignInActivity.this, RecetasCookeoConstants.PROPERTY_AVOID_GOOGLE_SIGN_IN, true);
                 finish();
             }
         });

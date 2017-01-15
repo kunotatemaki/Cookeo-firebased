@@ -3,34 +3,23 @@ package com.rukiasoft.androidapps.cocinaconroll;
 
 
 import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
 import android.support.multidex.MultiDex;
 import android.support.multidex.MultiDexApplication;
 
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
-import com.google.android.gms.common.api.GoogleApiClient;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.greendao.DaoMaster;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.greendao.DaoSession;
 import com.squareup.leakcanary.LeakCanary;
 import com.squareup.leakcanary.RefWatcher;
-
-import org.acra.ACRA;
-import org.acra.ReportingInteractionMode;
-import org.acra.annotation.ReportsCrashes;
 
 
 /**
  * Created by Ruler on 2015.
  *
  */
-@ReportsCrashes(
-        reportType = org.acra.sender.HttpSender.Type.JSON,
-        httpMethod = org.acra.sender.HttpSender.Method.PUT,
-        formUri = BuildConfig.RASPBERRY_IP + BuildConfig.ACRA_ENDPOINT,
-        formUriBasicAuthLogin = BuildConfig.ACRA_LOGIN_KEY,
-        formUriBasicAuthPassword = BuildConfig.ACRA_PASSWORD_KEY,
-        mode = ReportingInteractionMode.TOAST,
-        forceCloseDialogAfterToast = true, // optional, default false
-        resToastText = R.string.crash_toast_text
-)
+
 public class CocinaConRollApplication  extends MultiDexApplication {
     /**
      * The Analytics singleton. The field is set in onCreate method override when the application
@@ -43,6 +32,8 @@ public class CocinaConRollApplication  extends MultiDexApplication {
      * initially created.
      */
     private Tracker tracker;
+    private DaoSession daoSession;
+
 
     /**
      * Access to the global Analytics singleton. If this method returns null you forgot to either
@@ -103,6 +94,11 @@ public class CocinaConRollApplication  extends MultiDexApplication {
 
 // Make myHandler the new default uncaught exception handler.
         Thread.setDefaultUncaughtExceptionHandler(myHandler);*/
+
+        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(this, "lepetitcuquichef.db", null);
+        SQLiteDatabase db = helper.getWritableDatabase();
+        DaoMaster daoMaster = new DaoMaster(db);
+        daoSession = daoMaster.newSession();
     }
 
     @Override
@@ -113,5 +109,7 @@ public class CocinaConRollApplication  extends MultiDexApplication {
         //}
     }
 
-
+    public DaoSession getDaoSession() {
+        return daoSession;
+    }
 }

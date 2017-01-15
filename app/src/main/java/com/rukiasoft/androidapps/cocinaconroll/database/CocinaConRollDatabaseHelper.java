@@ -22,7 +22,7 @@ public class CocinaConRollDatabaseHelper extends SQLiteOpenHelper {
         this.myContext = context;
     }
 
-    // Method is called during creation of the database
+    // Method is called during creation     of the database
     @Override
     public void onCreate(SQLiteDatabase database) {
         //delete database from previous version

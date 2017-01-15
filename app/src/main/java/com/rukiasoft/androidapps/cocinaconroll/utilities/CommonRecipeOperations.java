@@ -33,16 +33,16 @@ public class CommonRecipeOperations {
         if(activity == null)    return;
         Intent intent = new Intent(activity, EditRecipeActivity.class);
         Bundle bundle = new Bundle();
-        bundle.putParcelable(Constants.KEY_RECIPE, recipe);
+        bundle.putParcelable(RecetasCookeoConstants.KEY_RECIPE, recipe);
         intent.putExtras(bundle);
-        activity.startActivityForResult(intent, Constants.REQUEST_EDIT_RECIPE);
+        activity.startActivityForResult(intent, RecetasCookeoConstants.REQUEST_EDIT_RECIPE);
     }
 
 
     public void updateRecipe(String deleteOldPicture){
         if(activity == null)    return;
-        if(recipe.getPicture().equals(Constants.DEFAULT_PICTURE_NAME))
-            recipe.setPathPicture(Constants.DEFAULT_PICTURE_NAME);
+        if(recipe.getPicture().equals(RecetasCookeoConstants.DEFAULT_PICTURE_NAME))
+            recipe.setPathPicture(RecetasCookeoConstants.DEFAULT_PICTURE_NAME);
         ReadWriteTools rwTools = new ReadWriteTools();
         String path = rwTools.saveRecipeOnEditedPath(activity.getApplicationContext(), recipe);
         recipe.setPathRecipe(path);

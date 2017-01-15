@@ -55,7 +55,7 @@ import com.rukiasoft.androidapps.cocinaconroll.R;
 import com.rukiasoft.androidapps.cocinaconroll.classes.RecipeItem;
 import com.rukiasoft.androidapps.cocinaconroll.database.DatabaseRelatedTools;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.CommonRecipeOperations;
-import com.rukiasoft.androidapps.cocinaconroll.utilities.Constants;
+import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.ReadWriteTools;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.Tools;
 import com.squareup.leakcanary.RefWatcher;
@@ -70,8 +70,8 @@ public class RecipeDetailsFragment extends Fragment implements
     //private static final String TAG = LogHelper.makeLogTag(RecipeDetailsFragment.class);
     private static final float PERCENTAGE_TO_ELLIPSIZE_TITLE  = 0.1f;
 
-    private static final String KEY_SAVE_RECIPE = Constants.PACKAGE_NAME + "." + RecipeDetailsFragment.class.getSimpleName() + ".saverecipe";
-    private static final String KEY_ANIMATED = Constants.PACKAGE_NAME + "." + RecipeDetailsFragment.class.getSimpleName() + ".animate";
+    private static final String KEY_SAVE_RECIPE = RecetasCookeoConstants.PACKAGE_NAME + "." + RecipeDetailsFragment.class.getSimpleName() + ".saverecipe";
+    private static final String KEY_ANIMATED = RecetasCookeoConstants.PACKAGE_NAME + "." + RecipeDetailsFragment.class.getSimpleName() + ".animate";
 
 
     @BindView(R.id.recipe_details_icon_minutes) ImageView iconMinutes;
@@ -166,8 +166,8 @@ public class RecipeDetailsFragment extends Fragment implements
             switch (which){
                 case DialogInterface.BUTTON_POSITIVE:
                     Intent resultIntent = new Intent();
-                    resultIntent.putExtra(Constants.KEY_RECIPE, recipe);
-                    getActivity().setResult(Constants.RESULT_DELETE_RECIPE, resultIntent);
+                    resultIntent.putExtra(RecetasCookeoConstants.KEY_RECIPE, recipe);
+                    getActivity().setResult(RecetasCookeoConstants.RESULT_DELETE_RECIPE, resultIntent);
                     getActivity().finish();
                     break;
 
@@ -187,9 +187,9 @@ public class RecipeDetailsFragment extends Fragment implements
             case R.id.menu_item_remove:
                 AlertDialog.Builder removeBuilder = new AlertDialog.Builder(getActivity());
                 String message;
-                if((recipe.getState() & (Constants.FLAG_EDITED|Constants.FLAG_EDITED_PICTURE))!=0){
+                if((recipe.getState() & (RecetasCookeoConstants.FLAG_EDITED| RecetasCookeoConstants.FLAG_EDITED_PICTURE))!=0){
                     message = getActivity().getResources().getString(R.string.restore_recipe_confirmation);
-                }else if((recipe.getState() & Constants.FLAG_OWN)!=0){
+                }else if((recipe.getState() & RecetasCookeoConstants.FLAG_OWN)!=0){
                     message = getActivity().getResources().getString(R.string.delete_recipe_confirmation);
                 }else{
                     return false;
@@ -231,14 +231,14 @@ public class RecipeDetailsFragment extends Fragment implements
                                         dialog.cancel();
                                         ActivityCompat.requestPermissions(getActivity(),
                                                 new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                                                Constants.MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
+                                                RecetasCookeoConstants.MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
                                     }
                                 });
                 builder.create().show();
             } else {
                 ActivityCompat.requestPermissions(getActivity(),
                         new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                        Constants.MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
+                        RecetasCookeoConstants.MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
             }
         }else{
             CommonRecipeOperations commonRecipeOperations = new CommonRecipeOperations(getActivity(), recipe);
@@ -379,9 +379,9 @@ public class RecipeDetailsFragment extends Fragment implements
         dbTools.updateFavoriteById(getActivity().getApplicationContext(), recipe.get_id(), recipe.getFavourite());
         Intent returnIntent = new Intent();
         Bundle bundle = new Bundle();
-        bundle.putParcelable(Constants.KEY_RECIPE, recipe);
+        bundle.putParcelable(RecetasCookeoConstants.KEY_RECIPE, recipe);
         returnIntent.putExtras(bundle);
-        getActivity().setResult(Constants.RESULT_UPDATE_RECIPE, returnIntent);
+        getActivity().setResult(RecetasCookeoConstants.RESULT_UPDATE_RECIPE, returnIntent);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
             scaleIn.run();
         }
@@ -427,7 +427,7 @@ public class RecipeDetailsFragment extends Fragment implements
 
     private void loadRecipe(){
         if(recipeLoaded) return;
-        own = (recipe.getState() & (Constants.FLAG_OWN|Constants.FLAG_EDITED)) != 0;
+        own = (recipe.getState() & (RecetasCookeoConstants.FLAG_OWN| RecetasCookeoConstants.FLAG_EDITED)) != 0;
 
         if(recipeName != null){
             recipeName.setText(recipe.getName());

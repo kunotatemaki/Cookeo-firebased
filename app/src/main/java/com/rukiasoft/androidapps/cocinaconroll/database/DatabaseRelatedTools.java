@@ -10,7 +10,7 @@ import android.os.Build;
 import com.rukiasoft.androidapps.cocinaconroll.R;
 import com.rukiasoft.androidapps.cocinaconroll.classes.RecipeItem;
 import com.rukiasoft.androidapps.cocinaconroll.classes.ZipItem;
-import com.rukiasoft.androidapps.cocinaconroll.utilities.Constants;
+import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 
 import java.text.Normalizer;
 import java.util.ArrayList;
@@ -63,7 +63,7 @@ public class DatabaseRelatedTools {
         ContentValues values = new ContentValues();
 
         values.put(RecipesTable.FIELD_PATH_RECIPE_EDITED, recipe.getPathRecipe());
-        if((recipe.getState()&Constants.FLAG_EDITED_PICTURE) != 0){
+        if((recipe.getState()& RecetasCookeoConstants.FLAG_EDITED_PICTURE) != 0){
             values.put(RecipesTable.FIELD_PATH_PICTURE_EDITED, recipe.getPathPicture());
         }
         values.put(RecipesTable.FIELD_STATE, recipe.getState());
@@ -84,13 +84,13 @@ public class DatabaseRelatedTools {
         values.put(RecipesTable.FIELD_VERSION, recipeItem.getVersion());
         int icon;
         switch (recipeItem.getType()) {
-            case Constants.TYPE_DESSERTS:
+            case RecetasCookeoConstants.TYPE_DESSERTS:
                 icon = R.drawable.ic_dessert_24;
                 break;
-            case Constants.TYPE_STARTERS:
+            case RecetasCookeoConstants.TYPE_STARTERS:
                 icon = R.drawable.ic_starters_24;
                 break;
-            case Constants.TYPE_MAIN:
+            case RecetasCookeoConstants.TYPE_MAIN:
                 icon = R.drawable.ic_main_24;
                 break;
             default:
@@ -102,12 +102,12 @@ public class DatabaseRelatedTools {
         values.put(RecipesTable.FIELD_STATE, recipeItem.getState());
         values.put(RecipesTable.FIELD_FAVORITE, 0);
         values.put(RecipesTable.FIELD_DATE, recipeItem.getDate());
-        if((recipeItem.getState()&(Constants.FLAG_EDITED|Constants.FLAG_OWN))!=0) {
+        if((recipeItem.getState()&(RecetasCookeoConstants.FLAG_EDITED| RecetasCookeoConstants.FLAG_OWN))!=0) {
             values.put(RecipesTable.FIELD_PATH_RECIPE_EDITED, recipeItem.getPathRecipe());
         }else {
             values.put(RecipesTable.FIELD_PATH_RECIPE, recipeItem.getPathRecipe());
         }
-        if((recipeItem.getState()&Constants.FLAG_EDITED_PICTURE)!=0) {
+        if((recipeItem.getState()& RecetasCookeoConstants.FLAG_EDITED_PICTURE)!=0) {
             values.put(RecipesTable.FIELD_PATH_PICTURE_EDITED, recipeItem.getPathPicture());
         }else {
             values.put(RecipesTable.FIELD_PATH_PICTURE, recipeItem.getPathPicture());
@@ -135,13 +135,13 @@ public class DatabaseRelatedTools {
             int state = item.getState();
             String selection = RecipesTable.FIELD_ID + " = ? ";
             String[] selectionArgs = {String.valueOf(id)};
-            if((state&Constants.FLAG_OWN) != 0){
+            if((state& RecetasCookeoConstants.FLAG_OWN) != 0){
                 //own recipe, delete from database
                 mContext.getContentResolver().delete(CocinaConRollContentProvider.CONTENT_URI_RECIPES, selection, selectionArgs);
             }else{
                 //updated recipe, reset it
-                state = (state&(~Constants.FLAG_EDITED_PICTURE));
-                state = (state&(~Constants.FLAG_EDITED));
+                state = (state&(~RecetasCookeoConstants.FLAG_EDITED_PICTURE));
+                state = (state&(~RecetasCookeoConstants.FLAG_EDITED));
                 ContentValues values = new ContentValues();
                 values.put(RecipesTable.FIELD_STATE, state);
                 values.put(RecipesTable.FIELD_PATH_PICTURE_EDITED, "");
@@ -264,7 +264,7 @@ public class DatabaseRelatedTools {
         ContentValues values = new ContentValues();
         values.put(ZipsTable.FIELD_NAME, name);
         values.put(ZipsTable.FIELD_LINK, link);
-        values.put(ZipsTable.FIELD_STATE, Constants.STATE_NOT_DOWNLOADED);
+        values.put(ZipsTable.FIELD_STATE, RecetasCookeoConstants.STATE_NOT_DOWNLOADED);
         return mContext.getContentResolver().insert(CocinaConRollContentProvider.CONTENT_URI_ZIPS, values);
     }
 
@@ -325,7 +325,7 @@ public class DatabaseRelatedTools {
                 int vegetarian = cursor.getInt(cursor.getColumnIndexOrThrow(RecipesTable.FIELD_VEGETARIAN));
                 item.setVegetarian(vegetarian != 0);
                 item.setDate(cursor.getLong(cursor.getColumnIndexOrThrow(RecipesTable.FIELD_DATE)));
-                if((item.getState()&Constants.FLAG_EDITED_PICTURE) != 0){
+                if((item.getState()& RecetasCookeoConstants.FLAG_EDITED_PICTURE) != 0){
                     //picture edited
                     item.setPathPicture(cursor.getString(cursor.getColumnIndexOrThrow(RecipesTable.FIELD_PATH_PICTURE_EDITED)));
                 }else{
@@ -336,7 +336,7 @@ public class DatabaseRelatedTools {
                 String recipePictureName = uri.getLastPathSegment();
                 item.setPicture(recipePictureName);
 
-                if((item.getState()&(Constants.FLAG_EDITED|Constants.FLAG_OWN)) != 0){
+                if((item.getState()&(RecetasCookeoConstants.FLAG_EDITED| RecetasCookeoConstants.FLAG_OWN)) != 0){
                     //recipe edited
                     item.setPathRecipe(cursor.getString(cursor.getColumnIndexOrThrow(RecipesTable.FIELD_PATH_RECIPE_EDITED)));
                 }else{

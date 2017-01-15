@@ -29,7 +29,7 @@ import com.rukiasoft.androidapps.cocinaconroll.BuildConfig;
 import com.rukiasoft.androidapps.cocinaconroll.R;
 import com.rukiasoft.androidapps.cocinaconroll.classes.RegistrationClass;
 import com.rukiasoft.androidapps.cocinaconroll.classes.RegistrationResponse;
-import com.rukiasoft.androidapps.cocinaconroll.utilities.Constants;
+import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.LogHelper;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.Tools;
 import com.squareup.okhttp.Response;
@@ -127,8 +127,8 @@ public class RegistrationIntentService extends IntentService {
 
         registrationClass.setGcm_regid(token);
         registrationClass.setVersion(mTools.getAppVersion(getApplication()));
-        registrationClass.setEmail(mTools.getStringFromPreferences(this, Constants.PROPERTY_DEVICE_OWNER_EMAIL));
-        registrationClass.setName(mTools.getStringFromPreferences(this, Constants.PROPERTY_DEVICE_OWNER_NAME));
+        registrationClass.setEmail(mTools.getStringFromPreferences(this, RecetasCookeoConstants.PROPERTY_DEVICE_OWNER_EMAIL));
+        registrationClass.setName(mTools.getStringFromPreferences(this, RecetasCookeoConstants.PROPERTY_DEVICE_OWNER_NAME));
 
 
 

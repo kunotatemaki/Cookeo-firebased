@@ -19,9 +19,7 @@ import com.rukiasoft.androidapps.cocinaconroll.R;
 import com.rukiasoft.androidapps.cocinaconroll.classes.PreinstalledRecipeNamesList;
 import com.rukiasoft.androidapps.cocinaconroll.classes.RecipeItem;
 import com.rukiasoft.androidapps.cocinaconroll.database.DatabaseRelatedTools;
-import com.rukiasoft.androidapps.cocinaconroll.zip.UnzipUtility;
 
-import org.acra.ACRA;
 import org.apache.commons.io.FileUtils;
 import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.core.Persister;
@@ -110,7 +108,7 @@ public class ReadWriteTools {
      */
     public String getOriginalStorageDir(Context mContext){
         String path = mContext.getExternalFilesDir(null) + String.valueOf(File.separatorChar)
-                + Constants.RECIPES_DIR + String.valueOf(File.separatorChar);
+                + RecetasCookeoConstants.RECIPES_DIR + String.valueOf(File.separatorChar);
         File file = new File(path);
         if (!file.exists()) {
             file.mkdirs();
@@ -121,8 +119,8 @@ public class ReadWriteTools {
     public String getEditedStorageDir(){
         File rootPath = Environment.getExternalStoragePublicDirectory("");
         String path = rootPath.getAbsolutePath() + String.valueOf(File.separatorChar) +
-                Constants.BASE_DIR + String.valueOf(File.separatorChar) +
-                Constants.RECIPES_DIR + String.valueOf(File.separatorChar);
+                RecetasCookeoConstants.BASE_DIR + String.valueOf(File.separatorChar) +
+                RecetasCookeoConstants.RECIPES_DIR + String.valueOf(File.separatorChar);
         File file = new File(path);
         if (!file.exists()) {
             file.mkdirs();
@@ -133,8 +131,8 @@ public class ReadWriteTools {
     public String getOldEditedStorageDir(){
         File rootPath = Environment.getExternalStoragePublicDirectory("");
         String path = rootPath.getAbsolutePath() + String.valueOf(File.separatorChar) +
-                Constants.OLD_BASE_DIR + String.valueOf(File.separatorChar) +
-                Constants.RECIPES_DIR + String.valueOf(File.separatorChar);
+                RecetasCookeoConstants.OLD_BASE_DIR + String.valueOf(File.separatorChar) +
+                RecetasCookeoConstants.RECIPES_DIR + String.valueOf(File.separatorChar);
         File file = new File(path);
         if (!file.exists()) {
             file.mkdirs();
@@ -145,7 +143,7 @@ public class ReadWriteTools {
     public File getOldBaseEditedStorageDirToBeDeleted(){
         File rootPath = Environment.getExternalStoragePublicDirectory("");
         String path = rootPath.getAbsolutePath() + String.valueOf(File.separatorChar) +
-                Constants.OLD_BASE_DIR;
+                RecetasCookeoConstants.OLD_BASE_DIR;
         return new File(path);
     }
 
@@ -156,7 +154,7 @@ public class ReadWriteTools {
         RecipeItem recipeItem;
         String path = "";
         File source;
-        if(type.equals(Constants.PATH_TYPE_ASSETS)) {
+        if(type.equals(RecetasCookeoConstants.PATH_TYPE_ASSETS)) {
             InputStream inputStream;
             try {
                 inputStream = mContext.getAssets().open(name);
@@ -171,15 +169,15 @@ public class ReadWriteTools {
             if(recipeItem == null){
                 return null;
             }
-            recipeItem.setState(Constants.FLAG_ASSETS);
-            recipeItem.setPathRecipe(Constants.ASSETS_PATH + name);
+            recipeItem.setState(RecetasCookeoConstants.FLAG_ASSETS);
+            recipeItem.setPathRecipe(RecetasCookeoConstants.ASSETS_PATH + name);
             source.delete();
         }else {
-            if (type.equals(Constants.PATH_TYPE_ORIGINAL)) {
+            if (type.equals(RecetasCookeoConstants.PATH_TYPE_ORIGINAL)) {
                 path = getOriginalStorageDir(mContext) + name;
-            }else if (type.equals(Constants.PATH_TYPE_EDITED)) {
+            }else if (type.equals(RecetasCookeoConstants.PATH_TYPE_EDITED)) {
                 path = getEditedStorageDir() + name;
-            }else if (type.equals(Constants.PATH_TYPE_OLD_EDITED)) {
+            }else if (type.equals(RecetasCookeoConstants.PATH_TYPE_OLD_EDITED)) {
                 path = getOldEditedStorageDir() + name;
             }
             source = new File(path);
@@ -187,20 +185,20 @@ public class ReadWriteTools {
             if(recipeItem == null)
                 return null;
             recipeItem.setPathRecipe(path);
-            if (type.equals(Constants.PATH_TYPE_ORIGINAL)) {
-                recipeItem.setState(Constants.FLAG_ORIGINAL);
+            if (type.equals(RecetasCookeoConstants.PATH_TYPE_ORIGINAL)) {
+                recipeItem.setState(RecetasCookeoConstants.FLAG_ORIGINAL);
                 if(recipeItem.getDate() == -1L){
                     recipeItem.setDate(System.currentTimeMillis());
                 }
             }
         }
 
-        if((recipeItem.getState() & Constants.FLAG_EDITED_PICTURE) != 0)
-            recipeItem.setPathPicture(Constants.FILE_PATH + getEditedStorageDir() + recipeItem.getPicture());
-        else if((recipeItem.getState() & Constants.FLAG_ORIGINAL) != 0)
-            recipeItem.setPathPicture(Constants.FILE_PATH + getOriginalStorageDir(mContext) + recipeItem.getPicture());
-        else if((recipeItem.getState() & Constants.FLAG_ASSETS) != 0)
-            recipeItem.setPathPicture(Constants.ASSETS_PATH + recipeItem.getPicture());
+        if((recipeItem.getState() & RecetasCookeoConstants.FLAG_EDITED_PICTURE) != 0)
+            recipeItem.setPathPicture(RecetasCookeoConstants.FILE_PATH + getEditedStorageDir() + recipeItem.getPicture());
+        else if((recipeItem.getState() & RecetasCookeoConstants.FLAG_ORIGINAL) != 0)
+            recipeItem.setPathPicture(RecetasCookeoConstants.FILE_PATH + getOriginalStorageDir(mContext) + recipeItem.getPicture());
+        else if((recipeItem.getState() & RecetasCookeoConstants.FLAG_ASSETS) != 0)
+            recipeItem.setPathPicture(RecetasCookeoConstants.ASSETS_PATH + recipeItem.getPicture());
 
         return recipeItem;
     }
@@ -312,7 +310,7 @@ public class ReadWriteTools {
             File file = new File(recipeItem.getPathRecipe());
             if (file.exists())
                 file.delete();
-            if ((recipeItem.getState() & Constants.FLAG_EDITED_PICTURE) != 0) {
+            if ((recipeItem.getState() & RecetasCookeoConstants.FLAG_EDITED_PICTURE) != 0) {
                 file = new File(String.valueOf(Uri.parse(recipeItem.getPathPicture())));
                 if (file.exists()) {
                     file.delete();
@@ -325,7 +323,7 @@ public class ReadWriteTools {
                 }
             }
         }catch(Exception e){
-            ACRA.getErrorReporter().handleSilentException(e);
+            // TODO: 14/1/17 aquí mandaba excepción con ACRA
         }
     }
 
@@ -336,7 +334,7 @@ public class ReadWriteTools {
             if (file.exists())
                 file.delete();
         }catch(Exception e){
-            ACRA.getErrorReporter().handleSilentException(e);
+            // TODO: 14/1/17 aquí mandaba excepción con ACRA
         }
     }
 
@@ -411,14 +409,14 @@ public class ReadWriteTools {
                 e.printStackTrace();
             }
         }
-        return Constants.FILE_PATH.concat(filename);
+        return RecetasCookeoConstants.FILE_PATH.concat(filename);
     }
 
     public void loadImageFromPath(Context mContext, ImageView imageView, String path, int defaultImage, int version) {
        Glide.with(mContext)
                .load(Uri.parse(path))
                .centerCrop()
-               .signature(new MediaStoreSignature(Constants.MIME_TYPE_PICTURE, version, 0))
+               .signature(new MediaStoreSignature(RecetasCookeoConstants.MIME_TYPE_PICTURE, version, 0))
                .error(defaultImage)
                .into(imageView);
     }
@@ -427,7 +425,7 @@ public class ReadWriteTools {
        Glide.with(mContext)
                .load(Uri.parse(path))
                .centerCrop()
-               .signature(new MediaStoreSignature(Constants.MIME_TYPE_PICTURE, version, 0))
+               .signature(new MediaStoreSignature(RecetasCookeoConstants.MIME_TYPE_PICTURE, version, 0))
                .transform(new GlideCircleTransform(mContext))
                .error(defaultImage)
                .into(imageView);
@@ -437,7 +435,7 @@ public class ReadWriteTools {
         Glide.with(mContext)
                 .load(Uri.parse(path))
                 .asBitmap()
-                .signature(new MediaStoreSignature(Constants.MIME_TYPE_PICTURE, version, 0))
+                .signature(new MediaStoreSignature(RecetasCookeoConstants.MIME_TYPE_PICTURE, version, 0))
                 .centerCrop()
                 .error(defaultImage)
                 .into(bitmapImageViewTarget);
@@ -454,7 +452,7 @@ public class ReadWriteTools {
             emailIntent.setClassName("com.google.android.gm", "com.google.android.gm.ComposeActivityGmail");
 
         emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL,
-                new String[]{Constants.EMAIL});
+                new String[]{RecetasCookeoConstants.EMAIL});
         emailIntent.putExtra(Intent.EXTRA_SUBJECT, recipe.getName());
         String sender = String.format(activity.getResources().getString(R.string.sender), recipe.getAuthor());
         emailIntent.putExtra(Intent.EXTRA_TEXT, sender);
@@ -464,7 +462,7 @@ public class ReadWriteTools {
         File fileXml = new File(recipe.getPathRecipe());
         Uri u = Uri.fromFile(fileXml);
         uris.add(u);
-        if((recipe.getState()&Constants.FLAG_EDITED_PICTURE) != 0) {
+        if((recipe.getState()& RecetasCookeoConstants.FLAG_EDITED_PICTURE) != 0) {
             Uri uri = Uri.parse(recipe.getPathPicture());
             String name = uri.getLastPathSegment();
             File fileJpg = new File(getEditedStorageDir() + name);
@@ -498,7 +496,7 @@ public class ReadWriteTools {
     public String getZipsStorageDir(Context mContext){
         //create the dir if dont exist
         String path = mContext.getExternalFilesDir(null) + String.valueOf(File.separatorChar)
-                + Constants.ZIPS_DIR + String.valueOf(File.separatorChar);
+                + RecetasCookeoConstants.ZIPS_DIR + String.valueOf(File.separatorChar);
         File f = new File(path);
         if(!f.exists()){
             f.mkdirs();
@@ -506,39 +504,7 @@ public class ReadWriteTools {
         return path;
     }
 
-    public Uri zipRecipe(Context mContext, List<Uri> filesToZip, String zipName){
-        UnzipUtility unzipper = new UnzipUtility();
-        String zipPath = getZipsStorageDir(mContext) + zipName;
-        try {
-            unzipper.zip(filesToZip, zipPath);
-        } catch (Exception ex) {
-            // some errors occurred
-            ex.printStackTrace();
-            return null;
-        }
-        return Uri.parse(zipPath);
-    }
 
-    public Boolean unzipRecipesInOriginal(Context mContext, String name){
-        return unzipRecipes(mContext, name, getOriginalStorageDir(mContext));
-    }
-
-    public Boolean unzipRecipesInEdited(Context mContext, String name){
-        return unzipRecipes(mContext, name, getEditedStorageDir());
-    }
-
-    private Boolean unzipRecipes(Context mContext, String name, String path){
-        UnzipUtility unzipper = new UnzipUtility();
-        try {
-            unzipper.unzip(getZipsStorageDir(mContext) + name,
-                    path);
-        } catch (Exception ex) {
-            // some errors occurred
-            ex.printStackTrace();
-            return false;
-        }
-        return true;
-    }
 
 
     public void initDatabaseWithOriginalPath(Context mContext) {
@@ -549,7 +515,7 @@ public class ReadWriteTools {
         for(int i=0; i<listAssets.size(); i++) {
             RecipeItem recipeItem;
             recipeItem = readRecipe(mContext, listAssets.get(i),
-                    Constants.PATH_TYPE_ASSETS);
+                    RecetasCookeoConstants.PATH_TYPE_ASSETS);
             if (recipeItem != null) {
                 dbTools.insertRecipeIntoDatabase(mContext, recipeItem, true);
             }
@@ -558,7 +524,7 @@ public class ReadWriteTools {
         List<String> listOriginal = loadFiles(mContext, filter, false);
         for(int i=0; i<listOriginal.size(); i++) {
             RecipeItem recipeItem= readRecipe(mContext, listOriginal.get(i),
-                    Constants.PATH_TYPE_ORIGINAL);
+                    RecetasCookeoConstants.PATH_TYPE_ORIGINAL);
             if(recipeItem != null) {
                 dbTools.insertRecipeIntoDatabase(mContext, recipeItem, true);
             }
@@ -574,16 +540,16 @@ public class ReadWriteTools {
         List<String> listOldFiles = loadRecipesFromOldDirectory(filter);
         for(int i=0; i<listOldFiles.size(); i++) {
             RecipeItem recipeItem = readRecipe(mContext, listOldFiles.get(i),
-                    Constants.PATH_TYPE_OLD_EDITED);
+                    RecetasCookeoConstants.PATH_TYPE_OLD_EDITED);
             if(recipeItem != null) {
-                if((recipeItem.getState()&(Constants.FLAG_EDITED | Constants.FLAG_OWN)) == 0){
+                if((recipeItem.getState()&(RecetasCookeoConstants.FLAG_EDITED | RecetasCookeoConstants.FLAG_OWN)) == 0){
                     //not created nor edited. It was an original recipe set as favorite
                     dbTools.updateFavoriteByFileName(mContext, recipeItem.getName(), recipeItem.getFavourite());
                     //delete the file
                     deleteRecipe(recipeItem);
                 }else{
                     String picture = "";
-                    if((recipeItem.getState() & Constants.FLAG_EDITED_PICTURE) != 0) {
+                    if((recipeItem.getState() & RecetasCookeoConstants.FLAG_EDITED_PICTURE) != 0) {
                         picture = recipeItem.getPicture();
                     }
                     moveFileToEditedStorageAndDeleteOriginal(listOldFiles.get(i), picture);
@@ -605,7 +571,7 @@ public class ReadWriteTools {
         List<String> listEdited = loadFiles(mContext, filter, true);
         for(int i=0; i<listEdited.size(); i++) {
             RecipeItem recipeItem= readRecipe(mContext, listEdited.get(i),
-                    Constants.PATH_TYPE_EDITED);
+                    RecetasCookeoConstants.PATH_TYPE_EDITED);
             if(recipeItem != null) {
                 dbTools.insertRecipeIntoDatabase(mContext, recipeItem, true);
             }
@@ -653,11 +619,10 @@ public class ReadWriteTools {
         File source;
         if(pathRecipe == null){
             Exception caughtException = new Exception("Error intentado leer una receta sin pathRecipe");
-            ACRA.getErrorReporter().handleSilentException(caughtException);
-            return null;
+            // TODO: 14/1/17 aquí mandaba excepción con ACRA return null;
         }
 
-        if(pathRecipe.contains(Constants.ASSETS_PATH)) {
+        if(pathRecipe.contains(RecetasCookeoConstants.ASSETS_PATH)) {
             Uri uri = Uri.parse(pathRecipe);
             String name =  uri.getLastPathSegment();
             InputStream inputStream;
@@ -674,9 +639,9 @@ public class ReadWriteTools {
             if(recipeItem == null){
                 return null;
             }
-            recipeItem.setState(Constants.FLAG_ASSETS);
+            recipeItem.setState(RecetasCookeoConstants.FLAG_ASSETS);
             //recipeItem.setFileName(name);
-            recipeItem.setPathRecipe(Constants.ASSETS_PATH + "/" + name);
+            recipeItem.setPathRecipe(RecetasCookeoConstants.ASSETS_PATH + "/" + name);
             source.delete();
         }else {
             source = new File(pathRecipe);
@@ -697,7 +662,7 @@ public class ReadWriteTools {
         List<String> listOriginal = loadFiles(mContext, filter, false);
         for(int i=0; i<listOriginal.size(); i++) {
             RecipeItem recipeItem= readRecipe(mContext, listOriginal.get(i),
-                    Constants.PATH_TYPE_ORIGINAL);
+                    RecetasCookeoConstants.PATH_TYPE_ORIGINAL);
             if(recipeItem != null) {
                 dbTools.insertRecipeIntoDatabase(mContext, recipeItem, false);
             }
@@ -707,7 +672,7 @@ public class ReadWriteTools {
     public void loadUpdatedFilesAndInsertInDatabase(Context mContext, String name, int version) {
         DatabaseRelatedTools dbTools = new DatabaseRelatedTools();
         RecipeItem recipeItem= readRecipe(mContext, name,
-                Constants.PATH_TYPE_EDITED);
+                RecetasCookeoConstants.PATH_TYPE_EDITED);
         if(recipeItem != null) {
             recipeItem.setVersion(version);
             dbTools.insertRecipeIntoDatabase(mContext, recipeItem, true);

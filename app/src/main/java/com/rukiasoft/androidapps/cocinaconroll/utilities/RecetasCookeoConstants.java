@@ -1,7 +1,7 @@
 package com.rukiasoft.androidapps.cocinaconroll.utilities;
 
 
-public class Constants {
+public class RecetasCookeoConstants {
     public static final String SENDER_ID = "962580870211";
     public static final String PACKAGE_NAME = "com.rukiasoft.androidapps.cocinaconroll";
 
@@ -21,10 +21,10 @@ public class Constants {
     public static final String TYPE_MAIN = "main";
     public static final String TYPE_DESSERTS = "dessert";
 
-    public static final String KEY_RECIPE = Constants.PACKAGE_NAME + ".recipe";
-    public static final String KEY_DELETE_OLD_PICTURE = Constants.PACKAGE_NAME +  ".deleteoldpicture";
-    public static final String KEY_TYPE = Constants.PACKAGE_NAME + ".type";
-    public static final String KEY_SIGN_OUT = Constants.PACKAGE_NAME + ".sign_out";
+    public static final String KEY_RECIPE = RecetasCookeoConstants.PACKAGE_NAME + ".recipe";
+    public static final String KEY_DELETE_OLD_PICTURE = RecetasCookeoConstants.PACKAGE_NAME +  ".deleteoldpicture";
+    public static final String KEY_TYPE = RecetasCookeoConstants.PACKAGE_NAME + ".type";
+    public static final String KEY_SIGN_OUT = RecetasCookeoConstants.PACKAGE_NAME + ".sign_out";
     public static final int REQUEST_DETAILS = 200;
     public static final int REQUEST_CREATE_RECIPE = 201;
     public static final int REQUEST_EDIT_RECIPE = 202;
@@ -68,6 +68,16 @@ public class Constants {
     public static final Integer STATE_DOWNLOADED_UNZIPED_NOT_ERASED = 2;
     public static final Integer STATE_DOWNLOADED_UNZIPED_ERASED = 3;
 
+
+    public static final String ALLOWED_RECIPES_NODE = "allowed_recipes";
+    public static final String FORBIDDEN_RECIPES_NODE = "forbidden_recipes";
+    public static final String PENDING_RECIPES_NODE = "pending_recipes";
+    public static final String RECIPE_LIST_NODE = "recipe_list";
+
+    public static final String DETAILED_RECIPES_NODE = "detailed_recipes";
+    public static final String TIMESTAMP_RECIPES_NODE = "timestamp";
+    public static final String SHORT_RECIPES_NODE = "short_recipes";
+
     public static final Integer PATH_TYPE_ASSETS = 0;
     public static final Integer PATH_TYPE_ORIGINAL = 1;
     public static final Integer PATH_TYPE_EDITED = 2;
@@ -97,4 +107,5 @@ public class Constants {
     public static final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 13;
 
 
+    public static final String SHORT_RECIPE_TABLE_NAME = "SHORT_RECIPES";
 }

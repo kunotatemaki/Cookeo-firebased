@@ -37,18 +37,30 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.rukiasoft.androidapps.cocinaconroll.BuildConfig;
+import com.rukiasoft.androidapps.cocinaconroll.CocinaConRollApplication;
 import com.rukiasoft.androidapps.cocinaconroll.R;
 import com.rukiasoft.androidapps.cocinaconroll.classes.RecipeItem;
 import com.rukiasoft.androidapps.cocinaconroll.classes.ZipItem;
 import com.rukiasoft.androidapps.cocinaconroll.database.DatabaseRelatedTools;
-import com.rukiasoft.androidapps.cocinaconroll.gcm.GetZipsAsyncTask;
 import com.rukiasoft.androidapps.cocinaconroll.gcm.QuickstartPreferences;
 import com.rukiasoft.androidapps.cocinaconroll.gcm.RegistrationIntentService;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.RecipeTimestamp;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.greendao.RecipeShort;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.greendao.RecipeShortDao;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.CommonRecipeOperations;
-import com.rukiasoft.androidapps.cocinaconroll.utilities.Constants;
+import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.LogHelper;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.ReadWriteTools;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.Tools;
+
+import org.greenrobot.greendao.query.Query;
+import org.greenrobot.greendao.query.QueryBuilder;
 
 import java.io.File;
 import java.io.IOException;
@@ -57,6 +69,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import icepick.State;
 
 public class RecipeListActivity extends FirebaseAuthBase implements RecipeListFragment.TaskCallback{
 
@@ -75,17 +88,20 @@ public class RecipeListActivity extends FirebaseAuthBase implements RecipeListFr
     private Unbinder unbinder;
 
     private MenuItem searchMenuItem;
-    private boolean showMenuSignOut = false;
+    @State boolean showMenuSignOut = false;
     private int magnifyingX;
     private int magnifyingY;
     private int openCircleRevealX;
     private int openCircleRevealY;
     private boolean animate;
-    private String lastFilter;
+    @State String lastFilter;
+    @State Boolean checkRecipesFromFirebase = true;
 
+    //Firebase values
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
-
+    private FirebaseDatabase mFirebaseDatabase;
+    private DatabaseReference mRecipeTimestamps;
 
 
     private final DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
@@ -127,7 +143,7 @@ public class RecipeListActivity extends FirebaseAuthBase implements RecipeListFr
                 } else {
                     // User is signed out
                     showMenuSignOut = false;
-                    if(!mTools.getBooleanFromPreferences(getApplicationContext(), Constants.PROPERTY_AVOID_GOOGLE_SIGN_IN)){
+                    if(!mTools.getBooleanFromPreferences(getApplicationContext(), RecetasCookeoConstants.PROPERTY_AVOID_GOOGLE_SIGN_IN)){
                         launchSignInActivity();
                     }
                 }
@@ -136,27 +152,16 @@ public class RecipeListActivity extends FirebaseAuthBase implements RecipeListFr
         };
         // [END auth_state_listener]
 
-        if(savedInstanceState != null){
-            if(savedInstanceState.containsKey(Constants.KEY_TYPE)) {
-                lastFilter = savedInstanceState.getString(Constants.KEY_TYPE);
-            }
-            if(savedInstanceState.containsKey(Constants.KEY_SIGN_OUT)) {
-                showMenuSignOut = savedInstanceState.getBoolean(Constants.KEY_SIGN_OUT);
-            }
-
-           // shownToAllowDrive = savedInstanceState.getBoolean(KEY_ALLOWED_DRIVE);
-        }
-
-
-        if(mTools.getAppVersion(getApplication()) > mTools.getIntegerFromPreferences(this, Constants.PROPERTY_APP_VERSION_STORED)){
+        if(mTools.getAppVersion(getApplication()) > mTools.getIntegerFromPreferences(this, RecetasCookeoConstants.PROPERTY_APP_VERSION_STORED)){
             //first instalation, or recently updated app
             mTools.savePreferences(this, QuickstartPreferences.SENT_TOKEN_TO_SERVER, false);
-            mTools.savePreferences(this, Constants.PROPERTY_APP_VERSION_STORED, mTools.getAppVersion(getApplication()));
+            mTools.savePreferences(this, RecetasCookeoConstants.PROPERTY_APP_VERSION_STORED, mTools.getAppVersion(getApplication()));
+            // TODO: 15/1/17 Meter aquí la migración de las recetas propias de la antigua versión
         }
 
-        lastFilter = Constants.FILTER_ALL_RECIPES;
-        if(getIntent() != null && getIntent().hasExtra(Constants.KEY_TYPE)){
-            lastFilter = getIntent().getStringExtra(Constants.KEY_TYPE);
+        lastFilter = RecetasCookeoConstants.FILTER_ALL_RECIPES;
+        if(getIntent() != null && getIntent().hasExtra(RecetasCookeoConstants.KEY_TYPE)){
+            lastFilter = getIntent().getStringExtra(RecetasCookeoConstants.KEY_TYPE);
         }
         if (checkPlayServices()) {
             // Start IntentService to register this application with GCM.
@@ -184,34 +189,21 @@ public class RecipeListActivity extends FirebaseAuthBase implements RecipeListFr
 
         mAdViewList.loadAd(adRequest);
 
-        //check if we need to check for new recipes
-        long expirationTime =
-                mTools.getLongFromPreferences(this, Constants.PROPERTY_EXPIRATION_TIME);
-        if (mTools.getBooleanFromPreferences(this, QuickstartPreferences.SENT_TOKEN_TO_SERVER) &&
-                (expirationTime == Long.MIN_VALUE || System.currentTimeMillis() > expirationTime)) {
-            GetZipsAsyncTask getZipsAsyncTask = new GetZipsAsyncTask(this);
-            getZipsAsyncTask.execute();
-        }
-
         // The filter's action is BROADCAST_ACTION
         IntentFilter mStatusIntentFilter = new IntentFilter();
-        mStatusIntentFilter.addAction(Constants.ACTION_BROADCAST_UPLOADED_RECIPE);
-        mStatusIntentFilter.addAction(Constants.ACTION_BROADCAST_DELETED_RECIPE);
+        mStatusIntentFilter.addAction(RecetasCookeoConstants.ACTION_BROADCAST_UPLOADED_RECIPE);
+        mStatusIntentFilter.addAction(RecetasCookeoConstants.ACTION_BROADCAST_DELETED_RECIPE);
 
+        //Compruebo si hay nuevas recetas o modificaciones en la base de datos (sólo en el arranque)
+        if(checkRecipesFromFirebase){
+            connectToFirebaseForNewRecipes();
+        }
 
 
         if(savedInstanceState == null) {
             clearGarbage();
         }
 
-    }
-
-
-    @Override
-    public void onSaveInstanceState(Bundle bundle){
-        bundle.putString(Constants.KEY_TYPE, lastFilter);
-        bundle.putBoolean(Constants.KEY_SIGN_OUT, showMenuSignOut);
-        super.onSaveInstanceState(bundle);
     }
 
     @Override
@@ -225,12 +217,12 @@ public class RecipeListActivity extends FirebaseAuthBase implements RecipeListFr
         super.onNewIntent(intent);
         RecipeListFragment mRecipeListFragment = (RecipeListFragment) getSupportFragmentManager().findFragmentById(R.id.list_recipes_fragment);
         if(mRecipeListFragment != null){
-            if(intent != null && intent.hasExtra(Constants.KEY_RECIPE)) {
-                String name = intent.getStringExtra(Constants.KEY_RECIPE);
+            if(intent != null && intent.hasExtra(RecetasCookeoConstants.KEY_RECIPE)) {
+                String name = intent.getStringExtra(RecetasCookeoConstants.KEY_RECIPE);
                 mRecipeListFragment.searchAndShow(name);
             }
-            if(intent != null && intent.hasExtra(Constants.KEY_TYPE)){
-                lastFilter = intent.getStringExtra(Constants.KEY_TYPE);
+            if(intent != null && intent.hasExtra(RecetasCookeoConstants.KEY_TYPE)){
+                lastFilter = intent.getStringExtra(RecetasCookeoConstants.KEY_TYPE);
                 restartLoader();
             }
         }
@@ -240,16 +232,16 @@ public class RecipeListActivity extends FirebaseAuthBase implements RecipeListFr
     public void onActivityResult(int requestCode, int resultCode, Intent intentData) {
         Tools tools = new Tools();
         switch (requestCode) {
-            case Constants.REQUEST_DETAILS:
+            case RecetasCookeoConstants.REQUEST_DETAILS:
                 //return from RecipeDetailsActivity
-                if (resultCode == Constants.RESULT_DELETE_RECIPE && intentData != null && intentData.hasExtra(Constants.KEY_RECIPE)) {
-                    RecipeItem recipe = intentData.getParcelableExtra(Constants.KEY_RECIPE);
+                if (resultCode == RecetasCookeoConstants.RESULT_DELETE_RECIPE && intentData != null && intentData.hasExtra(RecetasCookeoConstants.KEY_RECIPE)) {
+                    RecipeItem recipe = intentData.getParcelableExtra(RecetasCookeoConstants.KEY_RECIPE);
                     if (recipe != null) {
                         removeRecipeFromDiskAndDatabase(recipe);
                     }
-                }else if(resultCode == Constants.RESULT_UPDATE_RECIPE){
-                    if (intentData != null && intentData.hasExtra(Constants.KEY_RECIPE)) {
-                        RecipeItem recipe = intentData.getParcelableExtra(Constants.KEY_RECIPE);
+                }else if(resultCode == RecetasCookeoConstants.RESULT_UPDATE_RECIPE){
+                    if (intentData != null && intentData.hasExtra(RecetasCookeoConstants.KEY_RECIPE)) {
+                        RecipeItem recipe = intentData.getParcelableExtra(RecetasCookeoConstants.KEY_RECIPE);
                         RecipeListFragment mRecipeListFragment = (RecipeListFragment) getSupportFragmentManager().findFragmentById(R.id.list_recipes_fragment);
                         if (mRecipeListFragment != null) {
                             mRecipeListFragment.updateRecipe(recipe);
@@ -257,13 +249,13 @@ public class RecipeListActivity extends FirebaseAuthBase implements RecipeListFr
                     }
                 }
                 break;
-            case Constants.REQUEST_EDIT_RECIPE:
-                if(resultCode == Constants.RESULT_UPDATE_RECIPE && intentData != null && intentData.hasExtra(Constants.KEY_RECIPE)) {
-                    RecipeItem recipe = intentData.getParcelableExtra(Constants.KEY_RECIPE);
+            case RecetasCookeoConstants.REQUEST_EDIT_RECIPE:
+                if(resultCode == RecetasCookeoConstants.RESULT_UPDATE_RECIPE && intentData != null && intentData.hasExtra(RecetasCookeoConstants.KEY_RECIPE)) {
+                    RecipeItem recipe = intentData.getParcelableExtra(RecetasCookeoConstants.KEY_RECIPE);
                     CommonRecipeOperations commonRecipeOperations = new CommonRecipeOperations(this, recipe);
                     String oldPicture = "";
-                    if (intentData.hasExtra(Constants.KEY_DELETE_OLD_PICTURE)) {
-                        oldPicture = intentData.getStringExtra(Constants.KEY_DELETE_OLD_PICTURE);
+                    if (intentData.hasExtra(RecetasCookeoConstants.KEY_DELETE_OLD_PICTURE)) {
+                        oldPicture = intentData.getStringExtra(RecetasCookeoConstants.KEY_DELETE_OLD_PICTURE);
                     }
                     commonRecipeOperations.updateRecipe(oldPicture);
                     RecipeListFragment mRecipeListFragment = (RecipeListFragment) getSupportFragmentManager().findFragmentById(R.id.list_recipes_fragment);
@@ -272,9 +264,9 @@ public class RecipeListActivity extends FirebaseAuthBase implements RecipeListFr
                     }
                 }
                 break;
-            case Constants.REQUEST_CREATE_RECIPE:
-                if (resultCode == Constants.RESULT_UPDATE_RECIPE && intentData != null && intentData.hasExtra(Constants.KEY_RECIPE)) {
-                    RecipeItem recipe = intentData.getParcelableExtra(Constants.KEY_RECIPE);
+            case RecetasCookeoConstants.REQUEST_CREATE_RECIPE:
+                if (resultCode == RecetasCookeoConstants.RESULT_UPDATE_RECIPE && intentData != null && intentData.hasExtra(RecetasCookeoConstants.KEY_RECIPE)) {
+                    RecipeItem recipe = intentData.getParcelableExtra(RecetasCookeoConstants.KEY_RECIPE);
                     RecipeListFragment mRecipeListFragment = (RecipeListFragment) getSupportFragmentManager().findFragmentById(R.id.list_recipes_fragment);
                     ReadWriteTools readWriteTools = new ReadWriteTools();
                     String path = readWriteTools.saveRecipeOnEditedPath(getApplicationContext(), recipe);
@@ -291,7 +283,7 @@ public class RecipeListActivity extends FirebaseAuthBase implements RecipeListFr
                 }
                 break;*/
             case REQUEST_CODE_SIGNING:
-                if(!tools.getBooleanFromPreferences(this, Constants.PROPERTY_INIT_DATABASE_WITH_EDITED_PATH)) {
+                if(!tools.getBooleanFromPreferences(this, RecetasCookeoConstants.PROPERTY_INIT_DATABASE_WITH_EDITED_PATH)) {
                     askForPermissionAndLoadEditedRecipes();
                 }
                 break;
@@ -318,14 +310,14 @@ public class RecipeListActivity extends FirebaseAuthBase implements RecipeListFr
                                         dialog.cancel();
                                         ActivityCompat.requestPermissions(RecipeListActivity.this,
                                                 new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                                                Constants.MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
+                                                RecetasCookeoConstants.MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
                                     }
                                 });
                 builder.create().show();
             } else {
                 ActivityCompat.requestPermissions(this,
                         new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                        Constants.MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
+                        RecetasCookeoConstants.MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
             }
         }else{
             RecipeListFragment fragment = (RecipeListFragment)getSupportFragmentManager().findFragmentById(R.id.list_recipes_fragment);
@@ -511,36 +503,36 @@ public class RecipeListActivity extends FirebaseAuthBase implements RecipeListFr
                         if(mRecipeListFragment != null) {
                             switch (menuItem.getItemId()) {
                                 case R.id.menu_all_recipes:
-                                    mRecipeListFragment.filterRecipes(Constants.FILTER_ALL_RECIPES);
-                                    lastFilter = Constants.FILTER_ALL_RECIPES;
+                                    mRecipeListFragment.filterRecipes(RecetasCookeoConstants.FILTER_ALL_RECIPES);
+                                    lastFilter = RecetasCookeoConstants.FILTER_ALL_RECIPES;
                                     break;
                                 case R.id.menu_starters:
-                                    mRecipeListFragment.filterRecipes(Constants.FILTER_STARTER_RECIPES);
-                                    lastFilter = Constants.FILTER_STARTER_RECIPES;
+                                    mRecipeListFragment.filterRecipes(RecetasCookeoConstants.FILTER_STARTER_RECIPES);
+                                    lastFilter = RecetasCookeoConstants.FILTER_STARTER_RECIPES;
                                     break;
                                 case R.id.menu_main_courses:
-                                    mRecipeListFragment.filterRecipes(Constants.FILTER_MAIN_COURSES_RECIPES);
-                                    lastFilter = Constants.FILTER_MAIN_COURSES_RECIPES;
+                                    mRecipeListFragment.filterRecipes(RecetasCookeoConstants.FILTER_MAIN_COURSES_RECIPES);
+                                    lastFilter = RecetasCookeoConstants.FILTER_MAIN_COURSES_RECIPES;
                                     break;
                                 case R.id.menu_desserts:
-                                    mRecipeListFragment.filterRecipes(Constants.FILTER_DESSERT_RECIPES);
-                                    lastFilter = Constants.FILTER_DESSERT_RECIPES;
+                                    mRecipeListFragment.filterRecipes(RecetasCookeoConstants.FILTER_DESSERT_RECIPES);
+                                    lastFilter = RecetasCookeoConstants.FILTER_DESSERT_RECIPES;
                                     break;
                                 case R.id.menu_vegetarians:
-                                    mRecipeListFragment.filterRecipes(Constants.FILTER_VEGETARIAN_RECIPES);
-                                    lastFilter = Constants.FILTER_VEGETARIAN_RECIPES;
+                                    mRecipeListFragment.filterRecipes(RecetasCookeoConstants.FILTER_VEGETARIAN_RECIPES);
+                                    lastFilter = RecetasCookeoConstants.FILTER_VEGETARIAN_RECIPES;
                                     break;
                                 case R.id.menu_favorites:
-                                    mRecipeListFragment.filterRecipes(Constants.FILTER_FAVOURITE_RECIPES);
-                                    lastFilter = Constants.FILTER_FAVOURITE_RECIPES;
+                                    mRecipeListFragment.filterRecipes(RecetasCookeoConstants.FILTER_FAVOURITE_RECIPES);
+                                    lastFilter = RecetasCookeoConstants.FILTER_FAVOURITE_RECIPES;
                                     break;
                                 case R.id.menu_own_recipes:
-                                    mRecipeListFragment.filterRecipes(Constants.FILTER_OWN_RECIPES);
-                                    lastFilter = Constants.FILTER_OWN_RECIPES;
+                                    mRecipeListFragment.filterRecipes(RecetasCookeoConstants.FILTER_OWN_RECIPES);
+                                    lastFilter = RecetasCookeoConstants.FILTER_OWN_RECIPES;
                                     break;
                                 case R.id.menu_last_downloaded:
-                                    mRecipeListFragment.filterRecipes(Constants.FILTER_LATEST_RECIPES);
-                                    lastFilter = Constants.FILTER_LATEST_RECIPES;
+                                    mRecipeListFragment.filterRecipes(RecetasCookeoConstants.FILTER_LATEST_RECIPES);
+                                    lastFilter = RecetasCookeoConstants.FILTER_LATEST_RECIPES;
                                     break;
                             }
                         }
@@ -626,11 +618,11 @@ public class RecipeListActivity extends FirebaseAuthBase implements RecipeListFr
     }
 
     public void performClickInDrawerIfNecessary() {
-        if(lastFilter.equals(Constants.FILTER_LATEST_RECIPES)){
+        if(lastFilter.equals(RecetasCookeoConstants.FILTER_LATEST_RECIPES)){
             navigationView.setCheckedItem(R.id.menu_last_downloaded);
             RecipeListFragment mRecipeListFragment = (RecipeListFragment) getSupportFragmentManager().findFragmentById(R.id.list_recipes_fragment);
             if(mRecipeListFragment != null) {
-                mRecipeListFragment.filterRecipes(Constants.FILTER_LATEST_RECIPES);
+                mRecipeListFragment.filterRecipes(RecetasCookeoConstants.FILTER_LATEST_RECIPES);
             }
         } else {
             navigationView.setCheckedItem(R.id.menu_all_recipes);
@@ -640,7 +632,7 @@ public class RecipeListActivity extends FirebaseAuthBase implements RecipeListFr
     public void restartLoader(){
         RecipeListFragment mRecipeListFragment = (RecipeListFragment) getSupportFragmentManager().findFragmentById(R.id.list_recipes_fragment);
         if(mRecipeListFragment != null) {
-            getSupportLoaderManager().restartLoader(Constants.LOADER_ID, null, mRecipeListFragment);
+            getSupportLoaderManager().restartLoader(RecetasCookeoConstants.LOADER_ID, null, mRecipeListFragment);
         }
     }
 
@@ -657,7 +649,7 @@ public class RecipeListActivity extends FirebaseAuthBase implements RecipeListFr
         //borro temporales de la cámara
         List<String> list = rwTools.loadFiles(getApplicationContext(), null, true);
         for(int i=0; i<list.size(); i++) {
-            if(list.get(i).contains(Constants.TEMP_CAMERA_NAME)){
+            if(list.get(i).contains(RecetasCookeoConstants.TEMP_CAMERA_NAME)){
                 file = new File(rwTools.getEditedStorageDir() + list.get(i));
                 if(file.exists())
                     file.delete();
@@ -678,7 +670,7 @@ public class RecipeListActivity extends FirebaseAuthBase implements RecipeListFr
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[], int[] grantResults) {
         switch (requestCode) {
-            case Constants.MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE: {
+            case RecetasCookeoConstants.MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE: {
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     RecipeListFragment mRecipeListFragment = (RecipeListFragment) getSupportFragmentManager().
@@ -701,7 +693,7 @@ public class RecipeListActivity extends FirebaseAuthBase implements RecipeListFr
                     builder.create().show();
                 }
             }
-            case Constants.MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE: {
+            case RecetasCookeoConstants.MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE: {
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     RecipeListFragment mRecipeListFragment = (RecipeListFragment) getSupportFragmentManager().
@@ -762,6 +754,54 @@ public class RecipeListActivity extends FirebaseAuthBase implements RecipeListFr
     private void launchSignInActivity(){
         Intent intent = new Intent(RecipeListActivity.this, SignInActivity.class);
         startActivityForResult(intent, REQUEST_CODE_SIGNING);
+    }
+
+    private void connectToFirebaseForNewRecipes(){
+        mFirebaseDatabase = FirebaseDatabase.getInstance();
+        mRecipeTimestamps = mFirebaseDatabase.getReference(RecetasCookeoConstants.ALLOWED_RECIPES_NODE +
+            "/" + RecetasCookeoConstants.TIMESTAMP_RECIPES_NODE);
+        mRecipeTimestamps.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                RecipeShortDao recipeShortDao = ((CocinaConRollApplication)getApplication()).getDaoSession().getRecipeShortDao();
+                recipeShortDao.detachAll();
+                String key = "";
+                if(BuildConfig.DEBUG) {
+                    QueryBuilder.LOG_SQL = true;
+                    QueryBuilder.LOG_VALUES = true;
+                }
+                Query query = recipeShortDao.queryBuilder().where(
+                        RecipeShortDao.Properties.Key.eq(key)
+                ).build();
+                for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
+                    RecipeTimestamp recipeTimestamp = postSnapshot.getValue(RecipeTimestamp.class);
+                    key = postSnapshot.getKey();
+                    query.setParameter(0, key);
+                    RecipeShort recipeFromDatabase = (RecipeShort) query.unique();
+                    if(recipeFromDatabase == null){
+                        //no existe en la base de datos, la creo
+                        recipeFromDatabase = new RecipeShort();
+                        recipeFromDatabase.setKey(key);
+                        recipeFromDatabase.setTimestamp(recipeTimestamp.getTimestamp());
+                        recipeFromDatabase.setDownloadRecipe(true);
+                        recipeShortDao.insert(recipeFromDatabase);
+                    }else{
+                        //ya existe
+                        if(recipeTimestamp.getTimestamp() > recipeFromDatabase.getTimestamp()){
+                            //la actualizo
+                            recipeFromDatabase.setTimestamp(recipeTimestamp.getTimestamp());
+                            recipeFromDatabase.setDownloadRecipe(true);
+                            recipeFromDatabase.update();
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
 

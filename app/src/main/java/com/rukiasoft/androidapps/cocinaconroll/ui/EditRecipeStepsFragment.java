@@ -14,7 +14,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 
 import com.rukiasoft.androidapps.cocinaconroll.CocinaConRollApplication;
-import com.rukiasoft.androidapps.cocinaconroll.utilities.Constants;
+import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 import com.rukiasoft.androidapps.cocinaconroll.R;
 import com.rukiasoft.androidapps.cocinaconroll.dragandswipehelper.OnStartDragListener;
 import com.rukiasoft.androidapps.cocinaconroll.dragandswipehelper.SimpleItemTouchHelperCallback;
@@ -29,7 +29,7 @@ import butterknife.Unbinder;
 
 public class EditRecipeStepsFragment extends Fragment implements OnStartDragListener {
 
-    private static final String KEY_ITEM_TO_ADD = Constants.PACKAGE_NAME + ".itemtoadd";
+    private static final String KEY_ITEM_TO_ADD = RecetasCookeoConstants.PACKAGE_NAME + ".itemtoadd";
     private RecipeItem recipeItem;
     //private static final String TAG = "EditRecipeIngredientsFragment";
     @BindView(R.id.edit_recipe_add_item)EditText addItem;

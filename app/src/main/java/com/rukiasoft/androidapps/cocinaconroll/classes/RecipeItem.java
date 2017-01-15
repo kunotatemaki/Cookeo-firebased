@@ -3,7 +3,7 @@ package com.rukiasoft.androidapps.cocinaconroll.classes;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.rukiasoft.androidapps.cocinaconroll.utilities.Constants;
+import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.ElementList;
@@ -23,7 +23,7 @@ public class RecipeItem implements Parcelable {
     private String type = "";
     private Integer icon = -1;
     @Element
-    private String picture = Constants.DEFAULT_PICTURE_NAME;
+    private String picture = RecetasCookeoConstants.DEFAULT_PICTURE_NAME;
     @ElementList
     private List<String> ingredients = new ArrayList<>();
     @ElementList
@@ -43,7 +43,7 @@ public class RecipeItem implements Parcelable {
     @Element  (required=false)
     private String tip = "";
     private String pathRecipe = "";
-    private String pathPicture = Constants.ASSETS_PATH + Constants.DEFAULT_PICTURE_NAME;
+    private String pathPicture = RecetasCookeoConstants.ASSETS_PATH + RecetasCookeoConstants.DEFAULT_PICTURE_NAME;
     @Element  (required=false)
     private Long date = -1L;
     @Element

@@ -16,14 +16,21 @@
 package com.rukiasoft.androidapps.cocinaconroll.ui;
 
 import android.app.ProgressDialog;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.widget.TextView;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 import java.lang.reflect.Field;
+
+import icepick.Icepick;
 
 /**
  * Base activity for activities that need to show a Refresh Layout and a Custom Toolbar
@@ -34,6 +41,16 @@ public abstract class ToolbarAndProgressActivity extends AppCompatActivity {
     @VisibleForTesting
     public ProgressDialog mProgressDialog;
 
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Icepick.restoreInstanceState(this, savedInstanceState);
+    }
+
+    @Override public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Icepick.saveInstanceState(this, outState);
+    }
 
     protected void setDefaultValuesForOptions(int id){
         PreferenceManager.setDefaultValues(this, id, false);

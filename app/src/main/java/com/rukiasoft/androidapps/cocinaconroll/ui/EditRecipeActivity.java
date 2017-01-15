@@ -16,7 +16,7 @@ import android.widget.TextView;
 
 import com.rukiasoft.androidapps.cocinaconroll.R;
 import com.rukiasoft.androidapps.cocinaconroll.classes.RecipeItem;
-import com.rukiasoft.androidapps.cocinaconroll.utilities.Constants;
+import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.LogHelper;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.ReadWriteTools;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.Tools;
@@ -35,8 +35,8 @@ public class EditRecipeActivity extends AppCompatActivity {
     private EditRecipeStepsFragment editRecipeStepsFragment;
     private RecipeItem recipe;
     private final static String TAG = LogHelper.makeLogTag(EditRecipeActivity.class);
-    private final static String KEY_FRAGMENT = Constants.PACKAGE_NAME + ".fragment";
-    private final static String KEY_TITLE = Constants.PACKAGE_NAME + ".title";
+    private final static String KEY_FRAGMENT = RecetasCookeoConstants.PACKAGE_NAME + ".fragment";
+    private final static String KEY_TITLE = RecetasCookeoConstants.PACKAGE_NAME + ".title";
     private String title;
     private Tools mTools;
     @BindView(R.id.standard_toolbar) Toolbar mToolbar;
@@ -50,30 +50,30 @@ public class EditRecipeActivity extends AppCompatActivity {
         //Log.d(TAG, "onCreate");
         mTools = new Tools();
         if(savedInstanceState != null){
-            if(savedInstanceState.containsKey(Constants.KEY_RECIPE)) {
-                recipe = savedInstanceState.getParcelable(Constants.KEY_RECIPE);
+            if(savedInstanceState.containsKey(RecetasCookeoConstants.KEY_RECIPE)) {
+                recipe = savedInstanceState.getParcelable(RecetasCookeoConstants.KEY_RECIPE);
             }
             if(savedInstanceState.containsKey(KEY_TITLE)) {
                 title = savedInstanceState.getString(KEY_TITLE);
             }
-            oldPicture = savedInstanceState.getString(Constants.KEY_DELETE_OLD_PICTURE);
-        }else if(getIntent() != null && getIntent().hasExtra(Constants.KEY_RECIPE)) {
-            recipe = getIntent().getExtras().getParcelable(Constants.KEY_RECIPE);
+            oldPicture = savedInstanceState.getString(RecetasCookeoConstants.KEY_DELETE_OLD_PICTURE);
+        }else if(getIntent() != null && getIntent().hasExtra(RecetasCookeoConstants.KEY_RECIPE)) {
+            recipe = getIntent().getExtras().getParcelable(RecetasCookeoConstants.KEY_RECIPE);
             //check if the picture is previosly edited, to delete the old picture
             if(recipe == null){
                 recipe = new RecipeItem();
                 setResult(RESULT_CANCELED);
                 finish();
             }
-            if((recipe.getState()&Constants.FLAG_EDITED_PICTURE)!=0){
+            if((recipe.getState()& RecetasCookeoConstants.FLAG_EDITED_PICTURE)!=0){
                 oldPicture = recipe.getPathPicture();
             }
             title = getResources().getString(R.string.edit_recipe);
-            recipe.setState(Constants.FLAG_EDITED);
+            recipe.setState(RecetasCookeoConstants.FLAG_EDITED);
         }else{
             title = getResources().getString(R.string.create_recipe);
             recipe = new RecipeItem();
-            recipe.setState(Constants.FLAG_OWN);
+            recipe.setState(RecetasCookeoConstants.FLAG_OWN);
         }
 
         super.onCreate(savedInstanceState);
@@ -132,10 +132,10 @@ public class EditRecipeActivity extends AppCompatActivity {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         if(recipe != null) {
-            outState.putParcelable(Constants.KEY_RECIPE, recipe);
+            outState.putParcelable(RecetasCookeoConstants.KEY_RECIPE, recipe);
         }
         outState.putString(KEY_TITLE, title);
-        outState.putString(Constants.KEY_DELETE_OLD_PICTURE, oldPicture);
+        outState.putString(RecetasCookeoConstants.KEY_DELETE_OLD_PICTURE, oldPicture);
         super.onSaveInstanceState(outState);
     }
 
@@ -246,11 +246,11 @@ public class EditRecipeActivity extends AppCompatActivity {
     }
     private void setResultData(){
         Intent resultIntent = new Intent();
-        resultIntent.putExtra(Constants.KEY_RECIPE, recipe);
+        resultIntent.putExtra(RecetasCookeoConstants.KEY_RECIPE, recipe);
         if(oldPicture != null && !oldPicture.isEmpty() && !oldPicture.equals(recipe.getPathPicture())){
-            resultIntent.putExtra(Constants.KEY_DELETE_OLD_PICTURE, oldPicture);
+            resultIntent.putExtra(RecetasCookeoConstants.KEY_DELETE_OLD_PICTURE, oldPicture);
         }
-        setResult(Constants.RESULT_UPDATE_RECIPE, resultIntent);
+        setResult(RecetasCookeoConstants.RESULT_UPDATE_RECIPE, resultIntent);
         finish();
     }
 
@@ -298,7 +298,7 @@ public class EditRecipeActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[], int[] grantResults) {
         switch (requestCode) {
-            case Constants.MY_PERMISSIONS_REQUEST_CAMERA: {
+            case RecetasCookeoConstants.MY_PERMISSIONS_REQUEST_CAMERA: {
                 Fragment f = getSupportFragmentManager().findFragmentById(R.id.edit_recipe_container);
                 Boolean cameraAllowed = (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED);

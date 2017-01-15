@@ -24,7 +24,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.rukiasoft.androidapps.cocinaconroll.R;
 import com.rukiasoft.androidapps.cocinaconroll.gcm.QuickstartPreferences;
-import com.rukiasoft.androidapps.cocinaconroll.utilities.Constants;
+import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.Tools;
 
 public class FirebaseAuthBase extends ToolbarAndProgressActivity implements
@@ -61,15 +61,15 @@ public class FirebaseAuthBase extends ToolbarAndProgressActivity implements
     private void handleSignInResult(FirebaseUser user) {
         Tools mTools = new Tools();
         if (user != null) {
-            mTools.savePreferences(this, Constants.PROPERTY_DEVICE_OWNER_NAME, user.getDisplayName());
-            mTools.savePreferences(this, Constants.PROPERTY_DEVICE_OWNER_EMAIL, user.getEmail());
-            mTools.savePreferences(this, Constants.PROPERTY_FIREBASE_ID, user.getUid());
+            mTools.savePreferences(this, RecetasCookeoConstants.PROPERTY_DEVICE_OWNER_NAME, user.getDisplayName());
+            mTools.savePreferences(this, RecetasCookeoConstants.PROPERTY_DEVICE_OWNER_EMAIL, user.getEmail());
+            mTools.savePreferences(this, RecetasCookeoConstants.PROPERTY_FIREBASE_ID, user.getUid());
             //force to send registration token to server again, with this new information
             mTools.savePreferences(this, QuickstartPreferences.SENT_TOKEN_TO_SERVER, false);
         } else {
-            mTools.savePreferences(this, Constants.PROPERTY_DEVICE_OWNER_NAME, "");
-            mTools.savePreferences(this, Constants.PROPERTY_DEVICE_OWNER_EMAIL, "");
-            mTools.savePreferences(this, Constants.PROPERTY_FIREBASE_ID, "");
+            mTools.savePreferences(this, RecetasCookeoConstants.PROPERTY_DEVICE_OWNER_NAME, "");
+            mTools.savePreferences(this, RecetasCookeoConstants.PROPERTY_DEVICE_OWNER_EMAIL, "");
+            mTools.savePreferences(this, RecetasCookeoConstants.PROPERTY_FIREBASE_ID, "");
         }
     }
 
@@ -120,9 +120,9 @@ public class FirebaseAuthBase extends ToolbarAndProgressActivity implements
                     @Override
                     public void onResult(@NonNull Status status) {
                         Tools mTools = new Tools();
-                        mTools.savePreferences(getApplicationContext(), Constants.PROPERTY_DEVICE_OWNER_EMAIL, "");
-                        mTools.savePreferences(getApplicationContext(), Constants.PROPERTY_DEVICE_OWNER_NAME, "");
-                        mTools.savePreferences(getApplicationContext(), Constants.PROPERTY_AVOID_GOOGLE_SIGN_IN, true);
+                        mTools.savePreferences(getApplicationContext(), RecetasCookeoConstants.PROPERTY_DEVICE_OWNER_EMAIL, "");
+                        mTools.savePreferences(getApplicationContext(), RecetasCookeoConstants.PROPERTY_DEVICE_OWNER_NAME, "");
+                        mTools.savePreferences(getApplicationContext(), RecetasCookeoConstants.PROPERTY_AVOID_GOOGLE_SIGN_IN, true);
                     }
                 });
 

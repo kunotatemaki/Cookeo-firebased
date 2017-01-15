@@ -6,7 +6,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.TextView;
 
-import com.rukiasoft.androidapps.cocinaconroll.utilities.Constants;
+import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 import com.rukiasoft.androidapps.cocinaconroll.R;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.Tools;
 
@@ -42,7 +42,7 @@ public class ThanksActivity extends AppCompatActivity {
         //TextView support = (TextView)getWindow().getDecorView().findViewById(R.id.textView_support_recipes);
         Tools tools = new Tools();
         String sSupport = String.format(getResources().getString(R.string.support_recipes),
-                tools.getApplicationName(getApplicationContext()), Constants.EMAIL);
+                tools.getApplicationName(getApplicationContext()), RecetasCookeoConstants.EMAIL);
 
         //sSupport = sSupport.replace("_app_name_", appName );
         support.setText(sSupport);

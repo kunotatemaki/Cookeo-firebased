@@ -25,12 +25,11 @@ import android.util.Log;
 
 import com.google.android.gms.gcm.GcmListenerService;
 import com.rukiasoft.androidapps.cocinaconroll.database.DatabaseRelatedTools;
-import com.rukiasoft.androidapps.cocinaconroll.services.DownloadAndUnzipIntentService;
-import com.rukiasoft.androidapps.cocinaconroll.utilities.Constants;
+import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.LogHelper;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.Tools;
 
-import org.acra.ACRA;
+
 
 public class MyGcmListenerService extends GcmListenerService {
 
@@ -70,14 +69,14 @@ public class MyGcmListenerService extends GcmListenerService {
             if (id != -1) {
                 Tools mTools = new Tools();
                 if (mTools.hasPermissionForDownloading(getApplicationContext())) {
-                    Intent intent = new Intent(this, DownloadAndUnzipIntentService.class);
-                    intent.putExtra(Constants.KEY_TYPE, Constants.FILTER_LATEST_RECIPES);
-                    startService(intent);
+                    //Intent intent = new Intent(this, DownloadAndUnzipIntentService.class);
+                    //intent.putExtra(RecetasCookeoConstants.KEY_TYPE, RecetasCookeoConstants.FILTER_LATEST_RECIPES);
+                    //startService(intent);
                 }
             }
         }catch (NumberFormatException e){
             e.printStackTrace();
-            ACRA.getErrorReporter().handleSilentException(e);
+            // TODO: 14/1/17 aquí mandaba excepción con ACRA
         }
     }
     // [END receive_message]

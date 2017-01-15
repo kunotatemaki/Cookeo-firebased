@@ -16,7 +16,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.rukiasoft.androidapps.cocinaconroll.utilities.Constants;
+import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 import com.rukiasoft.androidapps.cocinaconroll.R;
 import com.rukiasoft.androidapps.cocinaconroll.database.CocinaConRollContentProvider;
 
@@ -85,7 +85,7 @@ public class SearchableActivity extends ToolbarAndProgressActivity implements Lo
 
     private void sendRecipeName(String recipeName){
         Intent detailIntent = new Intent(this, RecipeListActivity.class);
-        detailIntent.putExtra(Constants.KEY_RECIPE, recipeName);
+        detailIntent.putExtra(RecetasCookeoConstants.KEY_RECIPE, recipeName);
 		detailIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(detailIntent);
         finish();

@@ -10,16 +10,13 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.rukiasoft.androidapps.cocinaconroll.ui.ToolbarAndProgressActivity;
 import com.rukiasoft.androidapps.cocinaconroll.wifi.WifiHandler;
 
-import org.acra.ACRA;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -34,7 +31,7 @@ public class Tools {
 
     public Long getTimeframe(){
         try {
-            Long miliseconds = Constants.TIMEFRAME_MILISECONDS_DAY * Constants.TIMEFRAME_NEW_RECIPE_DAYS;
+            Long miliseconds = RecetasCookeoConstants.TIMEFRAME_MILISECONDS_DAY * RecetasCookeoConstants.TIMEFRAME_NEW_RECIPE_DAYS;
             return System.currentTimeMillis() - miliseconds;
         }catch(Exception e){
             e.printStackTrace();
@@ -152,7 +149,7 @@ public class Tools {
 
     public String getCurrentDate(Context context) {
         Calendar c = Calendar.getInstance();
-        SimpleDateFormat df = new SimpleDateFormat(Constants.FORMAT_DATE_TIME,
+        SimpleDateFormat df = new SimpleDateFormat(RecetasCookeoConstants.FORMAT_DATE_TIME,
                 context.getResources().getConfiguration().locale);
         return df.format(c.getTime());
     }
@@ -193,7 +190,7 @@ public class Tools {
                     .getPackageInfo(application.getPackageName(), 0);
             return packageInfo.versionCode;
         } catch (PackageManager.NameNotFoundException e) {
-            ACRA.getErrorReporter().handleSilentException(e);
+            // TODO: 14/1/17 aquí mandaba excepción con ACRA
             return 0;
         }
     }
