@@ -95,13 +95,14 @@ public class RecipeListActivity extends FirebaseAuthBase implements RecipeListFr
     private int openCircleRevealY;
     private boolean animate;
     @State String lastFilter;
-    @State Boolean checkRecipesFromFirebase = true;
+    @State Boolean checkRecipesTimestampFromFirebase = true;
+    @State Boolean downloadPendingRecipesFromFirebase = false;
 
     //Firebase values
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
-    private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mRecipeTimestamps;
+    private ValueEventListener timestampListener;
 
 
     private final DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
@@ -195,7 +196,7 @@ public class RecipeListActivity extends FirebaseAuthBase implements RecipeListFr
         mStatusIntentFilter.addAction(RecetasCookeoConstants.ACTION_BROADCAST_DELETED_RECIPE);
 
         //Compruebo si hay nuevas recetas o modificaciones en la base de datos (sólo en el arranque)
-        if(checkRecipesFromFirebase){
+        if(checkRecipesTimestampFromFirebase){
             connectToFirebaseForNewRecipes();
         }
 
@@ -736,6 +737,9 @@ public class RecipeListActivity extends FirebaseAuthBase implements RecipeListFr
         if (mAuthListener != null) {
             mAuth.removeAuthStateListener(mAuthListener);
         }
+        if(timestampListener != null){
+            mRecipeTimestamps.removeEventListener(timestampListener);
+        }
 
     }
 
@@ -757,10 +761,9 @@ public class RecipeListActivity extends FirebaseAuthBase implements RecipeListFr
     }
 
     private void connectToFirebaseForNewRecipes(){
-        mFirebaseDatabase = FirebaseDatabase.getInstance();
-        mRecipeTimestamps = mFirebaseDatabase.getReference(RecetasCookeoConstants.ALLOWED_RECIPES_NODE +
+        mRecipeTimestamps = FirebaseDatabase.getInstance().getReference(RecetasCookeoConstants.ALLOWED_RECIPES_NODE +
             "/" + RecetasCookeoConstants.TIMESTAMP_RECIPES_NODE);
-        mRecipeTimestamps.addListenerForSingleValueEvent(new ValueEventListener() {
+        timestampListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 RecipeShortDao recipeShortDao = ((CocinaConRollApplication)getApplication()).getDaoSession().getRecipeShortDao();
@@ -773,26 +776,38 @@ public class RecipeListActivity extends FirebaseAuthBase implements RecipeListFr
                 Query query = recipeShortDao.queryBuilder().where(
                         RecipeShortDao.Properties.Key.eq(key)
                 ).build();
+                Boolean downloadRecipesTemp = false;
                 for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
                     RecipeTimestamp recipeTimestamp = postSnapshot.getValue(RecipeTimestamp.class);
                     key = postSnapshot.getKey();
                     query.setParameter(0, key);
                     RecipeShort recipeFromDatabase = (RecipeShort) query.unique();
                     if(recipeFromDatabase == null){
-                        //no existe en la base de datos, la creo
+                        //no existe en la base de datos -> la creo.
                         recipeFromDatabase = new RecipeShort();
                         recipeFromDatabase.setKey(key);
                         recipeFromDatabase.setTimestamp(recipeTimestamp.getTimestamp());
                         recipeFromDatabase.setDownloadRecipe(true);
                         recipeShortDao.insert(recipeFromDatabase);
+                        downloadRecipesTemp = true;
                     }else{
                         //ya existe
                         if(recipeTimestamp.getTimestamp() > recipeFromDatabase.getTimestamp()){
-                            //la actualizo
+                            //existe -> la actualizo
                             recipeFromDatabase.setTimestamp(recipeTimestamp.getTimestamp());
                             recipeFromDatabase.setDownloadRecipe(true);
                             recipeFromDatabase.update();
+                            downloadRecipesTemp = true;
                         }
+                    }
+                }
+                checkRecipesTimestampFromFirebase = false;
+                if(downloadRecipesTemp){
+                    RecipeListFragment fragment = (RecipeListFragment) getSupportFragmentManager().findFragmentById(R.id.list_recipes_fragment);
+                    if(fragment != null){
+                        fragment.downloadRecipesFromFirebase();
+                    }else{
+                        downloadPendingRecipesFromFirebase = downloadRecipesTemp;
                     }
                 }
             }
@@ -801,7 +816,8 @@ public class RecipeListActivity extends FirebaseAuthBase implements RecipeListFr
             public void onCancelled(DatabaseError databaseError) {
 
             }
-        });
+        };
+        mRecipeTimestamps.addListenerForSingleValueEvent(timestampListener);
     }
 
 

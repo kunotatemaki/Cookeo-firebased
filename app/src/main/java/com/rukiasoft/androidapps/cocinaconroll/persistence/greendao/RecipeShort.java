@@ -17,6 +17,7 @@ public class RecipeShort {
     @Id(autoincrement = true)
     private Long id;
     @Index(unique = true)
+    @NotNull
     private String key;
     private String name;
     private String type;
@@ -39,9 +40,9 @@ private transient RecipeShortDao myDao;
     public RecipeShort() {
     }
 
-@Generated(hash = 1268009714)
-public RecipeShort(Long id, String key, String name, String type, Integer icon,
-        String picture, Boolean vegetarian, Boolean favourite,
+@Generated(hash = 619197396)
+public RecipeShort(Long id, @NotNull String key, String name, String type,
+        Integer icon, String picture, Boolean vegetarian, Boolean favourite,
         @NotNull Long timestamp, @NotNull Boolean downloadRecipe,
         Boolean downloadPicture) {
     this.id = id;

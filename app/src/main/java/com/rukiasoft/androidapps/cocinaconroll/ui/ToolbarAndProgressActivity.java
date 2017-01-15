@@ -31,6 +31,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.lang.reflect.Field;
 
 import icepick.Icepick;
+import icepick.State;
 
 /**
  * Base activity for activities that need to show a Refresh Layout and a Custom Toolbar
@@ -38,6 +39,8 @@ import icepick.Icepick;
 public abstract class ToolbarAndProgressActivity extends AppCompatActivity {
 
 
+    @State Boolean needToShowRefresh = false;
+    @State String message = "";
     @VisibleForTesting
     public ProgressDialog mProgressDialog;
 
@@ -82,25 +85,30 @@ public abstract class ToolbarAndProgressActivity extends AppCompatActivity {
         }
     }
 
-    public void showProgressDialog(String message) {
+    public void showProgressDialog(String message)
+    {
+        this.message = message;
+        showProgressDialog();
+    }
+
+    public void showProgressDialog() {
         if (mProgressDialog == null) {
             mProgressDialog = new ProgressDialog(this);
-            mProgressDialog.setMessage(message);
             mProgressDialog.setIndeterminate(true);
         }
-
+        mProgressDialog.setMessage(message);
+        needToShowRefresh = true;
         mProgressDialog.show();
     }
 
-    public void changeMessage(String message){
-        if(mProgressDialog.isShowing()){
-            mProgressDialog.setMessage(message);
-        }else{
-            showProgressDialog(message);
+    public void hideProgressDialog() {
+        if (mProgressDialog != null && mProgressDialog.isShowing()) {
+            mProgressDialog.dismiss();
         }
+        needToShowRefresh = false;
     }
 
-    public void hideProgressDialog() {
+    public void hideProgressDialogOnStop() {
         if (mProgressDialog != null && mProgressDialog.isShowing()) {
             mProgressDialog.dismiss();
         }
@@ -109,7 +117,7 @@ public abstract class ToolbarAndProgressActivity extends AppCompatActivity {
     @Override
     public void onStop() {
         super.onStop();
-        hideProgressDialog();
+        hideProgressDialogOnStop();
     }
 
 

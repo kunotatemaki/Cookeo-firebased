@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
@@ -40,6 +41,7 @@ import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
 import com.rukiasoft.androidapps.cocinaconroll.BuildConfig;
+import com.rukiasoft.androidapps.cocinaconroll.CocinaConRollApplication;
 import com.rukiasoft.androidapps.cocinaconroll.R;
 import com.rukiasoft.androidapps.cocinaconroll.classes.RecipeItem;
 import com.rukiasoft.androidapps.cocinaconroll.database.CocinaConRollContentProvider;
@@ -47,6 +49,7 @@ import com.rukiasoft.androidapps.cocinaconroll.database.DatabaseRelatedTools;
 import com.rukiasoft.androidapps.cocinaconroll.database.RecipesTable;
 import com.rukiasoft.androidapps.cocinaconroll.fastscroller.FastScroller;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.CommonRecipeOperations;
+import com.rukiasoft.androidapps.cocinaconroll.utilities.LogHelper;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.ReadWriteTools;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.Tools;
@@ -59,6 +62,7 @@ import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import jp.wasabeef.recyclerview.adapters.SlideInBottomAnimationAdapter;
 
+
 /**
  * A placeholder fragment containing a simple view.
  */
@@ -66,10 +70,12 @@ public class RecipeListFragment extends Fragment implements
         LoaderManager.LoaderCallbacks<Cursor>, RecipeListRecyclerViewAdapter.OnCardClickListener,
         AppBarLayout.OnOffsetChangedListener{
 
+    private static final String TAG = LogHelper.makeLogTag(RecipeListFragment.class);
     private static final String KEY_SCROLL_POSITION = RecetasCookeoConstants.PACKAGE_NAME + ".scrollposition";
     private static final String KEY_RECIPE_LIST = RecetasCookeoConstants.PACKAGE_NAME + ".recipelist";
     private static final int LOAD_ORIGINAL_PATH = 0;
     private static final int LOAD_EDITED_PATH = 1;
+    private static final long MAX_MSECONDS_REFRESING = 3000000;
 
 
     @Nullable
@@ -93,6 +99,7 @@ public class RecipeListFragment extends Fragment implements
     FloatingActionButton addRecipeButtonFAB;
     @BindView(R.id.init_database_text) TextView initDatabaseText;
     private Unbinder unbinder;
+    private CountDownTimer timeoutRefreshing;
 
     interface TaskCallback {
         void onInitDatabasePostExecute();
@@ -172,6 +179,19 @@ public class RecipeListFragment extends Fragment implements
         });
 
         requestNewInterstitial();
+        if(timeoutRefreshing == null){
+            timeoutRefreshing = new CountDownTimer(MAX_MSECONDS_REFRESING, 5000) {
+
+                public void onTick(long millisUntilFinished) {
+                    Log.d(TAG, "imprimiendo counter" + millisUntilFinished);
+                }
+
+                public void onFinish() {
+                    Log.d(TAG, "terminado counter");
+                    ((RecipeListActivity)getActivity()).hideProgressDialog();
+                }
+            };
+        }
     }
 
     private void requestNewInterstitial() {
@@ -280,15 +300,16 @@ public class RecipeListFragment extends Fragment implements
     @Override
     public void onResume(){
         super.onResume();
-        Tools tools = new Tools();
+
         if(getActivity() instanceof ToolbarAndProgressActivity){
-            /*if(((ToolbarAndProgressActivity) getActivity()).needToShowRefresh){
-                tools.showRefreshLayout(getActivity());
+            ToolbarAndProgressActivity activity = (ToolbarAndProgressActivity) getActivity();
+            if(activity.needToShowRefresh){
+                activity.showProgressDialog();
             }else{
-                tools.hideRefreshLayout(getActivity());
-            }*/
+                activity.hideProgressDialog();
+            }
         }
-        Tools mTools = new Tools();
+
 
     }
 
@@ -301,6 +322,10 @@ public class RecipeListFragment extends Fragment implements
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+        //Veo si tengo que descargar recetas de firebase
+        if(((RecipeListActivity)getActivity()).downloadPendingRecipesFromFirebase){
+            downloadRecipesFromFirebase();
+        }
 
         // Initialize a Loader with id '1'. If the Loader with this id already
         // exists, then the LoaderManager will reuse the existing Loader.
@@ -311,8 +336,6 @@ public class RecipeListFragment extends Fragment implements
         }
 
     }
-
-
 
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
@@ -636,6 +659,20 @@ public class RecipeListFragment extends Fragment implements
     public void onDetach() {
         super.onDetach();
         mInitDatabaseCallback = null;
+    }
+
+    public void downloadRecipesFromFirebase(){
+        //inicio el timer
+        if(timeoutRefreshing != null){
+            timeoutRefreshing.start();
+        }
+        //Leo las recetas pendientes
+        if(this.isResumed()) {
+            ((RecipeListActivity) getActivity()).showProgressDialog("descargando recetas");
+        }else{
+            ((RecipeListActivity) getActivity()).needToShowRefresh = true;
+        }
+
     }
 
 }
