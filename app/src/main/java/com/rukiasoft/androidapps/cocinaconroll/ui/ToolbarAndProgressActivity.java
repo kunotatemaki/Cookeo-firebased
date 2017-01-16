@@ -108,16 +108,12 @@ public abstract class ToolbarAndProgressActivity extends AppCompatActivity {
         needToShowRefresh = false;
     }
 
-    public void hideProgressDialogOnStop() {
-        if (mProgressDialog != null && mProgressDialog.isShowing()) {
-            mProgressDialog.dismiss();
-        }
-    }
-
     @Override
     public void onStop() {
         super.onStop();
-        hideProgressDialogOnStop();
+        if (mProgressDialog != null && mProgressDialog.isShowing()) {
+            mProgressDialog.dismiss();
+        }
     }
 
 

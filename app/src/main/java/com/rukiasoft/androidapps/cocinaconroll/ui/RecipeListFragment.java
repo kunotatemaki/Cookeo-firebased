@@ -40,6 +40,9 @@ import android.widget.TextView;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.rukiasoft.androidapps.cocinaconroll.BuildConfig;
 import com.rukiasoft.androidapps.cocinaconroll.CocinaConRollApplication;
 import com.rukiasoft.androidapps.cocinaconroll.R;
@@ -48,11 +51,15 @@ import com.rukiasoft.androidapps.cocinaconroll.database.CocinaConRollContentProv
 import com.rukiasoft.androidapps.cocinaconroll.database.DatabaseRelatedTools;
 import com.rukiasoft.androidapps.cocinaconroll.database.RecipesTable;
 import com.rukiasoft.androidapps.cocinaconroll.fastscroller.FastScroller;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.greendao.RecipeShort;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.greendao.RecipeShortDao;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.CommonRecipeOperations;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.LogHelper;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.ReadWriteTools;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.Tools;
+
+import org.greenrobot.greendao.query.Query;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,6 +67,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import icepick.State;
 import jp.wasabeef.recyclerview.adapters.SlideInBottomAnimationAdapter;
 
 
@@ -75,7 +83,7 @@ public class RecipeListFragment extends Fragment implements
     private static final String KEY_RECIPE_LIST = RecetasCookeoConstants.PACKAGE_NAME + ".recipelist";
     private static final int LOAD_ORIGINAL_PATH = 0;
     private static final int LOAD_EDITED_PATH = 1;
-    private static final long MAX_MSECONDS_REFRESING = 3000000;
+    private static final long MAX_MSECONDS_REFRESING = 30000;
 
 
     @Nullable
@@ -100,6 +108,8 @@ public class RecipeListFragment extends Fragment implements
     @BindView(R.id.init_database_text) TextView initDatabaseText;
     private Unbinder unbinder;
     private CountDownTimer timeoutRefreshing;
+    @State Boolean counting = false;    //Para controlar si está contando o no
+    private Query query;
 
     interface TaskCallback {
         void onInitDatabasePostExecute();
@@ -179,18 +189,25 @@ public class RecipeListFragment extends Fragment implements
         });
 
         requestNewInterstitial();
+
+        //Inicio el temporizador si es necesario
         if(timeoutRefreshing == null){
             timeoutRefreshing = new CountDownTimer(MAX_MSECONDS_REFRESING, 5000) {
 
                 public void onTick(long millisUntilFinished) {
-                    Log.d(TAG, "imprimiendo counter" + millisUntilFinished);
+                    counting = true;
                 }
 
                 public void onFinish() {
-                    Log.d(TAG, "terminado counter");
+                    counting = false;
                     ((RecipeListActivity)getActivity()).hideProgressDialog();
                 }
             };
+        }
+
+        //inicio la query si es necesario
+        if(query == null){
+            initializeQuery();
         }
     }
 
@@ -661,18 +678,35 @@ public class RecipeListFragment extends Fragment implements
         mInitDatabaseCallback = null;
     }
 
+    private void initializeQuery(){
+        RecipeShortDao recipeShortDao = ((CocinaConRollApplication)getActivity().getApplication()).getDaoSession().getRecipeShortDao();
+        recipeShortDao.detachAll();
+        String key = "";
+        query = recipeShortDao.queryBuilder().where(
+                RecipeShortDao.Properties.DownloadRecipe.eq(1)
+        ).build();
+    }
+
     public void downloadRecipesFromFirebase(){
         //inicio el timer
-        if(timeoutRefreshing != null){
+        if(!counting){
             timeoutRefreshing.start();
         }
         //Leo las recetas pendientes
         if(this.isResumed()) {
-            ((RecipeListActivity) getActivity()).showProgressDialog("descargando recetas");
+            ((RecipeListActivity) getActivity()).showProgressDialog(getString(R.string.downloading_recipes));
         }else{
             ((RecipeListActivity) getActivity()).needToShowRefresh = true;
         }
-
+        if(query == null){
+            initializeQuery();
+        }
+        List<RecipeShort> recipes = query.list();
+        for(RecipeShort recipe : recipes){
+            DatabaseReference mRecipeRefDetailed = FirebaseDatabase.getInstance().getReference(RecetasCookeoConstants.ALLOWED_RECIPES_NODE +
+                    "/" + RecetasCookeoConstants.DETAILED_RECIPES_NODE + "/" + recipe.getKey());
+            // TODO: 17/1/17 leer las recetas
+        }
     }
 
 }

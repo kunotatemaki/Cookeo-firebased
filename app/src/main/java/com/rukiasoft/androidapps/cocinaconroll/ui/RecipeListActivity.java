@@ -133,6 +133,12 @@ public class RecipeListActivity extends FirebaseAuthBase implements RecipeListFr
 
         final Tools mTools = new Tools();
 
+        //Para hacer debug de las querys de la base de datos
+        if(BuildConfig.DEBUG) {
+            QueryBuilder.LOG_SQL = true;
+            QueryBuilder.LOG_VALUES = true;
+        }
+
         mAuth = FirebaseAuth.getInstance();
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -769,10 +775,6 @@ public class RecipeListActivity extends FirebaseAuthBase implements RecipeListFr
                 RecipeShortDao recipeShortDao = ((CocinaConRollApplication)getApplication()).getDaoSession().getRecipeShortDao();
                 recipeShortDao.detachAll();
                 String key = "";
-                if(BuildConfig.DEBUG) {
-                    QueryBuilder.LOG_SQL = true;
-                    QueryBuilder.LOG_VALUES = true;
-                }
                 Query query = recipeShortDao.queryBuilder().where(
                         RecipeShortDao.Properties.Key.eq(key)
                 ).build();

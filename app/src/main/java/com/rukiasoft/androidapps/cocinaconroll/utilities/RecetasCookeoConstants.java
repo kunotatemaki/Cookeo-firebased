@@ -108,4 +108,7 @@ public class RecetasCookeoConstants {
 
 
     public static final String SHORT_RECIPE_TABLE_NAME = "SHORT_RECIPES";
+
+    public static int LANG_SPANISH = 0;
+
 }
