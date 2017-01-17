@@ -23,7 +23,7 @@ public class Step {
     private String key;
     @Index
     @NotNull
-    private String position;
+    private int position;
     @NotNull
     private String step;
 /** Used to resolve relations */
@@ -97,7 +97,7 @@ public void update() {
 public String getPosition() {
     return this.position;
 }
-public void setPosition(String position) {
+public void setPosition(int position) {
     this.position = position;
 }
 /** called by internal mechanisms, do not call yourself. */
