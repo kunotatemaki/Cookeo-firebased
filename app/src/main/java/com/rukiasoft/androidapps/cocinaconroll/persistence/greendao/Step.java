@@ -32,9 +32,8 @@ private transient DaoSession daoSession;
 /** Used for active entity operations. */
 @Generated(hash = 838845936)
 private transient StepDao myDao;
-@Generated(hash = 1871213660)
-public Step(Long id, @NotNull String key, @NotNull String position,
-        @NotNull String step) {
+@Generated(hash = 1037140008)
+public Step(Long id, @NotNull String key, int position, @NotNull String step) {
     this.id = id;
     this.key = key;
     this.position = position;
@@ -54,6 +53,12 @@ public String getKey() {
 }
 public void setKey(String key) {
     this.key = key;
+}
+public int getPosition() {
+    return this.position;
+}
+public void setPosition(int position) {
+    this.position = position;
 }
 public String getStep() {
     return this.step;
@@ -93,12 +98,6 @@ public void update() {
         throw new DaoException("Entity is detached from DAO context");
     }
     myDao.update(this);
-}
-public String getPosition() {
-    return this.position;
-}
-public void setPosition(int position) {
-    this.position = position;
 }
 /** called by internal mechanisms, do not call yourself. */
 @Generated(hash = 1241179918)
