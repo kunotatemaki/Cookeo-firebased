@@ -778,7 +778,6 @@ public class RecipeListActivity extends FirebaseAuthBase implements RecipeListFr
                 Query query = recipeShortDao.queryBuilder().where(
                         RecipeShortDao.Properties.Key.eq(key)
                 ).build();
-                Boolean downloadRecipesTemp = false;
                 for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
                     RecipeTimestamp recipeTimestamp = postSnapshot.getValue(RecipeTimestamp.class);
                     key = postSnapshot.getKey();
@@ -791,7 +790,6 @@ public class RecipeListActivity extends FirebaseAuthBase implements RecipeListFr
                         recipeFromDatabase.setTimestamp(recipeTimestamp.getTimestamp());
                         recipeFromDatabase.setDownloadRecipe(true);
                         recipeShortDao.insert(recipeFromDatabase);
-                        downloadRecipesTemp = true;
                     }else{
                         //ya existe
                         if(recipeTimestamp.getTimestamp() > recipeFromDatabase.getTimestamp()){
@@ -799,19 +797,19 @@ public class RecipeListActivity extends FirebaseAuthBase implements RecipeListFr
                             recipeFromDatabase.setTimestamp(recipeTimestamp.getTimestamp());
                             recipeFromDatabase.setDownloadRecipe(true);
                             recipeFromDatabase.update();
-                            downloadRecipesTemp = true;
                         }
                     }
                 }
                 checkRecipesTimestampFromFirebase = false;
-                if(downloadRecipesTemp){
-                    RecipeListFragment fragment = (RecipeListFragment) getSupportFragmentManager().findFragmentById(R.id.list_recipes_fragment);
-                    if(fragment != null){
-                        fragment.downloadRecipesFromFirebase();
-                    }else{
-                        downloadPendingRecipesFromFirebase = downloadRecipesTemp;
-                    }
+                //Si el fragment existe, llamo a descargar (haya recetas nuevas o no).
+                //Si no, lo marco como pendiente
+                RecipeListFragment fragment = (RecipeListFragment) getSupportFragmentManager().findFragmentById(R.id.list_recipes_fragment);
+                if(fragment != null){
+                    fragment.downloadRecipesFromFirebase();
+                }else{
+                    downloadPendingRecipesFromFirebase = true;
                 }
+
             }
 
             @Override

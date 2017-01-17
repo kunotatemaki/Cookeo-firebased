@@ -1,5 +1,9 @@
 package com.rukiasoft.androidapps.cocinaconroll.persistence.greendao;
 
+import com.rukiasoft.androidapps.cocinaconroll.R;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.RecipeDetailed;
+import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
+
 import org.greenrobot.greendao.DaoException;
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Generated;
@@ -38,6 +42,32 @@ private transient DaoSession daoSession;
 private transient RecipeShortDao myDao;
 
     public RecipeShort() {
+    }
+
+    public RecipeShort(RecipeDetailed recipe, String key){
+        this.key = key;
+        this.name = recipe.getName();
+        this.type = recipe.getType();
+        switch (recipe.getType()) {
+            case RecetasCookeoConstants.TYPE_DESSERTS:
+                this.icon = R.drawable.ic_dessert_24;
+                break;
+            case RecetasCookeoConstants.TYPE_STARTERS:
+                this.icon = R.drawable.ic_starters_24;
+                break;
+            case RecetasCookeoConstants.TYPE_MAIN:
+                this.icon = R.drawable.ic_main_24;
+                break;
+            default:
+                this.icon = R.drawable.ic_all_24;
+                break;
+        }
+        this.picture = recipe.getPicture()!=null? recipe.getPicture() : RecetasCookeoConstants.DEFAULT_PICTURE_NAME;
+        this.downloadPicture = !this.picture.equals(RecetasCookeoConstants.DEFAULT_PICTURE_NAME);
+        this.vegetarian = recipe.getVegetarian();
+        this.favourite = false;
+        this.downloadRecipe = false;
+        this.timestamp = System.currentTimeMillis();
     }
 
 @Generated(hash = 619197396)

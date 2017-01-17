@@ -18,9 +18,12 @@ import org.greenrobot.greendao.DaoException;
 public class Ingredient {
     @Id(autoincrement = true)
     private Long id;
-    @Index(unique = true)
+    @Index
     @NotNull
     private String key;
+    @Index
+    @NotNull
+    private int position;
     @NotNull
     private String ingredient;
 /** Used to resolve relations */
@@ -29,10 +32,12 @@ private transient DaoSession daoSession;
 /** Used for active entity operations. */
 @Generated(hash = 942581853)
 private transient IngredientDao myDao;
-@Generated(hash = 90575321)
-public Ingredient(Long id, @NotNull String key, @NotNull String ingredient) {
+@Generated(hash = 1315817613)
+public Ingredient(Long id, @NotNull String key, int position,
+        @NotNull String ingredient) {
     this.id = id;
     this.key = key;
+    this.position = position;
     this.ingredient = ingredient;
 }
 @Generated(hash = 1584798654)
@@ -88,6 +93,12 @@ public void update() {
         throw new DaoException("Entity is detached from DAO context");
     }
     myDao.update(this);
+}
+public int getPosition() {
+    return this.position;
+}
+public void setPosition(int position) {
+    this.position = position;
 }
 /** called by internal mechanisms, do not call yourself. */
 @Generated(hash = 1386056592)

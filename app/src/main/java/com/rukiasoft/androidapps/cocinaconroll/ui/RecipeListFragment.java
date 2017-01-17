@@ -40,6 +40,8 @@ import android.widget.TextView;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
@@ -51,6 +53,9 @@ import com.rukiasoft.androidapps.cocinaconroll.database.CocinaConRollContentProv
 import com.rukiasoft.androidapps.cocinaconroll.database.DatabaseRelatedTools;
 import com.rukiasoft.androidapps.cocinaconroll.database.RecipesTable;
 import com.rukiasoft.androidapps.cocinaconroll.fastscroller.FastScroller;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.RecipeDetailed;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.greendao.Ingredient;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.greendao.IngredientDao;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.greendao.RecipeShort;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.greendao.RecipeShortDao;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.CommonRecipeOperations;
@@ -109,7 +114,7 @@ public class RecipeListFragment extends Fragment implements
     private Unbinder unbinder;
     private CountDownTimer timeoutRefreshing;
     @State Boolean counting = false;    //Para controlar si está contando o no
-    private Query query;
+    private Query queryRecipesToDownload;
 
     interface TaskCallback {
         void onInitDatabasePostExecute();
@@ -205,9 +210,9 @@ public class RecipeListFragment extends Fragment implements
             };
         }
 
-        //inicio la query si es necesario
-        if(query == null){
-            initializeQuery();
+        //inicio la queryRecipesToDownload si es necesario
+        if(queryRecipesToDownload == null){
+            initializeQueryRecipesToDownload();
         }
     }
 
@@ -325,6 +330,12 @@ public class RecipeListFragment extends Fragment implements
             }else{
                 activity.hideProgressDialog();
             }
+        }
+
+        //Veo si tengo que descargar recetas
+        if(getActivity() instanceof RecipeListActivity &&
+                ((RecipeListActivity) getActivity()).downloadPendingRecipesFromFirebase){
+            downloadRecipesFromFirebase();
         }
 
 
@@ -678,37 +689,94 @@ public class RecipeListFragment extends Fragment implements
         mInitDatabaseCallback = null;
     }
 
-    private void initializeQuery(){
+    private void initializeQueryRecipesToDownload(){
         RecipeShortDao recipeShortDao = ((CocinaConRollApplication)getActivity().getApplication()).getDaoSession().getRecipeShortDao();
         recipeShortDao.detachAll();
-        String key = "";
-        query = recipeShortDao.queryBuilder().where(
+        queryRecipesToDownload = recipeShortDao.queryBuilder().where(
                 RecipeShortDao.Properties.DownloadRecipe.eq(1)
         ).build();
     }
 
     public void downloadRecipesFromFirebase(){
+        //Veo si hay que descargar recetas
+        if(queryRecipesToDownload == null){
+            initializeQueryRecipesToDownload();
+        }
+        List<RecipeShort> recipes = queryRecipesToDownload.list();
+        if(recipes == null || recipes.isEmpty()){
+            return;
+        }
+
         //inicio el timer
         if(!counting){
+            counting = true;
             timeoutRefreshing.start();
         }
-        //Leo las recetas pendientes
+        //Pongo el loading
         if(this.isResumed()) {
             ((RecipeListActivity) getActivity()).showProgressDialog(getString(R.string.downloading_recipes));
         }else{
             ((RecipeListActivity) getActivity()).needToShowRefresh = true;
         }
-        if(query == null){
-            initializeQuery();
-        }
-        List<RecipeShort> recipes = query.list();
+        //Descargo las recetas de Firebase
         for(RecipeShort recipe : recipes){
             DatabaseReference mRecipeRefDetailed = FirebaseDatabase.getInstance().getReference(RecetasCookeoConstants.ALLOWED_RECIPES_NODE +
                     "/" + RecetasCookeoConstants.DETAILED_RECIPES_NODE + "/" + recipe.getKey());
-            // TODO: 17/1/17 leer las recetas
+            mRecipeRefDetailed.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    RecipeDetailed recipe = dataSnapshot.getValue(RecipeDetailed.class);
+                    RecipeShort recipeShort = new RecipeShort(recipe, dataSnapshot.getKey());
+                    RecipeShortDao recipeShortDao = ((CocinaConRollApplication)getActivity().getApplication())
+                            .getDaoSession().getRecipeShortDao();
+                    recipeShortDao.detachAll();
+                    // TODO: 17/1/17 probar que esto reemplaza
+                    recipeShortDao.insertOrReplace(recipeShort);
+                    //grabo los ingredientes
+                    saveIngredientsToDatabase(recipe.getIngredients(), dataSnapshot.getKey());
+                    if(recipeShort.getDownloadPicture()){
+                        downloadPictureFromDatabase(recipeShort.getPicture());
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
         }
     }
 
+    private void saveIngredientsToDatabase(List<String> ingredients, String key){
+        //Grabo los ingredientes
+        IngredientDao ingredientDao = ((CocinaConRollApplication)getActivity().getApplication())
+                .getDaoSession().getIngredientDao();
+        Query query = ingredientDao.queryBuilder().where(
+                IngredientDao.Properties.Key.eq(""),
+                IngredientDao.Properties.Position.eq(0)
+        ).build();
+        for(int i=0; i<ingredients.size(); i++){
+            query.setParameter(0, key);
+            query.setParameter(1, i);
+            Ingredient ingredient = (Ingredient) query.unique();
+            if(ingredient == null){
+                ingredient = new Ingredient();
+                ingredient.setKey(key);
+                ingredient.setPosition(i);
+                ingredient.setIngredient(ingredients.get(i));
+                ingredientDao.insert(ingredient);
+            }else{
+                ingredient.setIngredient(ingredients.get(i));
+                ingredient.update();
+            }
+
+        }
+    }
+
+    private void downloadPictureFromDatabase(String name){
+        // TODO: 17/1/17 download picture from firebase
+
+    }
 }
 
 
