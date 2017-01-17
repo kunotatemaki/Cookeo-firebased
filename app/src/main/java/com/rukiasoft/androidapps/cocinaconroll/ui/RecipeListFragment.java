@@ -58,6 +58,8 @@ import com.rukiasoft.androidapps.cocinaconroll.persistence.greendao.Ingredient;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.greendao.IngredientDao;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.greendao.RecipeShort;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.greendao.RecipeShortDao;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.greendao.Step;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.greendao.StepDao;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.CommonRecipeOperations;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.LogHelper;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
@@ -734,6 +736,8 @@ public class RecipeListFragment extends Fragment implements
                     recipeShortDao.insertOrReplace(recipeShort);
                     //grabo los ingredientes
                     saveIngredientsToDatabase(recipe.getIngredients(), dataSnapshot.getKey());
+                    //grabo los pasos
+                    saveStepsToDatabase(recipe.getSteps(), dataSnapshot.getKey());
                     if(recipeShort.getDownloadPicture()){
                         downloadPictureFromDatabase(recipeShort.getPicture());
                     }
@@ -758,17 +762,31 @@ public class RecipeListFragment extends Fragment implements
         for(int i=0; i<ingredients.size(); i++){
             query.setParameter(0, key);
             query.setParameter(1, i);
-            Ingredient ingredient = (Ingredient) query.unique();
-            if(ingredient == null){
-                ingredient = new Ingredient();
-                ingredient.setKey(key);
-                ingredient.setPosition(i);
-                ingredient.setIngredient(ingredients.get(i));
-                ingredientDao.insert(ingredient);
-            }else{
-                ingredient.setIngredient(ingredients.get(i));
-                ingredient.update();
-            }
+            Ingredient ingredient = new Ingredient();
+            ingredient.setKey(key);
+            ingredient.setPosition(i);
+            ingredient.setIngredient(ingredients.get(i));
+            ingredientDao.insertOrReplace(ingredient);
+
+        }
+    }
+
+    private void saveStepsToDatabase(List<String> steps, String key){
+        //Grabo los pasos
+        StepDao stepDao = ((CocinaConRollApplication)getActivity().getApplication())
+                .getDaoSession().getStepDao();
+        Query query = stepDao.queryBuilder().where(
+                StepDao.Properties.Key.eq(""),
+                StepDao.Properties.Position.eq(0)
+        ).build();
+        for(int i=0; i<steps.size(); i++){
+            query.setParameter(0, key);
+            query.setParameter(1, i);
+            Step step = new Step();
+            step.setKey(key);
+            step.setPosition(i);
+            step.setStep(steps.get(i));
+            stepDao.insertOrReplace(step);
 
         }
     }
