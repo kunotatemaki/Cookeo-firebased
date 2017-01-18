@@ -784,6 +784,14 @@ public class RecipeListActivity extends FirebaseAuthBase implements RecipeListFr
                     query.setParameter(0, key);
                     RecipeShort recipeFromDatabase = (RecipeShort) query.unique();
                     if(recipeFromDatabase == null){
+                        recipeFromDatabase = new RecipeShort();
+                    }
+                    recipeFromDatabase.setKey(key);
+                    recipeFromDatabase.setTimestamp(recipeTimestamp.getTimestamp());
+                    recipeFromDatabase.setDownloadRecipe(true);
+                    recipeShortDao.insertOrReplace(recipeFromDatabase);
+
+                    /*if(recipeFromDatabase == null){
                         //no existe en la base de datos -> la creo.
                         recipeFromDatabase = new RecipeShort();
                         recipeFromDatabase.setKey(key);
@@ -798,7 +806,7 @@ public class RecipeListActivity extends FirebaseAuthBase implements RecipeListFr
                             recipeFromDatabase.setDownloadRecipe(true);
                             recipeFromDatabase.update();
                         }
-                    }
+                    }*/
                 }
                 checkRecipesTimestampFromFirebase = false;
                 //Si el fragment existe, llamo a descargar (haya recetas nuevas o no).
