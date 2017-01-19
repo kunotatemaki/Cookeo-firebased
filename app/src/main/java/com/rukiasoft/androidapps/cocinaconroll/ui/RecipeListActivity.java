@@ -11,6 +11,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.nfc.Tag;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -767,6 +768,7 @@ public class RecipeListActivity extends FirebaseAuthBase implements RecipeListFr
     }
 
     private void connectToFirebaseForNewRecipes(){
+        // TODO: 19/1/17 hacer lo mismo para las prohibidas, para que lo tengamos marieta y yo
         mRecipeTimestamps = FirebaseDatabase.getInstance().getReference(RecetasCookeoConstants.ALLOWED_RECIPES_NODE +
             "/" + RecetasCookeoConstants.TIMESTAMP_RECIPES_NODE);
         timestampListener = new ValueEventListener() {
@@ -784,7 +786,12 @@ public class RecipeListActivity extends FirebaseAuthBase implements RecipeListFr
                     query.setParameter(0, key);
                     RecipeShort recipeFromDatabase = (RecipeShort) query.unique();
                     if(recipeFromDatabase == null){
+                        //no existía, la creo
                         recipeFromDatabase = new RecipeShort();
+                        //Log.d(TAG, "no existe, la creo");
+                    }else if(recipeFromDatabase.getTimestamp() >= recipeTimestamp.getTimestamp()){
+                        //Log.d(TAG, "ACTUALIZADA: " + recipeFromDatabase.getName());
+                        continue;
                     }
                     recipeFromDatabase.setKey(key);
                     recipeFromDatabase.setTimestamp(recipeTimestamp.getTimestamp());
@@ -813,8 +820,10 @@ public class RecipeListActivity extends FirebaseAuthBase implements RecipeListFr
                 //Si no, lo marco como pendiente
                 RecipeListFragment fragment = (RecipeListFragment) getSupportFragmentManager().findFragmentById(R.id.list_recipes_fragment);
                 if(fragment != null){
+                    Log.d(TAG, "muestro directamente el loader");
                     fragment.downloadRecipesFromFirebase();
                 }else{
+                    Log.d(TAG, "solicito que muestre en onResume");
                     downloadPendingRecipesFromFirebase = true;
                 }
 

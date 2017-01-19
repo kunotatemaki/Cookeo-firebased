@@ -66,6 +66,7 @@ import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.ReadWriteTools;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.Tools;
 
+import org.greenrobot.greendao.query.DeleteQuery;
 import org.greenrobot.greendao.query.Query;
 
 import java.util.ArrayList;
@@ -701,6 +702,7 @@ public class RecipeListFragment extends Fragment implements
 
     public void downloadRecipesFromFirebase(){
         //Veo si hay que descargar recetas
+        // TODO: 19/1/17 sacar a un asynctask
         if(queryRecipesToDownload == null){
             initializeQueryRecipesToDownload();
         }
@@ -728,6 +730,7 @@ public class RecipeListFragment extends Fragment implements
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     RecipeDetailed recipe = dataSnapshot.getValue(RecipeDetailed.class);
+                    Log.d(TAG, "descatdo" + recipe.getName());
                     RecipeShort recipeShort = new RecipeShort(recipe, dataSnapshot.getKey());
                     RecipeShortDao recipeShortDao = ((CocinaConRollApplication)getActivity().getApplication())
                             .getDaoSession().getRecipeShortDao();
@@ -759,6 +762,18 @@ public class RecipeListFragment extends Fragment implements
                 IngredientDao.Properties.Key.eq(""),
                 IngredientDao.Properties.Position.eq(0)
         ).build();
+        //FOR TESTING
+        Query queryTest = ingredientDao.queryBuilder().where(
+                IngredientDao.Properties.Key.eq(key)
+        ).build();
+        List<Ingredient> ingredients1 = queryTest.list();
+// TODO: 19/1/17 hacer el borrado de ingredientes y pasos con esta query
+        DeleteQuery<Ingredient> delete = ingredientDao.queryBuilder().where(
+                IngredientDao.Properties.Key.eq(key)
+        ).buildDelete();
+delete.executeDeleteWithoutDetachingEntities();
+        List<Ingredient> ingredients2 = queryTest.list();
+
         for(int i=0; i<ingredients.size(); i++){
             query.setParameter(0, key);
             query.setParameter(1, i);

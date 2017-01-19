@@ -1,5 +1,7 @@
 package com.rukiasoft.androidapps.cocinaconroll.persistence.greendao;
 
+import android.bluetooth.BluetoothDevice;
+
 import com.rukiasoft.androidapps.cocinaconroll.R;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.RecipeDetailed;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
@@ -67,6 +69,7 @@ private transient RecipeShortDao myDao;
         this.vegetarian = recipe.getVegetarian();
         this.favourite = false;
         this.downloadRecipe = false;
+        // TODO: 19/1/17 comprobar si el timestamp actual es mayor o igual que el de la receta de firebase, y poner el mayor
         this.timestamp = System.currentTimeMillis();
     }
 
