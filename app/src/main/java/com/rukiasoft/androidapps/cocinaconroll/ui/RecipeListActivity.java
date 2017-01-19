@@ -96,14 +96,11 @@ public class RecipeListActivity extends FirebaseAuthBase implements RecipeListFr
     private int openCircleRevealY;
     private boolean animate;
     @State String lastFilter;
-    @State Boolean checkRecipesTimestampFromFirebase = true;
-    @State Boolean downloadPendingRecipesFromFirebase = false;
 
     //Firebase values
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
-    private DatabaseReference mRecipeTimestamps;
-    private ValueEventListener timestampListener;
+
 
 
     private final DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
@@ -202,10 +199,7 @@ public class RecipeListActivity extends FirebaseAuthBase implements RecipeListFr
         mStatusIntentFilter.addAction(RecetasCookeoConstants.ACTION_BROADCAST_UPLOADED_RECIPE);
         mStatusIntentFilter.addAction(RecetasCookeoConstants.ACTION_BROADCAST_DELETED_RECIPE);
 
-        //Compruebo si hay nuevas recetas o modificaciones en la base de datos (sólo en el arranque)
-        if(checkRecipesTimestampFromFirebase){
-            connectToFirebaseForNewRecipes();
-        }
+
 
 
         if(savedInstanceState == null) {
@@ -744,9 +738,7 @@ public class RecipeListActivity extends FirebaseAuthBase implements RecipeListFr
         if (mAuthListener != null) {
             mAuth.removeAuthStateListener(mAuthListener);
         }
-        if(timestampListener != null){
-            mRecipeTimestamps.removeEventListener(timestampListener);
-        }
+
 
     }
 
@@ -767,78 +759,7 @@ public class RecipeListActivity extends FirebaseAuthBase implements RecipeListFr
         startActivityForResult(intent, REQUEST_CODE_SIGNING);
     }
 
-    private void connectToFirebaseForNewRecipes(){
-        // TODO: 19/1/17 hacer lo mismo para las prohibidas, para que lo tengamos marieta y yo
-        mRecipeTimestamps = FirebaseDatabase.getInstance().getReference(RecetasCookeoConstants.ALLOWED_RECIPES_NODE +
-            "/" + RecetasCookeoConstants.TIMESTAMP_RECIPES_NODE);
-        timestampListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                RecipeShortDao recipeShortDao = ((CocinaConRollApplication)getApplication()).getDaoSession().getRecipeShortDao();
-                recipeShortDao.detachAll();
-                String key = "";
-                Query query = recipeShortDao.queryBuilder().where(
-                        RecipeShortDao.Properties.Key.eq(key)
-                ).build();
-                for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
-                    RecipeTimestamp recipeTimestamp = postSnapshot.getValue(RecipeTimestamp.class);
-                    key = postSnapshot.getKey();
-                    query.setParameter(0, key);
-                    RecipeShort recipeFromDatabase = (RecipeShort) query.unique();
-                    if(recipeFromDatabase == null){
-                        //no existía, la creo
-                        recipeFromDatabase = new RecipeShort();
-                        //Log.d(TAG, "no existe, la creo");
-                    }else if(recipeFromDatabase.getTimestamp() >= recipeTimestamp.getTimestamp()){
-                        //Log.d(TAG, "ACTUALIZADA: " + recipeFromDatabase.getName());
-                        continue;
-                    }
-                    if(recipeFromDatabase.getTimestamp() == null ||
-                            recipeFromDatabase.getTimestamp() < recipeTimestamp.getTimestamp()) {
-                        recipeFromDatabase.setKey(key);
-                        recipeFromDatabase.setTimestamp(System.currentTimeMillis());
-                        recipeFromDatabase.setDownloadRecipe(true);
-                        recipeShortDao.insertOrReplace(recipeFromDatabase);
-                    }
 
-                    /*if(recipeFromDatabase == null){
-                        //no existe en la base de datos -> la creo.
-                        recipeFromDatabase = new RecipeShort();
-                        recipeFromDatabase.setKey(key);
-                        recipeFromDatabase.setTimestamp(recipeTimestamp.getTimestamp());
-                        recipeFromDatabase.setDownloadRecipe(true);
-                        recipeShortDao.insert(recipeFromDatabase);
-                    }else{
-                        //ya existe
-                        if(recipeTimestamp.getTimestamp() > recipeFromDatabase.getTimestamp()){
-                            //existe -> la actualizo
-                            recipeFromDatabase.setTimestamp(recipeTimestamp.getTimestamp());
-                            recipeFromDatabase.setDownloadRecipe(true);
-                            recipeFromDatabase.update();
-                        }
-                    }*/
-                }
-                checkRecipesTimestampFromFirebase = false;
-                //Si el fragment existe, llamo a descargar (haya recetas nuevas o no).
-                //Si no, lo marco como pendiente
-                RecipeListFragment fragment = (RecipeListFragment) getSupportFragmentManager().findFragmentById(R.id.list_recipes_fragment);
-                if(fragment != null){
-                    Log.d(TAG, "muestro directamente el loader");
-                    fragment.downloadRecipesFromFirebase();
-                }else{
-                    Log.d(TAG, "solicito que muestre en onResume");
-                    downloadPendingRecipesFromFirebase = true;
-                }
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        };
-        mRecipeTimestamps.addListenerForSingleValueEvent(timestampListener);
-    }
 
 
 }
