@@ -777,7 +777,10 @@ delete.executeDeleteWithoutDetachingEntities();
         for(int i=0; i<ingredients.size(); i++){
             query.setParameter(0, key);
             query.setParameter(1, i);
-            Ingredient ingredient = new Ingredient();
+            Ingredient ingredient = (Ingredient) query.unique();
+            if(ingredient == null){
+                ingredient = new Ingredient();
+            }
             ingredient.setKey(key);
             ingredient.setPosition(i);
             ingredient.setIngredient(ingredients.get(i));
@@ -797,7 +800,10 @@ delete.executeDeleteWithoutDetachingEntities();
         for(int i=0; i<steps.size(); i++){
             query.setParameter(0, key);
             query.setParameter(1, i);
-            Step step = new Step();
+            Step step = (Step) query.unique();
+            if(step == null){
+                step = new Step();
+            }
             step.setKey(key);
             step.setPosition(i);
             step.setStep(steps.get(i));

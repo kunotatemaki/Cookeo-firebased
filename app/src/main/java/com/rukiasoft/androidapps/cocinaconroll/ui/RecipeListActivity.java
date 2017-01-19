@@ -793,10 +793,13 @@ public class RecipeListActivity extends FirebaseAuthBase implements RecipeListFr
                         //Log.d(TAG, "ACTUALIZADA: " + recipeFromDatabase.getName());
                         continue;
                     }
-                    recipeFromDatabase.setKey(key);
-                    recipeFromDatabase.setTimestamp(recipeTimestamp.getTimestamp());
-                    recipeFromDatabase.setDownloadRecipe(true);
-                    recipeShortDao.insertOrReplace(recipeFromDatabase);
+                    if(recipeFromDatabase.getTimestamp() == null ||
+                            recipeFromDatabase.getTimestamp() < recipeTimestamp.getTimestamp()) {
+                        recipeFromDatabase.setKey(key);
+                        recipeFromDatabase.setTimestamp(System.currentTimeMillis());
+                        recipeFromDatabase.setDownloadRecipe(true);
+                        recipeShortDao.insertOrReplace(recipeFromDatabase);
+                    }
 
                     /*if(recipeFromDatabase == null){
                         //no existe en la base de datos -> la creo.
