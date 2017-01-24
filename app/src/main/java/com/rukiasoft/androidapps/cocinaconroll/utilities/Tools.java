@@ -31,7 +31,7 @@ public class Tools {
 
     public Long getTimeframe(){
         try {
-            Long miliseconds = RecetasCookeoConstants.TIMEFRAME_MILISECONDS_DAY * RecetasCookeoConstants.TIMEFRAME_NEW_RECIPE_DAYS;
+            Long miliseconds = RecetasCookeoConstants.TIMEFRAME_MILI_SECONDS_DAY * RecetasCookeoConstants.TIMEFRAME_NEW_RECIPE_DAYS;
             return System.currentTimeMillis() - miliseconds;
         }catch(Exception e){
             e.printStackTrace();

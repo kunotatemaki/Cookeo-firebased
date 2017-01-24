@@ -95,6 +95,7 @@ public abstract class ToolbarAndProgressActivity extends AppCompatActivity {
         if (mProgressDialog == null) {
             mProgressDialog = new ProgressDialog(this);
             mProgressDialog.setIndeterminate(true);
+            mProgressDialog.setCanceledOnTouchOutside(false);
         }
         mProgressDialog.setMessage(message);
         needToShowRefresh = true;

@@ -1,17 +1,15 @@
 package com.rukiasoft.androidapps.cocinaconroll.persistence.greendao;
 
-import android.bluetooth.BluetoothDevice;
-
 import com.rukiasoft.androidapps.cocinaconroll.R;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.RecipeDetailed;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 
-import org.greenrobot.greendao.DaoException;
 import org.greenrobot.greendao.annotation.Entity;
-import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Index;
 import org.greenrobot.greendao.annotation.NotNull;
+import org.greenrobot.greendao.annotation.Generated;
+import org.greenrobot.greendao.DaoException;
 
 
 @Entity(
@@ -31,9 +29,13 @@ public class RecipeShort {
     private String picture;
     private Boolean vegetarian;
     private Boolean favourite;
-    private String tip;
     private Integer minutes;
     private Integer portions;
+    private Integer languaje;
+    private String author;
+    private String link;
+    private String tip;
+    private Boolean original;
     @NotNull
     private Long timestamp;
     @NotNull
@@ -72,14 +74,21 @@ public class RecipeShort {
         this.vegetarian = recipe.getVegetarian();
         this.favourite = false;
         this.downloadRecipe = false;
-        // TODO: 19/1/17 comprobar si el timestamp actual es mayor o igual que el de la receta de firebase, y poner el mayor
         this.timestamp = System.currentTimeMillis();
+        this.author = recipe.getAuthor();
+        this.minutes = recipe.getMinutes();
+        this.portions = recipe.getPortions();
+        this.tip = recipe.getTip();
+        this.languaje = recipe.getLanguage();
+        this.link = recipe.getLink();
+
     }
 
-    @Generated(hash = 1002064868)
+    @Generated(hash = 693107154)
     public RecipeShort(Long id, @NotNull String key, String name, String type, Integer icon, String picture,
-            Boolean vegetarian, Boolean favourite, String tip, Integer minutes, Integer portions, @NotNull Long timestamp,
-            @NotNull Boolean downloadRecipe, Boolean downloadPicture) {
+            Boolean vegetarian, Boolean favourite, Integer minutes, Integer portions, Integer languaje, String author,
+            String link, String tip, Boolean original, @NotNull Long timestamp, @NotNull Boolean downloadRecipe,
+            Boolean downloadPicture) {
         this.id = id;
         this.key = key;
         this.name = name;
@@ -88,9 +97,13 @@ public class RecipeShort {
         this.picture = picture;
         this.vegetarian = vegetarian;
         this.favourite = favourite;
-        this.tip = tip;
         this.minutes = minutes;
         this.portions = portions;
+        this.languaje = languaje;
+        this.author = author;
+        this.link = link;
+        this.tip = tip;
+        this.original = original;
         this.timestamp = timestamp;
         this.downloadRecipe = downloadRecipe;
         this.downloadPicture = downloadPicture;
@@ -160,14 +173,6 @@ public class RecipeShort {
         this.favourite = favourite;
     }
 
-    public String getTip() {
-        return this.tip;
-    }
-
-    public void setTip(String tip) {
-        this.tip = tip;
-    }
-
     public Integer getMinutes() {
         return this.minutes;
     }
@@ -182,6 +187,38 @@ public class RecipeShort {
 
     public void setPortions(Integer portions) {
         this.portions = portions;
+    }
+
+    public Integer getLanguaje() {
+        return this.languaje;
+    }
+
+    public void setLanguaje(Integer languaje) {
+        this.languaje = languaje;
+    }
+
+    public String getAuthor() {
+        return this.author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
+    public String getLink() {
+        return this.link;
+    }
+
+    public void setLink(String link) {
+        this.link = link;
+    }
+
+    public String getTip() {
+        return this.tip;
+    }
+
+    public void setTip(String tip) {
+        this.tip = tip;
     }
 
     public Long getTimestamp() {
@@ -242,6 +279,14 @@ public class RecipeShort {
             throw new DaoException("Entity is detached from DAO context");
         }
         myDao.update(this);
+    }
+
+    public Boolean getOriginal() {
+        return this.original;
+    }
+
+    public void setOriginal(Boolean original) {
+        this.original = original;
     }
 
     /** called by internal mechanisms, do not call yourself. */

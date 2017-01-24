@@ -14,6 +14,8 @@ import com.rukiasoft.androidapps.cocinaconroll.persistence.greendao.DaoSession;
 import com.squareup.leakcanary.LeakCanary;
 import com.squareup.leakcanary.RefWatcher;
 
+import org.greenrobot.greendao.query.QueryBuilder;
+
 
 /**
  * Created by Ruler on 2015.
@@ -99,6 +101,14 @@ public class CocinaConRollApplication  extends MultiDexApplication {
         SQLiteDatabase db = helper.getWritableDatabase();
         DaoMaster daoMaster = new DaoMaster(db);
         daoSession = daoMaster.newSession();
+
+        //Para hacer debug de las querys de la base de datos
+        if(BuildConfig.DEBUG) {
+            QueryBuilder.LOG_SQL = true;
+            QueryBuilder.LOG_VALUES = true;
+        }
+
+
     }
 
     @Override

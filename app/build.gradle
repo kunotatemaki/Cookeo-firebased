@@ -105,21 +105,17 @@ dependencies {
     compile 'commons-io:commons-io:2.4'
     compile 'com.google.code.gson:gson:2.8.0'
     compile 'com.squareup.okhttp:okhttp:2.0.0'
-
     //Database
     compile 'org.greenrobot:greendao:3.2.0'
-
     //Play Services
     compile 'com.google.android.gms:play-services-auth:10.0.1'
-
     //firebase
     compile 'com.google.firebase:firebase-auth:10.0.1'
     compile 'com.google.firebase:firebase-database:10.0.1'
-
+    compile 'com.google.firebase:firebase-storage:10.0.1'
     //Icepick
     compile 'frankiesardo:icepick:3.2.0'
     provided 'frankiesardo:icepick-processor:3.2.0'
-
     //Parceler
     compile 'org.parceler:parceler-api:1.1.1'
     apt 'org.parceler:parceler:1.1.1'

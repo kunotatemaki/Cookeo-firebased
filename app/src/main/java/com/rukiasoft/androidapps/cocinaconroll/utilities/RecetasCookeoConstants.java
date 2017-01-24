@@ -83,7 +83,7 @@ public class RecetasCookeoConstants {
     public static final Integer PATH_TYPE_EDITED = 2;
     public static final Integer PATH_TYPE_OLD_EDITED = 3;
 
-    public static final Long TIMEFRAME_MILISECONDS_DAY = (long) (1000 * 3600 * 24);
+    public static final Long TIMEFRAME_MILI_SECONDS_DAY = (long) (1000 * 3600 * 24);
     public static final Integer TIMEFRAME_NEW_RECIPE_DAYS = 7;
 
     public static final String FILTER_ALL_RECIPES = PACKAGE_NAME + ".allrecipes";
@@ -108,6 +108,8 @@ public class RecetasCookeoConstants {
 
 
     public static final String SHORT_RECIPE_TABLE_NAME = "SHORT_RECIPES";
+    public static final String STORAGE_URL = "gs://hardy-binder-89508.appspot.com";
+    public static final String STORAGE_NODE = "recipes";
 
     public static int LANG_SPANISH = 0;
 

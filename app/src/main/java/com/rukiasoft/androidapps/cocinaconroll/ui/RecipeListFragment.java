@@ -13,6 +13,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -40,11 +41,16 @@ import android.widget.TextView;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FileDownloadTask;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.rukiasoft.androidapps.cocinaconroll.BuildConfig;
 import com.rukiasoft.androidapps.cocinaconroll.CocinaConRollApplication;
 import com.rukiasoft.androidapps.cocinaconroll.R;
@@ -69,7 +75,10 @@ import com.rukiasoft.androidapps.cocinaconroll.utilities.Tools;
 
 import org.greenrobot.greendao.query.DeleteQuery;
 import org.greenrobot.greendao.query.Query;
+import org.greenrobot.greendao.query.QueryBuilder;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -124,6 +133,8 @@ public class RecipeListFragment extends Fragment implements
     private DatabaseReference mRecipeTimestamps;
     private ValueEventListener timestampListener;
     @State Boolean checkRecipesTimestampFromFirebase = true;
+    //Firebase storage
+    FirebaseStorage storage;
 
     interface TaskCallback {
         void onInitDatabasePostExecute();
@@ -223,6 +234,11 @@ public class RecipeListFragment extends Fragment implements
         if(queryRecipesToDownload == null){
             initializeQueryRecipesToDownload();
         }
+
+        //inicio el storage si es necesario
+        if(storage == null){
+            storage = FirebaseStorage.getInstance();
+        }
     }
 
     private void requestNewInterstitial() {
@@ -246,10 +262,6 @@ public class RecipeListFragment extends Fragment implements
         if(getActivity() instanceof ToolbarAndProgressActivity){
             ((ToolbarAndProgressActivity) getActivity()).setToolbar(mToolbarRecipeListFragment);
         }
-
-        //Set the refresh layout
-        Tools tools = new Tools();
-        //tools.setRefreshLayout(getActivity(), refreshLayout);
 
         savedScrollPosition = 0;
         if(savedInstanceState != null){
@@ -699,14 +711,15 @@ public class RecipeListFragment extends Fragment implements
     private void initializeQueryRecipesToDownload(){
         RecipeShortDao recipeShortDao = ((CocinaConRollApplication)getActivity().getApplication()).getDaoSession().getRecipeShortDao();
         recipeShortDao.detachAll();
-        queryRecipesToDownload = recipeShortDao.queryBuilder().where(
-                RecipeShortDao.Properties.DownloadRecipe.eq(1)
+        QueryBuilder qb = recipeShortDao.queryBuilder();
+        queryRecipesToDownload = qb.where(
+                qb.or(RecipeShortDao.Properties.DownloadRecipe.eq(1),
+                RecipeShortDao.Properties.DownloadPicture.eq(1))
         ).build();
     }
 
     public void downloadRecipesFromFirebase(){
         //Veo si hay que descargar recetas
-        // TODO: 19/1/17 sacar a un asynctask
         if(queryRecipesToDownload == null){
             initializeQueryRecipesToDownload();
         }
@@ -728,21 +741,27 @@ public class RecipeListFragment extends Fragment implements
         }
         //Descargo las recetas de Firebase
         for(RecipeShort recipe : recipes){
-            DatabaseReference mRecipeRefDetailed = FirebaseDatabase.getInstance().getReference(RecetasCookeoConstants.ALLOWED_RECIPES_NODE +
-                    "/" + RecetasCookeoConstants.DETAILED_RECIPES_NODE + "/" + recipe.getKey());
-            mRecipeRefDetailed.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    DowloadRecipeTask downloadTask = new DowloadRecipeTask();
-                    downloadTask.execute(dataSnapshot);
+            if(recipe.getDownloadRecipe()) {
+                //descargo la receta y luego si procede, la foto
+                DatabaseReference mRecipeRefDetailed = FirebaseDatabase.getInstance().getReference(RecetasCookeoConstants.ALLOWED_RECIPES_NODE +
+                        "/" + RecetasCookeoConstants.DETAILED_RECIPES_NODE + "/" + recipe.getKey());
+                mRecipeRefDetailed.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        DowloadRecipeTask downloadTask = new DowloadRecipeTask();
+                        downloadTask.execute(dataSnapshot);
 
-                }
+                    }
 
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
 
-                }
-            });
+                    }
+                });
+            }else if(recipe.getDownloadPicture()){
+                //sólo descargo la foto
+                downloadPictureFromDatabase(recipe.getPicture());
+            }
         }
     }
 
@@ -803,8 +822,28 @@ public class RecipeListFragment extends Fragment implements
         }
     }
 
-    private void downloadPictureFromDatabase(String name){
-        // TODO: 17/1/17 download picture from firebase
+    private void downloadPictureFromDatabase(final String name){
+        StorageReference storageRef = storage.getReference();
+        StorageReference imageRef = storageRef.child("recipes/" + name);
+        final File imageFile;
+        ReadWriteTools rwTools = new ReadWriteTools();
+        String path = rwTools.getOriginalStorageDir(getContext());
+        imageFile = new File(path + name);
+
+        imageRef.getFile(imageFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                // Local temp file has been created
+                Log.d(TAG, "Salvado correctamente: " + name);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                if(imageFile != null && imageFile.exists()){
+                    imageFile.delete();
+                }
+            }
+        });
 
     }
 
@@ -815,7 +854,8 @@ public class RecipeListFragment extends Fragment implements
         timestampListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-
+                DownloadTimestampsTask downloadTimestampsTask = new DownloadTimestampsTask();
+                downloadTimestampsTask.execute(dataSnapshot);
             }
 
             @Override
