@@ -739,8 +739,10 @@ public class RecipeListFragment extends Fragment implements
         }else{
             ((RecipeListActivity) getActivity()).needToShowRefresh = true;
         }
+        int i=1;
         //Descargo las recetas de Firebase
         for(RecipeShort recipe : recipes){
+            if(i==0) break;
             if(recipe.getDownloadRecipe()) {
                 //descargo la receta y luego si procede, la foto
                 DatabaseReference mRecipeRefDetailed = FirebaseDatabase.getInstance().getReference(RecetasCookeoConstants.ALLOWED_RECIPES_NODE +
@@ -762,6 +764,7 @@ public class RecipeListFragment extends Fragment implements
                 //sólo descargo la foto
                 downloadPictureFromDatabase(recipe.getPicture());
             }
+            i++;
         }
     }
 

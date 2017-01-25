@@ -60,9 +60,10 @@ public class SignInActivity extends FirebaseAuthBase{
         discardButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Tools mTools = new Tools();
+                signInAnnonimously();
+                /*Tools mTools = new Tools();
                 mTools.savePreferences(SignInActivity.this, RecetasCookeoConstants.PROPERTY_AVOID_GOOGLE_SIGN_IN, true);
-                finish();
+                finish();*/
             }
         });
 

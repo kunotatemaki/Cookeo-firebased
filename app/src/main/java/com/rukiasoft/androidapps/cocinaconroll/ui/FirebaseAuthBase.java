@@ -66,6 +66,14 @@ public class FirebaseAuthBase extends ToolbarAndProgressActivity implements
             mTools.savePreferences(this, RecetasCookeoConstants.PROPERTY_FIREBASE_ID, user.getUid());
             //force to send registration token to server again, with this new information
             mTools.savePreferences(this, QuickstartPreferences.SENT_TOKEN_TO_SERVER, false);
+            try {
+                Log.d(TAG, user.getUid());
+                Log.d(TAG, user.getDisplayName());
+                Log.d(TAG, user.getEmail());
+
+            }catch(Exception e){
+                Log.d(TAG, "no hay user");
+            }
         } else {
             mTools.savePreferences(this, RecetasCookeoConstants.PROPERTY_DEVICE_OWNER_NAME, "");
             mTools.savePreferences(this, RecetasCookeoConstants.PROPERTY_DEVICE_OWNER_EMAIL, "");
@@ -79,6 +87,29 @@ public class FirebaseAuthBase extends ToolbarAndProgressActivity implements
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }
 
+    protected void signInAnnonimously(){
+        FirebaseAuth.getInstance().signInAnonymously()
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        Log.d(TAG, "signInWithCredential:onComplete:" + task.isSuccessful());
+                        hideProgressDialog();
+                        // If sign in fails, display a message to the user. If sign in succeeds
+                        // the auth state listener will be notified and logic to handle the
+                        // signed in user can be handled in the listener.
+                        if (!task.isSuccessful()) {
+                            Log.w(TAG, "signInWithCredential", task.getException());
+                            Toast.makeText(FirebaseAuthBase.this, getString(R.string.signed_in_err),
+                                    Toast.LENGTH_SHORT).show();
+                            revokeAccess();
+                        }else{
+                            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                            handleSignInResult(user);
+                            finish();
+                        }
+                    }
+                });
+    }
 
 
     protected void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
