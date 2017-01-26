@@ -78,7 +78,6 @@ import org.greenrobot.greendao.query.Query;
 import org.greenrobot.greendao.query.QueryBuilder;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -133,8 +132,12 @@ public class RecipeListFragment extends Fragment implements
     private DatabaseReference mRecipeTimestamps;
     private ValueEventListener timestampListener;
     @State Boolean checkRecipesTimestampFromFirebase = true;
+    @State Boolean isDownloadingPics = false;
     //Firebase storage
     FirebaseStorage storage;
+
+    //Pull de fotos a descargar
+    private List<String> pullPictures;
 
     interface TaskCallback {
         void onInitDatabasePostExecute();
@@ -199,6 +202,7 @@ public class RecipeListFragment extends Fragment implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
+        pullPictures = new ArrayList<>();
         mInterstitialAd = new InterstitialAd(getActivity());
         mInterstitialAd.setAdUnitId(getResources().getString(R.string.banner_ad_unit_id_intersticial));
 
@@ -739,10 +743,8 @@ public class RecipeListFragment extends Fragment implements
         }else{
             ((RecipeListActivity) getActivity()).needToShowRefresh = true;
         }
-        int i=1;
         //Descargo las recetas de Firebase
         for(RecipeShort recipe : recipes){
-            if(i==0) break;
             if(recipe.getDownloadRecipe()) {
                 //descargo la receta y luego si procede, la foto
                 DatabaseReference mRecipeRefDetailed = FirebaseDatabase.getInstance().getReference(RecetasCookeoConstants.ALLOWED_RECIPES_NODE +
@@ -750,9 +752,8 @@ public class RecipeListFragment extends Fragment implements
                 mRecipeRefDetailed.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        DowloadRecipeTask downloadTask = new DowloadRecipeTask();
+                        DownloadRecipeTask downloadTask = new DownloadRecipeTask();
                         downloadTask.execute(dataSnapshot);
-
                     }
 
                     @Override
@@ -761,13 +762,21 @@ public class RecipeListFragment extends Fragment implements
                     }
                 });
             }else if(recipe.getDownloadPicture()){
-                //sólo descargo la foto
-                downloadPictureFromDatabase(recipe.getPicture());
+                //añado la foto al pull de descargas y si no ha empezado a descargar, empiezo
+                pullPictures.add(recipe.getPicture());
+                if(!isDownloadingPics) {
+                    isDownloadingPics = !isDownloadingPics;
+                    downloadPictureFromStorage();
+                }
             }
-            i++;
         }
     }
 
+    /**
+     * Salva los ingredientes de una receta en la base de datos local
+     * @param ingredients lista de ingredientes
+     * @param key identificador de la receta
+     */
     private void saveIngredientsToDatabase(List<String> ingredients, String key){
         //Grabo los ingredientes (primero borro los que había)
         IngredientDao ingredientDao = ((CocinaConRollApplication)getActivity().getApplication())
@@ -797,8 +806,12 @@ public class RecipeListFragment extends Fragment implements
         }
     }
 
+    /**
+     * Grabo los pasos de la receta en la base de datos local
+     * @param steps lista de pasos
+     * @param key identificador de la receta
+     */
     private void saveStepsToDatabase(List<String> steps, String key){
-        //Grabo los pasos
         StepDao stepDao = ((CocinaConRollApplication)getActivity().getApplication())
                 .getDaoSession().getStepDao();
         Query query = stepDao.queryBuilder().where(
@@ -825,7 +838,12 @@ public class RecipeListFragment extends Fragment implements
         }
     }
 
-    private void downloadPictureFromDatabase(final String name){
+    private void downloadPictureFromStorage(){
+        if(pullPictures.isEmpty()){
+            isDownloadingPics = !isDownloadingPics;
+            return;
+        }
+        final String name = pullPictures.get(0);
         StorageReference storageRef = storage.getReference();
         StorageReference imageRef = storageRef.child("recipes/" + name);
         final File imageFile;
@@ -838,20 +856,27 @@ public class RecipeListFragment extends Fragment implements
             public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
                 // Local temp file has been created
                 Log.d(TAG, "Salvado correctamente: " + name);
+                //quito del pull y sigo descargando
+                pullPictures.remove(name);
+                // TODO: 26/1/17 poner el flag de download pic a cero
+                downloadPictureFromStorage();
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception exception) {
-                if(imageFile != null && imageFile.exists()){
+                //Si ha fallado, borro el temporal y continuo
+                Log.d(TAG, "No existe " + name);
+                if(imageFile != null && imageFile.exists()) {
                     imageFile.delete();
                 }
+                pullPictures.remove(name);
+                downloadPictureFromStorage();
             }
         });
 
     }
 
     private void connectToFirebaseForNewRecipes(String node){
-        // TODO: 19/1/17 hacer lo mismo para las prohibidas, para que lo tengamos marieta y yo
         mRecipeTimestamps = FirebaseDatabase.getInstance().getReference(node +
                 "/" + RecetasCookeoConstants.TIMESTAMP_RECIPES_NODE);
         timestampListener = new ValueEventListener() {
@@ -870,12 +895,18 @@ public class RecipeListFragment extends Fragment implements
     }
 
     //ASYNCTASKS
-    private class DowloadRecipeTask extends AsyncTask<DataSnapshot, Integer, RecipeShort> {
+
+    /**
+     * Tarea que almacena las recetas descargadas
+     */
+    private class DownloadRecipeTask extends AsyncTask<DataSnapshot, Integer, RecipeShort> {
 
         @Override
         protected RecipeShort doInBackground(DataSnapshot... dataSnapshots) {
             DataSnapshot dataSnapshot = dataSnapshots[0];
             RecipeDetailed recipe = dataSnapshot.getValue(RecipeDetailed.class);
+            // TODO: 26/1/17 quitar esto provisional
+            if(recipe == null)  return null;
             RecipeShort recipeShort = new RecipeShort(recipe, dataSnapshot.getKey());
             RecipeShortDao recipeShortDao = ((CocinaConRollApplication)getActivity().getApplication())
                     .getDaoSession().getRecipeShortDao();
@@ -890,12 +921,22 @@ public class RecipeListFragment extends Fragment implements
 
         @Override
         protected void onPostExecute(RecipeShort recipeShort) {
+            // TODO: 26/1/17 quitar esto
+            if(recipeShort == null) return;
             if(recipeShort.getDownloadPicture()){
-                downloadPictureFromDatabase(recipeShort.getPicture());
+                pullPictures.add(recipeShort.getPicture());
+                if(!isDownloadingPics){
+                    isDownloadingPics = !isDownloadingPics;
+                    downloadPictureFromStorage();
+                }
+
             }
         }
     }
 
+    /**
+     * Tarea que comprueba los timestamps descargados
+     */
     private class DownloadTimestampsTask extends AsyncTask<DataSnapshot, Integer, Void>{
 
         @Override

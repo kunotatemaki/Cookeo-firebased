@@ -2,40 +2,56 @@ package com.rukiasoft.androidapps.cocinaconroll.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
+
+import icepick.State;
 
 
 public class SplashActivity extends AppCompatActivity {
 
-    private boolean started = false;
-    private static final String KEY_STARTED = RecetasCookeoConstants.PACKAGE_NAME + ".started";
+    @State boolean started = false;
     //request constants
-    private static final int REQUEST_CODE_ANIMATION = 21;
+    FirebaseAuth mAuth;
+    FirebaseAuth.AuthStateListener mAuthListener;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if(savedInstanceState != null){
-            if(savedInstanceState.containsKey(KEY_STARTED)) {
-                started = savedInstanceState.getBoolean(KEY_STARTED);
+        mAuth = FirebaseAuth.getInstance();
+        mAuthListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                if (user != null) {
+                    launchMainScreen();
+                } else {
+                    launchSignInScreen();
+                }
             }
-        }
+        };
 
         //start animation if needed
         if(!started){
             launchAnimation();
         }else {
-            launchMainScreen();
+            launchMainOrSigningScreen();
         }
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
-            case REQUEST_CODE_ANIMATION:
+            case RecetasCookeoConstants.REQUEST_CODE_ANIMATION:
+                launchMainOrSigningScreen();
+                break;
+            case RecetasCookeoConstants.REQUEST_CODE_SIGNING_FROM_SPLASH:
                 launchMainScreen();
                 break;
             default:
@@ -43,9 +59,21 @@ public class SplashActivity extends AppCompatActivity {
         }
     }
 
+    private void launchMainOrSigningScreen(){
+        mAuth.addAuthStateListener(mAuthListener);
+    }
+
     @Override
-    public void onSaveInstanceState(Bundle bundle){
-        bundle.putBoolean(KEY_STARTED, true);
+    public void onStop() {
+        super.onStop();
+        if (mAuthListener != null) {
+            mAuth.removeAuthStateListener(mAuthListener);
+        }
+    }
+
+    private void launchAnimation(){
+        Intent animationIntent = new Intent(this, AnimationActivity.class);
+        startActivityForResult(animationIntent, RecetasCookeoConstants.REQUEST_CODE_ANIMATION);
     }
 
     private void launchMainScreen(){
@@ -54,8 +82,8 @@ public class SplashActivity extends AppCompatActivity {
         finish();
     }
 
-    private void launchAnimation(){
-        Intent animationIntent = new Intent(this, AnimationActivity.class);
-        startActivityForResult(animationIntent, REQUEST_CODE_ANIMATION);
+    private void launchSignInScreen(){
+        Intent intent = new Intent(SplashActivity.this, SignInActivity.class);
+        startActivityForResult(intent, RecetasCookeoConstants.REQUEST_CODE_SIGNING_FROM_SPLASH);
     }
 }

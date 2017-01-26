@@ -9,6 +9,7 @@ import android.support.multidex.MultiDexApplication;
 
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.greendao.DaoMaster;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.greendao.DaoSession;
 import com.squareup.leakcanary.LeakCanary;
@@ -35,7 +36,6 @@ public class CocinaConRollApplication  extends MultiDexApplication {
      */
     private Tracker tracker;
     private DaoSession daoSession;
-
 
     /**
      * Access to the global Analytics singleton. If this method returns null you forgot to either
@@ -122,4 +122,5 @@ public class CocinaConRollApplication  extends MultiDexApplication {
     public DaoSession getDaoSession() {
         return daoSession;
     }
+
 }

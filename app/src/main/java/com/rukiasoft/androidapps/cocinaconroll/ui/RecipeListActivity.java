@@ -11,7 +11,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.nfc.Tag;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -38,30 +37,17 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-import com.rukiasoft.androidapps.cocinaconroll.BuildConfig;
-import com.rukiasoft.androidapps.cocinaconroll.CocinaConRollApplication;
 import com.rukiasoft.androidapps.cocinaconroll.R;
 import com.rukiasoft.androidapps.cocinaconroll.classes.RecipeItem;
 import com.rukiasoft.androidapps.cocinaconroll.classes.ZipItem;
 import com.rukiasoft.androidapps.cocinaconroll.database.DatabaseRelatedTools;
 import com.rukiasoft.androidapps.cocinaconroll.gcm.QuickstartPreferences;
 import com.rukiasoft.androidapps.cocinaconroll.gcm.RegistrationIntentService;
-import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.RecipeTimestamp;
-import com.rukiasoft.androidapps.cocinaconroll.persistence.greendao.RecipeShort;
-import com.rukiasoft.androidapps.cocinaconroll.persistence.greendao.RecipeShortDao;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.CommonRecipeOperations;
-import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.LogHelper;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.ReadWriteTools;
+import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.Tools;
-
-import org.greenrobot.greendao.query.Query;
-import org.greenrobot.greendao.query.QueryBuilder;
 
 import java.io.File;
 import java.io.IOException;
@@ -72,12 +58,10 @@ import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import icepick.State;
 
-public class RecipeListActivity extends FirebaseAuthBase implements RecipeListFragment.TaskCallback{
+public class RecipeListActivity extends ToolbarAndProgressActivity implements RecipeListFragment.TaskCallback{
 
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     private static final String TAG = LogHelper.makeLogTag(RecipeListActivity.class);
-    private static final int REQUEST_CODE_SETTINGS = 20;
-    private static final int REQUEST_CODE_SIGNING = 22;
 
 
     @BindView(R.id.drawer_layout)
@@ -139,6 +123,7 @@ public class RecipeListActivity extends FirebaseAuthBase implements RecipeListFr
                 if (user != null) {
                     // User is signed in
                     showMenuSignOut = true;
+                    Log.d(TAG, "user anonimous " + user.isAnonymous());
                 } else {
                     // User is signed out
                     showMenuSignOut = false;
@@ -278,7 +263,7 @@ public class RecipeListActivity extends FirebaseAuthBase implements RecipeListFr
                     connectToDrive(true);
                 }
                 break;*/
-            case REQUEST_CODE_SIGNING:
+            case RecetasCookeoConstants.REQUEST_CODE_SIGNING_FROM_RECIPELIST:
                 if(!tools.getBooleanFromPreferences(this, RecetasCookeoConstants.PROPERTY_INIT_DATABASE_WITH_EDITED_PATH)) {
                     askForPermissionAndLoadEditedRecipes();
                 }
@@ -447,7 +432,7 @@ public class RecipeListActivity extends FirebaseAuthBase implements RecipeListFr
                 return true;
             case R.id.action_settings:
                 Intent finalIntent = new Intent(this, SettingsActivity.class);
-                startActivityForResult(finalIntent, REQUEST_CODE_SETTINGS);
+                startActivityForResult(finalIntent, RecetasCookeoConstants.REQUEST_CODE_SETTINGS);
                 return true;
             case R.id.menu_thanks:
                 finalIntent = new Intent(this, ThanksActivity.class);
@@ -457,7 +442,7 @@ public class RecipeListActivity extends FirebaseAuthBase implements RecipeListFr
                 launchSignInActivity();
                 return true;
             case R.id.menu_sign_out:
-                revokeAccess();
+                launchSignInActivity();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -594,8 +579,6 @@ public class RecipeListActivity extends FirebaseAuthBase implements RecipeListFr
                 }
             }
         });
-
-
     }
 
     public void onPause(){
@@ -750,7 +733,7 @@ public class RecipeListActivity extends FirebaseAuthBase implements RecipeListFr
 
     private void launchSignInActivity(){
         Intent intent = new Intent(RecipeListActivity.this, SignInActivity.class);
-        startActivityForResult(intent, REQUEST_CODE_SIGNING);
+        startActivityForResult(intent, RecetasCookeoConstants.REQUEST_CODE_SIGNING_FROM_RECIPELIST);
     }
 
 

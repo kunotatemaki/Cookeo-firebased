@@ -113,4 +113,12 @@ public class RecetasCookeoConstants {
 
     public static int LANG_SPANISH = 0;
 
+    //Request codes
+    public static final int REQUEST_CODE_ANIMATION = 101;
+    public static final int REQUEST_CODE_SETTINGS = 102;
+    public static final int REQUEST_CODE_SIGNING_FROM_SPLASH = 103;
+    public static final int REQUEST_CODE_SIGNING_FROM_RECIPELIST = 104;
+    public static final int REQUEST_CODE_GOOGLE_SIGN_IN = 104;
+
+
 }
