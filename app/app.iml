@@ -213,7 +213,6 @@
     <orderEntry type="library" exported="" name="support-core-utils-25.1.0" level="project" />
     <orderEntry type="library" exported="" name="firebase-storage-10.0.1" level="project" />
     <orderEntry type="library" exported="" name="leakcanary-android-1.4-beta2" level="project" />
-    <orderEntry type="library" exported="" name="parceler-api-1.1.1" level="project" />
     <orderEntry type="library" exported="" name="quoin-0.1.2" level="project" />
     <orderEntry type="library" exported="" name="leakcanary-analyzer-1.4-beta2" level="project" />
     <orderEntry type="library" exported="" name="play-services-iid-10.0.1" level="project" />
@@ -229,5 +228,6 @@
     <orderEntry type="library" exported="" name="appcompat-v7-25.1.0" level="project" />
     <orderEntry type="library" exported="" name="simple-xml-2.7.1" level="project" />
     <orderEntry type="library" exported="" name="recyclerview-v7-25.1.0" level="project" />
+    <orderEntry type="library" exported="" name="auto-value-1.2" level="project" />
   </component>
 </module>

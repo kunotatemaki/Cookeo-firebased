@@ -120,5 +120,9 @@ public class RecetasCookeoConstants {
     public static final int REQUEST_CODE_SIGNING_FROM_RECIPELIST = 104;
     public static final int REQUEST_CODE_GOOGLE_SIGN_IN = 104;
 
+    public static final int FLAG_ALLOWED_RECIPE = 1;
+    public static final int FLAG_FORBIDDEN_RECIPE = 2;
+    public static final int FLAG_PERSONAL_RECIPE = 4;
+
 
 }

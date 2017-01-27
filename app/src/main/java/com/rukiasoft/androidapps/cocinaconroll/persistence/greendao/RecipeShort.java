@@ -31,11 +31,11 @@ public class RecipeShort {
     private Boolean favourite;
     private Integer minutes;
     private Integer portions;
-    private Integer languaje;
+    private Integer language;
     private String author;
     private String link;
     private String tip;
-    private Boolean original;
+    private Integer owner;
     @NotNull
     private Long timestamp;
     @NotNull
@@ -51,8 +51,9 @@ public class RecipeShort {
     public RecipeShort() {
     }
 
-    public RecipeShort(RecipeDetailed recipe, String key){
+    public RecipeShort(RecipeDetailed recipe, String key, Integer owner){
         this.key = key;
+        this.owner = owner;
         this.name = recipe.getName();
         this.type = recipe.getType();
         switch (recipe.getType()) {
@@ -79,15 +80,15 @@ public class RecipeShort {
         this.minutes = recipe.getMinutes();
         this.portions = recipe.getPortions();
         this.tip = recipe.getTip();
-        this.languaje = recipe.getLanguage();
+        this.language = recipe.getLanguage();
         this.link = recipe.getLink();
 
     }
 
-    @Generated(hash = 693107154)
+    @Generated(hash = 820236592)
     public RecipeShort(Long id, @NotNull String key, String name, String type, Integer icon, String picture,
-            Boolean vegetarian, Boolean favourite, Integer minutes, Integer portions, Integer languaje, String author,
-            String link, String tip, Boolean original, @NotNull Long timestamp, @NotNull Boolean downloadRecipe,
+            Boolean vegetarian, Boolean favourite, Integer minutes, Integer portions, Integer language, String author,
+            String link, String tip, Integer owner, @NotNull Long timestamp, @NotNull Boolean downloadRecipe,
             Boolean downloadPicture) {
         this.id = id;
         this.key = key;
@@ -99,11 +100,11 @@ public class RecipeShort {
         this.favourite = favourite;
         this.minutes = minutes;
         this.portions = portions;
-        this.languaje = languaje;
+        this.language = language;
         this.author = author;
         this.link = link;
         this.tip = tip;
-        this.original = original;
+        this.owner = owner;
         this.timestamp = timestamp;
         this.downloadRecipe = downloadRecipe;
         this.downloadPicture = downloadPicture;
@@ -189,12 +190,12 @@ public class RecipeShort {
         this.portions = portions;
     }
 
-    public Integer getLanguaje() {
-        return this.languaje;
+    public Integer getLanguage() {
+        return this.language;
     }
 
-    public void setLanguaje(Integer languaje) {
-        this.languaje = languaje;
+    public void setLanguage(Integer language) {
+        this.language = language;
     }
 
     public String getAuthor() {
@@ -219,6 +220,14 @@ public class RecipeShort {
 
     public void setTip(String tip) {
         this.tip = tip;
+    }
+
+    public Integer getOwner() {
+        return this.owner;
+    }
+
+    public void setOwner(Integer owner) {
+        this.owner = owner;
     }
 
     public Long getTimestamp() {
@@ -281,14 +290,6 @@ public class RecipeShort {
         myDao.update(this);
     }
 
-    public Boolean getOriginal() {
-        return this.original;
-    }
-
-    public void setOriginal(Boolean original) {
-        this.original = original;
-    }
-
     /** called by internal mechanisms, do not call yourself. */
     @Generated(hash = 1159410144)
     public void __setDaoSession(DaoSession daoSession) {
@@ -297,4 +298,5 @@ public class RecipeShort {
     }
 
 
+    
 }

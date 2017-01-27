@@ -103,10 +103,10 @@ public class CocinaConRollApplication  extends MultiDexApplication {
         daoSession = daoMaster.newSession();
 
         //Para hacer debug de las querys de la base de datos
-        if(BuildConfig.DEBUG) {
+        /*if(BuildConfig.DEBUG) {
             QueryBuilder.LOG_SQL = true;
             QueryBuilder.LOG_VALUES = true;
-        }
+        }*/
 
 
     }
