@@ -1,14 +1,11 @@
 package com.rukiasoft.androidapps.cocinaconroll.ui;
 
 
-import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
-import android.nfc.Tag;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -79,14 +76,12 @@ import com.rukiasoft.androidapps.cocinaconroll.utilities.ReadWriteTools;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.Tools;
 
-import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.query.DeleteQuery;
 import org.greenrobot.greendao.query.Query;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -107,8 +102,8 @@ public class RecipeListFragment extends Fragment implements
     private static final String KEY_RECIPE_LIST = RecetasCookeoConstants.PACKAGE_NAME + ".recipelist";
     private static final int LOAD_ORIGINAL_PATH = 0;
     private static final int LOAD_EDITED_PATH = 1;
-    private static final long MAX_MSECONDS_DOWNLOADING_RECIPES = 30000;
-    private static final long MAX_MSECONDS_DOWNLOADING_PICTURES = 300000;
+    private static final long MAX_MILI_SECONDS_DOWNLOADING_RECIPES = 30000;
+    private static final long MAX_MILI_SECONDS_DOWNLOADING_PICTURES = 300000;
 
 
     @Nullable
@@ -163,7 +158,6 @@ public class RecipeListFragment extends Fragment implements
     private String lastFilter;
     private InterstitialAd mInterstitialAd;
     private RecipeItem recipeToShow;
-    private boolean readExternalPermisionDialogShown;
 
     private class InitDatabase extends AsyncTask<Void, Integer, Void> {
         final Context mContext;
@@ -232,7 +226,7 @@ public class RecipeListFragment extends Fragment implements
 
         //Inicio el temporizador de las recetas si es necesario
         if(timeoutDownloadingRecipes == null){
-            timeoutDownloadingRecipes = new CountDownTimer(MAX_MSECONDS_DOWNLOADING_RECIPES, 5000) {
+            timeoutDownloadingRecipes = new CountDownTimer(MAX_MILI_SECONDS_DOWNLOADING_RECIPES, 5000) {
 
                 public void onTick(long millisUntilFinished) {
                     Query query = GreenDaoQueries.getQueryRecipesToDownload(session);
@@ -240,9 +234,11 @@ public class RecipeListFragment extends Fragment implements
                     Log.d(TAG, "RECETAS --> " + recipes.size() + " : sec --> " + millisUntilFinished/1000);
                     if(recipes.isEmpty()){
                         Log.d(TAG, "Cancelo");
+                        ((RecipeListActivity)getActivity()).hideProgressDialog();
+                        isDownloadingRecipes = true;
                         this.cancel();
                     }
-                    isDownloadingRecipes = true;
+
                 }
 
                 public void onFinish() {
@@ -255,7 +251,7 @@ public class RecipeListFragment extends Fragment implements
 
         //Inicio el temporizador de las fotos si es necesario
         if(timeoutDownloadingPictures == null){
-            timeoutDownloadingPictures = new CountDownTimer(MAX_MSECONDS_DOWNLOADING_PICTURES, 10000) {
+            timeoutDownloadingPictures = new CountDownTimer(MAX_MILI_SECONDS_DOWNLOADING_PICTURES, 10000) {
 
                 public void onTick(long millisUntilFinished) {
                     isDownloadingPics = true;
@@ -274,6 +270,30 @@ public class RecipeListFragment extends Fragment implements
         }
 
         session = ((CocinaConRollApplication)getActivity().getApplication()).getDaoSession();
+    }
+
+    private void requestSignInForNewRecipe(){
+        AlertDialog.Builder builder =
+                new AlertDialog.Builder(getActivity());
+
+        builder.setMessage(getResources().getString(R.string.create_recipe_explanation))
+                .setTitle(getResources().getString(R.string.permissions_title))
+                .setPositiveButton(getResources().getString(R.string.sign_in),
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel();
+                                ((RecipeListActivity) getActivity()).launchSignInActivity();
+                            }
+                        })
+                .setNegativeButton(getResources().getString(R.string.cancel),
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel();
+                            }
+                        })
+        ;
+
+        builder.create().show();
     }
 
     private void requestNewInterstitial() {
@@ -321,36 +341,13 @@ public class RecipeListFragment extends Fragment implements
             addRecipeButtonFAB.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
-                            ContextCompat.checkSelfPermission(getActivity(),
-                            Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                            != PackageManager.PERMISSION_GRANTED) {
-
-                        if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(),
-                                Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                            AlertDialog.Builder builder =
-                                    new AlertDialog.Builder(getActivity());
-
-                            builder.setMessage(getResources().getString(R.string.write_external_explanation))
-                                    .setTitle(getResources().getString(R.string.permissions_title))
-                                    .setPositiveButton(getResources().getString(R.string.accept),
-                                            new DialogInterface.OnClickListener() {
-                                        public void onClick(DialogInterface dialog, int id) {
-                                            dialog.cancel();
-                                            ActivityCompat.requestPermissions(getActivity(),
-                                                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                                                    RecetasCookeoConstants.MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
-                                        }
-                                    });
-                            builder.create().show();
-                        } else {
-                            ActivityCompat.requestPermissions(getActivity(),
-                                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                                    RecetasCookeoConstants.MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
-                        }
-                    }else{
+                    if(((RecipeListActivity)getActivity()).isSignedIn){
                         createRecipe();
+                    }else{
+                        requestSignInForNewRecipe();
                     }
+
+
                 }
             });
         }
@@ -361,6 +358,7 @@ public class RecipeListFragment extends Fragment implements
             connectToFirebaseForNewRecipes(RecetasCookeoConstants.FORBIDDEN_RECIPES_NODE);
             checkRecipesTimestampFromFirebase = false;
         }
+
 
         return view;
     }
@@ -745,23 +743,27 @@ public class RecipeListFragment extends Fragment implements
 
 
 
+
     public void downloadRecipesFromFirebase(){
         //Veo si hay que descargar recetas
-        List<RecipeShort> recipes = GreenDaoQueries.getQueryRecipesToDownload(session).list();
+        List<RecipeShort> recipes = GreenDaoQueries.getQueryRecipesAndPicturesToDownload(session).list();
         if(recipes == null || recipes.isEmpty()){
             return;
         }
-
+        List<RecipeShort> onlyRecipes = GreenDaoQueries.getQueryRecipesToDownload(session).list();
         //inicio el timer
-        if(!isDownloadingRecipes){
-            isDownloadingRecipes = true;
-            timeoutDownloadingRecipes.start();
-        }
-        //Pongo el loading
-        if(this.isResumed()) {
-            ((RecipeListActivity) getActivity()).showProgressDialog(getString(R.string.downloading_recipes));
-        }else{
-            ((RecipeListActivity) getActivity()).needToShowRefresh = true;
+        if(!onlyRecipes.isEmpty()) {
+            if (!isDownloadingRecipes) {
+                isDownloadingRecipes = true;
+                timeoutDownloadingRecipes.start();
+            }
+            //Pongo el loading
+            if (this.isResumed()) {
+                ((RecipeListActivity) getActivity()).showProgressDialog(getString(R.string.downloading_recipes));
+            } else {
+                ((RecipeListActivity) getActivity()).setMessage(getString(R.string.downloading_recipes));
+                ((RecipeListActivity) getActivity()).needToShowRefresh = true;
+            }
         }
         //Descargo las recetas de Firebase
         for(RecipeShort recipe : recipes){
@@ -814,14 +816,10 @@ public class RecipeListFragment extends Fragment implements
         //Grabo los ingredientes (primero borro los que había)
         IngredientDao ingredientDao = ((CocinaConRollApplication)getActivity().getApplication())
                 .getDaoSession().getIngredientDao();
-        Query query = ingredientDao.queryBuilder().where(
-                IngredientDao.Properties.Key.eq(""),
-                IngredientDao.Properties.Position.eq(0)
-        ).build();
+        Query query = GreenDaoQueries.getQueryGetIngredientByKeyAndPosition(session);
 
-        DeleteQuery<Ingredient> delete = ingredientDao.queryBuilder().where(
-                IngredientDao.Properties.Key.eq(key)
-        ).buildDelete();
+        DeleteQuery<Ingredient> delete = GreenDaoQueries.getDeleteQueryIngredientByKey(session);
+        delete.setParameter(0, key);
         delete.executeDeleteWithoutDetachingEntities();
 
         for(int i=0; i<ingredients.size(); i++){
@@ -847,14 +845,10 @@ public class RecipeListFragment extends Fragment implements
     private void saveStepsToDatabase(List<String> steps, String key){
         StepDao stepDao = ((CocinaConRollApplication)getActivity().getApplication())
                 .getDaoSession().getStepDao();
-        Query query = stepDao.queryBuilder().where(
-                StepDao.Properties.Key.eq(""),
-                StepDao.Properties.Position.eq(0)
-        ).build();
+        Query query = GreenDaoQueries.getQueryGetStepByKeyAndPosition(session);
 
-        DeleteQuery<Step> delete = stepDao.queryBuilder().where(
-                StepDao.Properties.Key.eq(key)
-        ).buildDelete();
+        DeleteQuery<Step> delete = GreenDaoQueries.getDeleteQueryStepByKey(session);
+        delete.setParameter(0, key);
         delete.executeDeleteWithoutDetachingEntities();
 
         for(int i=0; i<steps.size(); i++){
@@ -991,7 +985,7 @@ public class RecipeListFragment extends Fragment implements
                 String key = postSnapshot.getKey();
 
 
-                query.setParameter(0, key);
+                query.forCurrentThread().setParameter(0, key);
                 RecipeShort recipeFromDatabase = (RecipeShort) query.unique();
                 if(recipeFromDatabase == null){
                     //no existía, la creo

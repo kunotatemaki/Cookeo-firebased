@@ -10,13 +10,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -28,6 +25,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewAnimationUtils;
+import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.animation.AccelerateDecelerateInterpolator;
 
@@ -37,12 +35,16 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.karumi.dexter.Dexter;
+import com.rukiasoft.androidapps.cocinaconroll.BuildConfig;
 import com.rukiasoft.androidapps.cocinaconroll.R;
 import com.rukiasoft.androidapps.cocinaconroll.classes.RecipeItem;
 import com.rukiasoft.androidapps.cocinaconroll.classes.ZipItem;
 import com.rukiasoft.androidapps.cocinaconroll.database.DatabaseRelatedTools;
 import com.rukiasoft.androidapps.cocinaconroll.gcm.QuickstartPreferences;
 import com.rukiasoft.androidapps.cocinaconroll.gcm.RegistrationIntentService;
+import com.rukiasoft.androidapps.cocinaconroll.permissions.ErrorListener;
+import com.rukiasoft.androidapps.cocinaconroll.permissions.RecetasCookeoMultiplePermissionListener;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.CommonRecipeOperations;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.LogHelper;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.ReadWriteTools;
@@ -70,20 +72,29 @@ public class RecipeListActivity extends ToolbarAndProgressActivity implements Re
     NavigationView navigationView;
     @BindView(R.id.adview_list)
     AdView mAdViewList;
-    private Unbinder unbinder;
+    @BindView(android.R.id.content)
+    ViewGroup rootView;
 
-    private MenuItem searchMenuItem;
-    @State boolean showMenuSignOut = false;
-    private int magnifyingX;
-    private int magnifyingY;
-    private int openCircleRevealX;
-    private int openCircleRevealY;
+    private Unbinder mUnbinder;
+
+    private MenuItem mSearchMenuItem;
+    //@State boolean mShowMenuSignOut = false;
+    private int mMagnifyingX;
+    private int mMagnifyingY;
+    private int mOpenCircleRevealX;
+    private int mOpenCircleRevealY;
     private boolean animate;
-    @State String lastFilter;
+    @State String mLastFilter;
+    @State boolean mAskForPermission = true;
 
-    //Firebase values
+    //Firebase
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
+    @State Boolean isSignedIn;
+
+    //Permissions
+    private RecetasCookeoMultiplePermissionListener recetasCookeoMultiplePermissionListener;
+    private ErrorListener errorListener;
 
 
 
@@ -106,46 +117,36 @@ public class RecipeListActivity extends ToolbarAndProgressActivity implements Re
     }
 
 
-
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recipe_list);
-        unbinder = ButterKnife.bind(this);
+        mUnbinder = ButterKnife.bind(this);
 
-        final Tools mTools = new Tools();
-
-        mAuth = FirebaseAuth.getInstance();
-        mAuthListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
-                if (user != null) {
-                    // User is signed in
-                    showMenuSignOut = true;
-                    Log.d(TAG, "user anonimous " + user.isAnonymous());
-                } else {
-                    // User is signed out
-                    showMenuSignOut = false;
-                    if(!mTools.getBooleanFromPreferences(getApplicationContext(), RecetasCookeoConstants.PROPERTY_AVOID_GOOGLE_SIGN_IN)){
-                        launchSignInActivity();
-                    }
-                }
-
-            }
-        };
-        // [END auth_state_listener]
-
-        if(mTools.getAppVersion(getApplication()) > mTools.getIntegerFromPreferences(this, RecetasCookeoConstants.PROPERTY_APP_VERSION_STORED)){
-            //first instalation, or recently updated app
-            mTools.savePreferences(this, QuickstartPreferences.SENT_TOKEN_TO_SERVER, false);
-            mTools.savePreferences(this, RecetasCookeoConstants.PROPERTY_APP_VERSION_STORED, mTools.getAppVersion(getApplication()));
-            // TODO: 15/1/17 Meter aquí la migración de las recetas propias de la antigua versión
+        if(isSignedIn == null){
+            initAuth();
         }
 
-        lastFilter = RecetasCookeoConstants.FILTER_ALL_RECIPES;
+        //Pido los permisos si procede
+        if(mAskForPermission) {
+            createPermissionListeners();
+            Dexter.withActivity(this).continueRequestingPendingPermissions(recetasCookeoMultiplePermissionListener);
+            askForAllPermissions();
+            mAskForPermission = false;
+        }
+
+        // [END auth_state_listener]
+        final Tools mTools = new Tools();
+        if(mTools.getAppVersion(getApplication()) > mTools.getIntegerFromPreferences(this, RecetasCookeoConstants.PROPERTY_APP_VERSION_STORED)){
+            //first installation, or recently updated app
+            mTools.savePreferences(this, QuickstartPreferences.SENT_TOKEN_TO_SERVER, false);
+            mTools.savePreferences(this, RecetasCookeoConstants.PROPERTY_APP_VERSION_STORED, mTools.getAppVersion(getApplication()));
+            // TODO: 15/1/17 Esto posiblemente ya no haga falta
+        }
+
+        mLastFilter = RecetasCookeoConstants.FILTER_ALL_RECIPES;
         if(getIntent() != null && getIntent().hasExtra(RecetasCookeoConstants.KEY_TYPE)){
-            lastFilter = getIntent().getStringExtra(RecetasCookeoConstants.KEY_TYPE);
+            mLastFilter = getIntent().getStringExtra(RecetasCookeoConstants.KEY_TYPE);
         }
         if (checkPlayServices()) {
             // Start IntentService to register this application with GCM.
@@ -167,7 +168,7 @@ public class RecipeListActivity extends ToolbarAndProgressActivity implements Re
         //set up advertises
         AdRequest adRequest = new AdRequest.Builder()
                 .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)        // All emulators
-                .addTestDevice("B29C1F71528C79C864D503360C5225C0")  // My Xperia Z3 test device
+                .addTestDevice(BuildConfig.Z3_DEVICE_ID)  // My Xperia Z3 test device
                 .setGender(AdRequest.GENDER_FEMALE)
                 .build();
 
@@ -190,7 +191,7 @@ public class RecipeListActivity extends ToolbarAndProgressActivity implements Re
     @Override
     public void onDestroy(){
         super.onDestroy();
-        unbinder.unbind();
+        mUnbinder.unbind();
     }
 
     @Override
@@ -203,7 +204,7 @@ public class RecipeListActivity extends ToolbarAndProgressActivity implements Re
                 mRecipeListFragment.searchAndShow(name);
             }
             if(intent != null && intent.hasExtra(RecetasCookeoConstants.KEY_TYPE)){
-                lastFilter = intent.getStringExtra(RecetasCookeoConstants.KEY_TYPE);
+                mLastFilter = intent.getStringExtra(RecetasCookeoConstants.KEY_TYPE);
                 restartLoader();
             }
         }
@@ -264,8 +265,10 @@ public class RecipeListActivity extends ToolbarAndProgressActivity implements Re
                 }
                 break;*/
             case RecetasCookeoConstants.REQUEST_CODE_SIGNING_FROM_RECIPELIST:
+                initAuth();
+                // TODO: 28/1/17 revisar qué hace aquí cuando le llamo desde esta actividad
                 if(!tools.getBooleanFromPreferences(this, RecetasCookeoConstants.PROPERTY_INIT_DATABASE_WITH_EDITED_PATH)) {
-                    askForPermissionAndLoadEditedRecipes();
+                    //loadEditedRecipes();
                 }
                 break;
             default:
@@ -273,39 +276,13 @@ public class RecipeListActivity extends ToolbarAndProgressActivity implements Re
         }
     }
 
-    private void askForPermissionAndLoadEditedRecipes(){
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
-                ContextCompat.checkSelfPermission(this,
-                        Manifest.permission.READ_EXTERNAL_STORAGE)
-                        != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                    Manifest.permission.READ_EXTERNAL_STORAGE)) {
-                android.support.v7.app.AlertDialog.Builder builder =
-                        new android.support.v7.app.AlertDialog.Builder(this);
+    private void loadEditedRecipes(){
 
-                builder.setMessage(getResources().getString(R.string.read_external_explanation))
-                        .setTitle(getResources().getString(R.string.permissions_title))
-                        .setPositiveButton(getResources().getString(R.string.accept),
-                                new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
-                                        dialog.cancel();
-                                        ActivityCompat.requestPermissions(RecipeListActivity.this,
-                                                new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                                                RecetasCookeoConstants.MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
-                                    }
-                                });
-                builder.create().show();
-            } else {
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                        RecetasCookeoConstants.MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
-            }
-        }else{
-            RecipeListFragment fragment = (RecipeListFragment)getSupportFragmentManager().findFragmentById(R.id.list_recipes_fragment);
-            if(fragment != null) {
-                fragment.loadEditedRecipes();
-            }
+        RecipeListFragment fragment = (RecipeListFragment)getSupportFragmentManager().findFragmentById(R.id.list_recipes_fragment);
+        if(fragment != null) {
+            fragment.loadEditedRecipes();
         }
+
     }
 
     private void removeRecipeFromDiskAndDatabase(RecipeItem recipe){
@@ -320,8 +297,8 @@ public class RecipeListActivity extends ToolbarAndProgressActivity implements Re
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_recipe_list, menu);
-        searchMenuItem = menu.findItem(R.id.action_search);
-        MenuItemCompat.setOnActionExpandListener(searchMenuItem, new MenuItemCompat.OnActionExpandListener() {
+        mSearchMenuItem = menu.findItem(R.id.action_search);
+        MenuItemCompat.setOnActionExpandListener(mSearchMenuItem, new MenuItemCompat.OnActionExpandListener() {
 
             @Override
             public boolean onMenuItemActionCollapse(MenuItem item) {
@@ -341,8 +318,8 @@ public class RecipeListActivity extends ToolbarAndProgressActivity implements Re
                                 v.removeOnLayoutChangeListener(this);
                                 Animator animator = ViewAnimationUtils.createCircularReveal(
                                         toolbar,
-                                        openCircleRevealX,
-                                        openCircleRevealY,
+                                        mOpenCircleRevealX,
+                                        mOpenCircleRevealY,
                                         (float) Math.hypot(toolbar.getWidth(), toolbar.getHeight()),
                                         0);
 
@@ -389,12 +366,12 @@ public class RecipeListActivity extends ToolbarAndProgressActivity implements Re
                             v.removeOnLayoutChangeListener(this);
                             Animator animator = ViewAnimationUtils.createCircularReveal(
                                     toolbar,
-                                    magnifyingX,
-                                    magnifyingY,
+                                    mMagnifyingX,
+                                    mMagnifyingY,
                                     0,
                                     (float) Math.hypot(toolbar.getWidth(), toolbar.getHeight()));
-                            openCircleRevealX = magnifyingX;
-                            openCircleRevealY = magnifyingY;
+                            mOpenCircleRevealX = mMagnifyingX;
+                            mOpenCircleRevealY = mMagnifyingY;
                             // Set a natural ease-in/ease-out interpolator.
                             animator.setInterpolator(new AccelerateDecelerateInterpolator());
 
@@ -412,7 +389,7 @@ public class RecipeListActivity extends ToolbarAndProgressActivity implements Re
             }
 
         });
-        SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchMenuItem);
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(mSearchMenuItem);
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         //the searchable is in another activity, so instead of getcomponentname(), create a new one for that activity
         searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(this, SearchableActivity.class)));
@@ -485,35 +462,35 @@ public class RecipeListActivity extends ToolbarAndProgressActivity implements Re
                             switch (menuItem.getItemId()) {
                                 case R.id.menu_all_recipes:
                                     mRecipeListFragment.filterRecipes(RecetasCookeoConstants.FILTER_ALL_RECIPES);
-                                    lastFilter = RecetasCookeoConstants.FILTER_ALL_RECIPES;
+                                    mLastFilter = RecetasCookeoConstants.FILTER_ALL_RECIPES;
                                     break;
                                 case R.id.menu_starters:
                                     mRecipeListFragment.filterRecipes(RecetasCookeoConstants.FILTER_STARTER_RECIPES);
-                                    lastFilter = RecetasCookeoConstants.FILTER_STARTER_RECIPES;
+                                    mLastFilter = RecetasCookeoConstants.FILTER_STARTER_RECIPES;
                                     break;
                                 case R.id.menu_main_courses:
                                     mRecipeListFragment.filterRecipes(RecetasCookeoConstants.FILTER_MAIN_COURSES_RECIPES);
-                                    lastFilter = RecetasCookeoConstants.FILTER_MAIN_COURSES_RECIPES;
+                                    mLastFilter = RecetasCookeoConstants.FILTER_MAIN_COURSES_RECIPES;
                                     break;
                                 case R.id.menu_desserts:
                                     mRecipeListFragment.filterRecipes(RecetasCookeoConstants.FILTER_DESSERT_RECIPES);
-                                    lastFilter = RecetasCookeoConstants.FILTER_DESSERT_RECIPES;
+                                    mLastFilter = RecetasCookeoConstants.FILTER_DESSERT_RECIPES;
                                     break;
                                 case R.id.menu_vegetarians:
                                     mRecipeListFragment.filterRecipes(RecetasCookeoConstants.FILTER_VEGETARIAN_RECIPES);
-                                    lastFilter = RecetasCookeoConstants.FILTER_VEGETARIAN_RECIPES;
+                                    mLastFilter = RecetasCookeoConstants.FILTER_VEGETARIAN_RECIPES;
                                     break;
                                 case R.id.menu_favorites:
                                     mRecipeListFragment.filterRecipes(RecetasCookeoConstants.FILTER_FAVOURITE_RECIPES);
-                                    lastFilter = RecetasCookeoConstants.FILTER_FAVOURITE_RECIPES;
+                                    mLastFilter = RecetasCookeoConstants.FILTER_FAVOURITE_RECIPES;
                                     break;
                                 case R.id.menu_own_recipes:
                                     mRecipeListFragment.filterRecipes(RecetasCookeoConstants.FILTER_OWN_RECIPES);
-                                    lastFilter = RecetasCookeoConstants.FILTER_OWN_RECIPES;
+                                    mLastFilter = RecetasCookeoConstants.FILTER_OWN_RECIPES;
                                     break;
                                 case R.id.menu_last_downloaded:
                                     mRecipeListFragment.filterRecipes(RecetasCookeoConstants.FILTER_LATEST_RECIPES);
-                                    lastFilter = RecetasCookeoConstants.FILTER_LATEST_RECIPES;
+                                    mLastFilter = RecetasCookeoConstants.FILTER_LATEST_RECIPES;
                                     break;
                             }
                         }
@@ -566,10 +543,10 @@ public class RecipeListActivity extends ToolbarAndProgressActivity implements Re
                     int[] location = new int[2];
                     menuButton.getLocationInWindow(location);
                     //Log.d(TAG, "x=" + location[0] + " y=" + location[1]);
-                    magnifyingX = location[0] + menuButton.getWidth() / 2;
-                    magnifyingY = location[1];
+                    mMagnifyingX = location[0] + menuButton.getWidth() / 2;
+                    mMagnifyingY = location[1];
                     // Now you can get rid of this listener
-                    if (magnifyingX != 0 && magnifyingY != 0 && viewTreeObserver.isAlive()) {
+                    if (mMagnifyingX != 0 && mMagnifyingY != 0 && viewTreeObserver.isAlive()) {
                         if (Build.VERSION.SDK_INT < 16) {
                             viewTreeObserver.removeGlobalOnLayoutListener(this);
                         } else {
@@ -588,16 +565,24 @@ public class RecipeListActivity extends ToolbarAndProgressActivity implements Re
         }
     }
 
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (mAuthListener != null && mAuth != null) {
+            mAuth.removeAuthStateListener(mAuthListener);
+        }
+    }
+
 
     public void closeSearchView(){
         animate = false;
-        if(searchMenuItem != null){
-            MenuItemCompat.collapseActionView(searchMenuItem);
+        if(mSearchMenuItem != null){
+            MenuItemCompat.collapseActionView(mSearchMenuItem);
         }
     }
 
     public void performClickInDrawerIfNecessary() {
-        if(lastFilter.equals(RecetasCookeoConstants.FILTER_LATEST_RECIPES)){
+        if(mLastFilter.equals(RecetasCookeoConstants.FILTER_LATEST_RECIPES)){
             navigationView.setCheckedItem(R.id.menu_last_downloaded);
             RecipeListFragment mRecipeListFragment = (RecipeListFragment) getSupportFragmentManager().findFragmentById(R.id.list_recipes_fragment);
             if(mRecipeListFragment != null) {
@@ -645,83 +630,26 @@ public class RecipeListActivity extends ToolbarAndProgressActivity implements Re
         }
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
-        switch (requestCode) {
-            case RecetasCookeoConstants.MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE: {
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    RecipeListFragment mRecipeListFragment = (RecipeListFragment) getSupportFragmentManager().
-                            findFragmentById(R.id.list_recipes_fragment);
-                    if(mRecipeListFragment != null) {
-                        mRecipeListFragment.createRecipe();
-                    }
-                } else {
-                    AlertDialog.Builder builder =
-                            new AlertDialog.Builder(this);
-
-                    builder.setMessage(getResources().getString(R.string.write_external_denied))
-                            .setTitle(getResources().getString(R.string.permissions_title))
-                            .setPositiveButton(getResources().getString(R.string.accept),
-                                    new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
-                                    dialog.cancel();
-                                }
-                            });
-                    builder.create().show();
-                }
-            }
-            case RecetasCookeoConstants.MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE: {
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    RecipeListFragment mRecipeListFragment = (RecipeListFragment) getSupportFragmentManager().
-                            findFragmentById(R.id.list_recipes_fragment);
-                    if(mRecipeListFragment != null) {
-                        mRecipeListFragment.loadEditedRecipes();
-                    }
-                } else {
-                    AlertDialog.Builder builder =
-                            new AlertDialog.Builder(this);
-
-                    builder.setMessage(getResources().getString(R.string.read_external_denied))
-                            .setTitle(getResources().getString(R.string.permissions_title))
-                            .setPositiveButton(getResources().getString(R.string.accept),
-                                    new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
-                                    dialog.cancel();
-                                }
-                            });
-                    builder.create().show();
-                }
-            }
-
-            // other 'case' lines to check for other
-            // permissions this app might request
-        }
 
 
+    private void createPermissionListeners() {
+        recetasCookeoMultiplePermissionListener = new RecetasCookeoMultiplePermissionListener(this);
+        errorListener = new ErrorListener();
+    }
+
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
+    private void askForAllPermissions(){
+        Dexter.withActivity(this)
+                .withPermissions(Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                        Manifest.permission.READ_EXTERNAL_STORAGE)
+                .withListener(recetasCookeoMultiplePermissionListener)
+                .withErrorListener(errorListener)
+                .check();
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        mAuth.addAuthStateListener(mAuthListener);
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        if (mAuthListener != null) {
-            mAuth.removeAuthStateListener(mAuthListener);
-        }
-
-
-    }
-
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        if(showMenuSignOut){
+        public boolean onPrepareOptionsMenu(Menu menu) {
+        if(isSignedIn){
             menu.findItem(R.id.menu_sign_out).setVisible(true);
             menu.findItem(R.id.menu_sign_in).setVisible(false);
         }else{
@@ -731,12 +659,27 @@ public class RecipeListActivity extends ToolbarAndProgressActivity implements Re
         return true;
     }
 
-    private void launchSignInActivity(){
+    public void launchSignInActivity(){
         Intent intent = new Intent(RecipeListActivity.this, SignInActivity.class);
         startActivityForResult(intent, RecetasCookeoConstants.REQUEST_CODE_SIGNING_FROM_RECIPELIST);
     }
 
-
+    private void initAuth(){
+        if(mAuth == null){
+            mAuth = FirebaseAuth.getInstance();
+        }
+        if(mAuthListener == null) {
+            mAuthListener = new FirebaseAuth.AuthStateListener() {
+                @Override
+                public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                    FirebaseUser user = firebaseAuth.getCurrentUser();
+                    isSignedIn = user != null && !user.isAnonymous();
+                    invalidateOptionsMenu();
+                }
+            };
+        }
+        mAuth.addAuthStateListener(mAuthListener);
+    }
 
 
 }

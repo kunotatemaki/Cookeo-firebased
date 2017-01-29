@@ -85,6 +85,10 @@ public abstract class ToolbarAndProgressActivity extends AppCompatActivity {
         }
     }
 
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
     public void showProgressDialog(String message)
     {
         this.message = message;
