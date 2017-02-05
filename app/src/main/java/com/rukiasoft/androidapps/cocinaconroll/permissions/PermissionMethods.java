@@ -47,12 +47,12 @@ public class PermissionMethods {
                 .show();
     }
 
-    public void showPermissionDenied(@StringRes int text) {
+    /*public void showPermissionDenied(@StringRes int text) {
         ViewGroup rootView = (ViewGroup) activity.findViewById(android.R.id.content);
 
         if(rootView != null){
             Snackbar.make(rootView, text, Snackbar.LENGTH_LONG)
                     .show();
         }
-    }
+    }*/
 }

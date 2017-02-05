@@ -34,13 +34,13 @@ public class RecetasCookeoMultiplePermissionListener implements MultiplePermissi
             }
         }
 
-        for (PermissionDeniedResponse response : report.getDeniedPermissionResponses()) {
+        /*for (PermissionDeniedResponse response : report.getDeniedPermissionResponses()) {
             if(response.getRequestedPermission().getName().equals(android.Manifest.permission.READ_EXTERNAL_STORAGE) ||
                     response.getRequestedPermission().getName().equals(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)){
                 permissionMethods.showPermissionDenied(R.string.write_external_denied);
             }
 
-        }
+        }*/
     }
 
     @Override public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions,

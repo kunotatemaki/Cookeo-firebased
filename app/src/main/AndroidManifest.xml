@@ -201,9 +201,6 @@
             android:name="com.google.android.gms.analytics.globalConfigResource"
             android:resource="@xml/track_app" />
 
-        <service
-            android:name=".persistence.services.DownloadRecipesService"
-            android:exported="false"></service>
     </application>
 
 </manifest>
