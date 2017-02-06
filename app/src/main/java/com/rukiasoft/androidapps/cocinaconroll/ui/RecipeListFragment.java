@@ -59,17 +59,19 @@ import com.rukiasoft.androidapps.cocinaconroll.database.CocinaConRollContentProv
 import com.rukiasoft.androidapps.cocinaconroll.database.DatabaseRelatedTools;
 import com.rukiasoft.androidapps.cocinaconroll.database.RecipesTable;
 import com.rukiasoft.androidapps.cocinaconroll.fastscroller.FastScroller;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.daoqueries.IngredientQueries;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.daoqueries.RecipeQueries;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.daoqueries.StepQueries;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.daos.DaoSession;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.daos.Ingredient;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.daos.IngredientDao;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.daos.RecipeShort;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.daos.RecipeShortDao;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.daos.Step;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.daos.StepDao;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.RecipeDetailed;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.RecipeTimestamp;
-import com.rukiasoft.androidapps.cocinaconroll.persistence.greendao.DaoSession;
-import com.rukiasoft.androidapps.cocinaconroll.persistence.greendao.Ingredient;
-import com.rukiasoft.androidapps.cocinaconroll.persistence.greendao.IngredientDao;
-import com.rukiasoft.androidapps.cocinaconroll.persistence.greendao.RecipeShort;
-import com.rukiasoft.androidapps.cocinaconroll.persistence.greendao.RecipeShortDao;
-import com.rukiasoft.androidapps.cocinaconroll.persistence.greendao.Step;
-import com.rukiasoft.androidapps.cocinaconroll.persistence.greendao.StepDao;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.local.PictureQeue;
-import com.rukiasoft.androidapps.cocinaconroll.persistence.local.GreenDaoQueries;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.CommonRecipeOperations;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.LogHelper;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.ReadWriteTools;
@@ -160,11 +162,10 @@ public class RecipeListFragment extends Fragment implements
     private RecipeItem recipeToShow;
 
     private class InitDatabase extends AsyncTask<Void, Integer, Void> {
-        final Context mContext;
+
         final int mode;
 
         public InitDatabase(Context context, int mode){
-            this.mContext = context;
             this.mode = mode;
         }
 
@@ -189,10 +190,12 @@ public class RecipeListFragment extends Fragment implements
             Tools mTools = new Tools();
             switch (mode) {
                 case LOAD_ORIGINAL_PATH:
-                    mTools.savePreferences(mContext, RecetasCookeoConstants.PROPERTY_INIT_DATABASE_WITH_ORIGINAL_PATH, true);
+                    mTools.savePreferences(getContext(),
+                            RecetasCookeoConstants.PROPERTY_INIT_DATABASE_WITH_ORIGINAL_PATH, true);
                     break;
                 case LOAD_EDITED_PATH:
-                    mTools.savePreferences(mContext, RecetasCookeoConstants.PROPERTY_INIT_DATABASE_WITH_EDITED_PATH, true);
+                    mTools.savePreferences(getContext(),
+                            RecetasCookeoConstants.PROPERTY_INIT_DATABASE_WITH_EDITED_PATH, true);
                     break;
             }
             mInitDatabaseCallback.onInitDatabasePostExecute();
@@ -229,7 +232,7 @@ public class RecipeListFragment extends Fragment implements
             timeoutDownloadingRecipes = new CountDownTimer(MAX_MILI_SECONDS_DOWNLOADING_RECIPES, 5000) {
 
                 public void onTick(long millisUntilFinished) {
-                    Query query = GreenDaoQueries.getQueryRecipesToDownload(session);
+                    Query query = RecipeQueries.getQueryRecipesToDownload(session);
                     List<RecipeShort> recipes = query.list();
                     Log.d(TAG, "RECETAS --> " + recipes.size() + " : sec --> " + millisUntilFinished/1000);
                     if(recipes.isEmpty()){
@@ -746,11 +749,11 @@ public class RecipeListFragment extends Fragment implements
 
     public void downloadRecipesFromFirebase(){
         //Veo si hay que descargar recetas
-        List<RecipeShort> recipes = GreenDaoQueries.getQueryRecipesAndPicturesToDownload(session).list();
+        List<RecipeShort> recipes = RecipeQueries.getQueryRecipesAndPicturesToDownload(session).list();
         if(recipes == null || recipes.isEmpty()){
             return;
         }
-        List<RecipeShort> onlyRecipes = GreenDaoQueries.getQueryRecipesToDownload(session).list();
+        List<RecipeShort> onlyRecipes = RecipeQueries.getQueryRecipesToDownload(session).list();
         //inicio el timer
         if(!onlyRecipes.isEmpty()) {
             if (!isDownloadingRecipes) {
@@ -816,9 +819,9 @@ public class RecipeListFragment extends Fragment implements
         //Grabo los ingredientes (primero borro los que había)
         IngredientDao ingredientDao = ((CocinaConRollApplication)getActivity().getApplication())
                 .getDaoSession().getIngredientDao();
-        Query query = GreenDaoQueries.getQueryGetIngredientByKeyAndPosition(session);
+        Query query = IngredientQueries.getQueryGetIngredientByKeyAndPosition(session);
 
-        DeleteQuery<Ingredient> delete = GreenDaoQueries.getDeleteQueryIngredientByKey(session);
+        DeleteQuery<Ingredient> delete = IngredientQueries.getDeleteQueryIngredientByKey(session);
         delete.setParameter(0, key);
         delete.executeDeleteWithoutDetachingEntities();
 
@@ -845,9 +848,9 @@ public class RecipeListFragment extends Fragment implements
     private void saveStepsToDatabase(List<String> steps, String key){
         StepDao stepDao = ((CocinaConRollApplication)getActivity().getApplication())
                 .getDaoSession().getStepDao();
-        Query query = GreenDaoQueries.getQueryGetStepByKeyAndPosition(session);
+        Query query = StepQueries.getQueryGetStepByKeyAndPosition(session);
 
-        DeleteQuery<Step> delete = GreenDaoQueries.getDeleteQueryStepByKey(session);
+        DeleteQuery<Step> delete = StepQueries.getDeleteQueryStepByKey(session);
         delete.setParameter(0, key);
         delete.executeDeleteWithoutDetachingEntities();
 
@@ -887,7 +890,7 @@ public class RecipeListFragment extends Fragment implements
                 Log.d(TAG, "Salvado correctamente: " + name);
                 //quito del pull y sigo descargando
                 pullPictures.remove(name);
-                Query query = GreenDaoQueries.getQueryGetRecipeByName(session);
+                Query query = RecipeQueries.getQueryGetRecipeByName(session);
                 query.setParameter(0, name);
                 RecipeShort recipeFromDatabase = (RecipeShort) query.unique();
                 recipeFromDatabase.setDownloadPicture(false);
@@ -979,7 +982,7 @@ public class RecipeListFragment extends Fragment implements
                     .getApplication()).getDaoSession().getRecipeShortDao();
             recipeShortDao.detachAll();
             Integer recipeOwner = getFlagRecipeFromNode(dataSnapshot.getRef().getParent().getKey());
-            Query query = GreenDaoQueries.getQueryGetRecipeByKey(session);
+            Query query = RecipeQueries.getQueryGetRecipeByKey(session);
             for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
                 RecipeTimestamp recipeTimestamp = postSnapshot.getValue(RecipeTimestamp.class);
                 String key = postSnapshot.getKey();

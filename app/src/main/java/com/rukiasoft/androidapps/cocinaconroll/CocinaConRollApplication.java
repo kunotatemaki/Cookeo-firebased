@@ -9,13 +9,10 @@ import android.support.multidex.MultiDexApplication;
 
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.rukiasoft.androidapps.cocinaconroll.persistence.greendao.DaoMaster;
-import com.rukiasoft.androidapps.cocinaconroll.persistence.greendao.DaoSession;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.daos.DaoMaster;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.daos.DaoSession;
 import com.squareup.leakcanary.LeakCanary;
 import com.squareup.leakcanary.RefWatcher;
-
-import org.greenrobot.greendao.query.QueryBuilder;
 
 
 /**

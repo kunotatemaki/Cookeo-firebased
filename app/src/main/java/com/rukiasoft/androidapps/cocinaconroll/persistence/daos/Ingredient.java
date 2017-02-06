@@ -1,4 +1,4 @@
-package com.rukiasoft.androidapps.cocinaconroll.persistence.greendao;
+package com.rukiasoft.androidapps.cocinaconroll.persistence.daos;
 
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Id;

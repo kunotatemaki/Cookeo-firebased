@@ -1,4 +1,4 @@
-package com.rukiasoft.androidapps.cocinaconroll.persistence.greendao;
+package com.rukiasoft.androidapps.cocinaconroll.persistence.daos;
 
 import com.rukiasoft.androidapps.cocinaconroll.R;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.RecipeDetailed;
