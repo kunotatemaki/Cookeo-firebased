@@ -705,14 +705,13 @@ public class ReadWriteTools {
         return file.exists() && file.delete();
     }
 
-    public List<RecipeItem> loadOldEditedAndOriginalRecipes(Context context){
+    public List<String> loadOldEditedAndOriginalRecipes(Context context){
         List<String> names = new ArrayList<>();
-        List<RecipeItem> oldRecipes = new ArrayList<>();
         MyFileFilter filter = new MyFileFilter();
 
         if(!isExternalStorageReadable()){
             LogHelper.e(TAG, "no hay external storage in loadOldEditedAndOriginalRecipes");
-            return oldRecipes;
+            return names;
         }
 
         // Get the directory for the app's public recipes directory.
@@ -722,13 +721,7 @@ public class ReadWriteTools {
             String[] files = file.list(filter);
             Collections.addAll(names, files);
         }
-
-        //leo las recetas
-        for(String name : names){
-            RecipeItem recipe = readRecipe(context, name, RecetasCookeoConstants.PATH_TYPE_EDITED);
-            oldRecipes.add(recipe);
-        }
-        return oldRecipes;
+        return names;
     }
 
 }

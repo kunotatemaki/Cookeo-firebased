@@ -38,10 +38,10 @@ public class RecetasCookeoMultiplePermissionListener implements MultiplePermissi
             if(response.getRequestedPermission().getName().equals(android.Manifest.permission.READ_EXTERNAL_STORAGE)){
                 // TODO: 28/1/17 Aquí es donde leo las recetas antiguas
                 ReadWriteTools readWriteTools = new ReadWriteTools();
-                List<RecipeItem> recipeItemList = readWriteTools.loadOldEditedAndOriginalRecipes(context);
+                List<String> recipeItemNameList = readWriteTools.loadOldEditedAndOriginalRecipes(context);
                 DatabaseMethods databaseMethods = new DatabaseMethods();
-                for(RecipeItem recipeItem : recipeItemList) {
-                    databaseMethods.updateRecipeToPersonalStorage(recipeItem);
+                for(String name : recipeItemNameList) {
+                    databaseMethods.updateRecipeToPersonalStorage(context, name);
                 }
             }
         }
