@@ -73,6 +73,7 @@ public class RecetasCookeoConstants {
     public static final String FORBIDDEN_RECIPES_NODE = "forbidden_recipes";
     public static final String PENDING_RECIPES_NODE = "pending_recipes";
     public static final String RECIPE_LIST_NODE = "recipe_list";
+    public static final String PERSONAL_RECIPES_NODE = "personal_recipes";
 
     public static final String DETAILED_RECIPES_NODE = "detailed_recipes";
     public static final String TIMESTAMP_RECIPES_NODE = "timestamp";

@@ -180,7 +180,8 @@ public class RecipeListActivity extends ToolbarAndProgressActivity implements Re
         mStatusIntentFilter.addAction(RecetasCookeoConstants.ACTION_BROADCAST_DELETED_RECIPE);
 
 
-
+        /*ReadWriteTools readWriteTools = new ReadWriteTools();
+        readWriteTools.loadOldEditedAndOriginalRecipes(getApplicationContext());*/
 
         if(savedInstanceState == null) {
             clearGarbage();

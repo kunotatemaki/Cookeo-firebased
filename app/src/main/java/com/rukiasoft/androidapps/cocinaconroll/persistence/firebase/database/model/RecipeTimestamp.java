@@ -1,4 +1,4 @@
-package com.rukiasoft.androidapps.cocinaconroll.persistence.firebase;
+package com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.database.model;
 
 /**
  * Created by iRoll on 15/1/17.

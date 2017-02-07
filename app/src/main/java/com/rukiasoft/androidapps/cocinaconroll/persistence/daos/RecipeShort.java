@@ -1,7 +1,7 @@
 package com.rukiasoft.androidapps.cocinaconroll.persistence.daos;
 
 import com.rukiasoft.androidapps.cocinaconroll.R;
-import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.RecipeDetailed;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.database.model.RecipeDetailed;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 
 import org.greenrobot.greendao.annotation.Entity;

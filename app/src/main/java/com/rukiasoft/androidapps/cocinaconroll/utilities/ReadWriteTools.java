@@ -68,7 +68,7 @@ public class ReadWriteTools {
         return list;
     }
 
-    public List<String> loadRecipesFromOldDirectory(FilenameFilter filter){
+    private List<String> loadRecipesFromOldDirectory(FilenameFilter filter){
         List<String> list = new ArrayList<>();
         Boolean ret;
 
@@ -88,7 +88,7 @@ public class ReadWriteTools {
     }
 
     /* Checks if external storage is available for read and write */
-    public boolean isExternalStorageWritable() {
+    private boolean isExternalStorageWritable() {
         String state = Environment.getExternalStorageState();
         return Environment.MEDIA_MOUNTED.equals(state);
     }
@@ -705,13 +705,30 @@ public class ReadWriteTools {
         return file.exists() && file.delete();
     }
 
-    public boolean deleteZipByPath(Uri path){
-        return deleteFile(path);
-    }
+    public List<RecipeItem> loadOldEditedAndOriginalRecipes(Context context){
+        List<String> names = new ArrayList<>();
+        List<RecipeItem> oldRecipes = new ArrayList<>();
+        MyFileFilter filter = new MyFileFilter();
 
-    public boolean deleteZipByName(Context mContext, String name){
-        String path = getZipsStorageDir(mContext) + name;
-        return deleteFile(Uri.parse(path));
+        if(!isExternalStorageReadable()){
+            LogHelper.e(TAG, "no hay external storage in loadOldEditedAndOriginalRecipes");
+            return oldRecipes;
+        }
+
+        // Get the directory for the app's public recipes directory.
+        String path = getEditedStorageDir();
+        File file = new File(path);
+        if (file.exists()) {
+            String[] files = file.list(filter);
+            Collections.addAll(names, files);
+        }
+
+        //leo las recetas
+        for(String name : names){
+            RecipeItem recipe = readRecipe(context, name, RecetasCookeoConstants.PATH_TYPE_EDITED);
+            oldRecipes.add(recipe);
+        }
+        return oldRecipes;
     }
 
 }
