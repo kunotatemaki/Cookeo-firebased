@@ -71,7 +71,7 @@ import com.rukiasoft.androidapps.cocinaconroll.persistence.daos.Step;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.daos.StepDao;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.database.model.RecipeDetailed;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.database.model.RecipeTimestamp;
-import com.rukiasoft.androidapps.cocinaconroll.persistence.local.PictureQeue;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.local.ObjectQeue;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.CommonRecipeOperations;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.LogHelper;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.ReadWriteTools;
@@ -145,7 +145,8 @@ public class RecipeListFragment extends Fragment implements
     DaoSession session;
 
     //Pull de fotos a descargar
-    @State PictureQeue pullPictures;
+    @State
+    ObjectQeue pullPictures;
 
     interface TaskCallback {
         void onInitDatabasePostExecute();
@@ -210,7 +211,7 @@ public class RecipeListFragment extends Fragment implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
-        pullPictures = PictureQeue.create(new ArrayList<String>());
+        pullPictures = ObjectQeue.create(new ArrayList<String>());
         mInterstitialAd = new InterstitialAd(getActivity());
         mInterstitialAd.setAdUnitId(getResources().getString(R.string.banner_ad_unit_id_intersticial));
 

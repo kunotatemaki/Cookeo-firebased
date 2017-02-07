@@ -2,6 +2,7 @@ package com.rukiasoft.androidapps.cocinaconroll.permissions;
 
 
 import android.content.Context;
+import android.util.Log;
 
 import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
@@ -40,9 +41,11 @@ public class RecetasCookeoMultiplePermissionListener implements MultiplePermissi
                 ReadWriteTools readWriteTools = new ReadWriteTools();
                 List<String> recipeItemNameList = readWriteTools.loadOldEditedAndOriginalRecipes(context);
                 DatabaseMethods databaseMethods = new DatabaseMethods();
-                for(String name : recipeItemNameList) {
+                databaseMethods.updateRecipeToPersonalStorage(context, recipeItemNameList);
+                Log.d(TAG, "salgo del método");
+                /*for(String name : recipeItemNameList) {
                     databaseMethods.updateRecipeToPersonalStorage(context, name);
-                }
+                }*/
             }
         }
 

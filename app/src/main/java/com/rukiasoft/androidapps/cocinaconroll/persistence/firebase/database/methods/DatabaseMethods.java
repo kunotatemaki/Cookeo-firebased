@@ -11,11 +11,13 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.rukiasoft.androidapps.cocinaconroll.classes.RecipeItem;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.database.model.RecipeDetailed;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.database.model.RecipeTimestamp;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.storage.methods.StorageMethods;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.LogHelper;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.ReadWriteTools;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -25,11 +27,12 @@ import java.util.Map;
 public class DatabaseMethods {
     private final String TAG = LogHelper.makeLogTag(DatabaseMethods.class);
 
-    public void updateRecipeToPersonalStorage(Context context, final String recipeName){
+    public void updateRecipeToPersonalStorage(final Context context, final List<String> recipeList){
 
         final ReadWriteTools readWriteTools = new ReadWriteTools();
-
-        RecipeItem recipe = readWriteTools.readRecipe(context, recipeName, RecetasCookeoConstants.PATH_TYPE_EDITED);
+        if(recipeList.isEmpty())    return;
+        final RecipeItem recipe = readWriteTools.readRecipe(context, recipeList.get(0),
+                RecetasCookeoConstants.PATH_TYPE_EDITED);
         if(recipe == null)  return;
 
         DatabaseReference ref = FirebaseDatabase
@@ -64,10 +67,18 @@ public class DatabaseMethods {
                 }
                 StringBuilder sbPath = new StringBuilder(100);
                 sbPath.append(readWriteTools.getEditedStorageDir());
-                sbPath.append(recipeName);
-                Log.d(TAG, "number of characters path " + sbPath.length());
-
+                sbPath.append(recipeList.get(0));
+                // TODO: 7/2/17 descomentar lo de borrar receta cuando verifique que el proceso funciona 
                 //readWriteTools.deleteFile(sbPath.toString());
+                if(recipe.getPicture() != null && !recipe.getPicture().isEmpty()
+                        && !recipe.getPicture().equals(RecetasCookeoConstants.DEFAULT_PICTURE_NAME)) {
+                    StorageMethods storageMethods = new StorageMethods();
+                    storageMethods.updatePictureToPersonalStorage(recipe);
+                }
+                recipeList.remove(0);
+                if(!recipeList.isEmpty()){
+                    updateRecipeToPersonalStorage(context, recipeList);
+                }
             }
         });
     }
