@@ -10,9 +10,7 @@ import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import com.rukiasoft.androidapps.cocinaconroll.R;
-import com.rukiasoft.androidapps.cocinaconroll.classes.RecipeItem;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.database.methods.DatabaseMethods;
-import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.database.model.RecipeTimestamp;
 import com.rukiasoft.androidapps.cocinaconroll.ui.RecipeListActivity;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.LogHelper;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.ReadWriteTools;
@@ -41,10 +39,10 @@ public class RecetasCookeoMultiplePermissionListener implements MultiplePermissi
                 ReadWriteTools readWriteTools = new ReadWriteTools();
                 List<String> recipeItemNameList = readWriteTools.loadOldEditedAndOriginalRecipes(context);
                 DatabaseMethods databaseMethods = new DatabaseMethods();
-                databaseMethods.updateRecipeToPersonalStorage(context, recipeItemNameList);
+                databaseMethods.updateOldRecipesToPersonalStorage(context);
                 Log.d(TAG, "salgo del método");
                 /*for(String name : recipeItemNameList) {
-                    databaseMethods.updateRecipeToPersonalStorage(context, name);
+                    databaseMethods.updateRecipesToPersonalStorage(context, name);
                 }*/
             }
         }

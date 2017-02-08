@@ -43,6 +43,7 @@ public class RecetasCookeoConstants {
     public static final String PROPERTY_FIREBASE_ID = "firebase_id";
     public static final String PROPERTY_UPLOADED_RECIPES_ON_FIRST_BOOT = "uploaded_recipes_on_first_boot";
     public static final String PROPERTY_APP_VERSION_STORED = "app_version_stored";
+    public static final String PROPERTY_CAN_UPLOAD_OWN_RECIPES = "own_old_recipes";
 
     public static final String FORMAT_DATE_TIME = "yyyy-MM-dd_HH-mm-ss";
     public static final String DEFAULT_PICTURE_NAME = "default_picture";

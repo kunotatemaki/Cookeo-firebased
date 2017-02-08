@@ -69,6 +69,7 @@ import com.rukiasoft.androidapps.cocinaconroll.persistence.daos.RecipeShort;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.daos.RecipeShortDao;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.daos.Step;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.daos.StepDao;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.database.methods.DatabaseMethods;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.database.model.RecipeDetailed;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.database.model.RecipeTimestamp;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.local.ObjectQeue;
@@ -1013,6 +1014,11 @@ public class RecipeListFragment extends Fragment implements
 
         @Override
         protected void onPostExecute(Void aVoid) {
+            //pongo la variable a true para que pueda subir recetas propias a la cuenta pesonal
+            Tools tools = new Tools();
+            tools.savePreferences(getContext(), RecetasCookeoConstants.PROPERTY_CAN_UPLOAD_OWN_RECIPES, true);
+            DatabaseMethods dbMethods = new DatabaseMethods();
+            dbMethods.updateOldRecipesToPersonalStorage(getContext());
             //Llamo a descargar (haya recetas nuevas o no).
             downloadRecipesFromFirebase();
         }

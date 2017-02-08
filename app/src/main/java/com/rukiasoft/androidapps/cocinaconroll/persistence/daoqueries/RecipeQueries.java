@@ -16,6 +16,7 @@ public class RecipeQueries {
     private static Query queryRecipesToDownload;
     private static Query queryGetRecipeByPictureName;
     private static Query queryGetRecipeByKey;
+    private static Query queryGetRecipeByName;
 
     public static Query getQueryRecipesAndPicturesToDownload(DaoSession session) {
         if(queryRecipesAndPicturesToDownload == null){
@@ -31,7 +32,7 @@ public class RecipeQueries {
         return queryRecipesToDownload.forCurrentThread();
     }
 
-    public static Query getQueryGetRecipeByName(DaoSession session) {
+    public static Query getQueryGetRecipeByPictureName(DaoSession session) {
         if(queryGetRecipeByPictureName == null){
             initializeQueryGetRecipeByPictureName(session);
         }
@@ -43,6 +44,13 @@ public class RecipeQueries {
             initializeQueryGetRecipeByKey(session);
         }
         return queryGetRecipeByKey.forCurrentThread();
+    }
+
+    public static Query getQueryGetRecipeByName(DaoSession session) {
+        if(queryGetRecipeByName == null){
+            initializeQueryGetRecipeByName(session);
+        }
+        return queryGetRecipeByName.forCurrentThread();
     }
 
     private static void initializeQueryRecipesAndPicturesToDownload(DaoSession session){
@@ -78,6 +86,14 @@ public class RecipeQueries {
         recipeShortDao.detachAll();
         queryGetRecipeByKey = recipeShortDao.queryBuilder().where(
                 RecipeShortDao.Properties.Key.eq("")
+        ).build();
+    }
+
+    private static void initializeQueryGetRecipeByName(DaoSession session){
+        RecipeShortDao recipeShortDao = session.getRecipeShortDao();
+        recipeShortDao.detachAll();
+        queryGetRecipeByName = recipeShortDao.queryBuilder().where(
+                RecipeShortDao.Properties.Name.eq("")
         ).build();
     }
 

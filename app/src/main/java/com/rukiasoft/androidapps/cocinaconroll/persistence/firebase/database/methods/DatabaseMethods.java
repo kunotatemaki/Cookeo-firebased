@@ -1,20 +1,26 @@
 package com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.database.methods;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.rukiasoft.androidapps.cocinaconroll.CocinaConRollApplication;
 import com.rukiasoft.androidapps.cocinaconroll.classes.RecipeItem;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.daoqueries.RecipeQueries;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.daos.DaoSession;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.daos.RecipeShort;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.database.model.RecipeDetailed;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.database.model.RecipeTimestamp;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.storage.methods.StorageMethods;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.LogHelper;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.ReadWriteTools;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
+import com.rukiasoft.androidapps.cocinaconroll.utilities.Tools;
+
+import org.greenrobot.greendao.query.Query;
 
 import java.util.HashMap;
 import java.util.List;
@@ -27,7 +33,24 @@ import java.util.Map;
 public class DatabaseMethods {
     private final String TAG = LogHelper.makeLogTag(DatabaseMethods.class);
 
-    public void updateRecipeToPersonalStorage(final Context context, final List<String> recipeList){
+    public void updateOldRecipesToPersonalStorage(final Context context){
+        ReadWriteTools readWriteTools = new ReadWriteTools();
+        List<String> recipeItemNameList = readWriteTools.loadOldEditedAndOriginalRecipes(context);
+        DatabaseMethods databaseMethods = new DatabaseMethods();
+        databaseMethods.updateRecipesToPersonalStorage(context, recipeItemNameList);
+
+    }
+
+    public void updateRecipesToPersonalStorage(final Context context, final List<String> recipeList){
+
+        Tools tools = new Tools();
+        if(!tools.getBooleanFromPreferences(context, RecetasCookeoConstants.PROPERTY_CAN_UPLOAD_OWN_RECIPES)){
+            return;
+        }
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if(user == null || user.isAnonymous()){
+            return;
+        }
 
         final ReadWriteTools readWriteTools = new ReadWriteTools();
         if(recipeList.isEmpty())    return;
@@ -39,12 +62,18 @@ public class DatabaseMethods {
                 .getInstance()
                 .getReference("/" + RecetasCookeoConstants.PERSONAL_RECIPES_NODE);
 
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if(user == null || user.isAnonymous()){
-            return;
-        }
 
-        String key = ref.child(user.getUid()).push().getKey();
+        //String key = ref.child(user.getUid()).push().getKey();
+        //Si la receta está en base de datos, era una editada, no una nueva. Me quedo con la key
+        String key;
+        DaoSession session = ((CocinaConRollApplication)context).getDaoSession();
+        Query queryRecipe = RecipeQueries.getQueryGetRecipeByName(session);
+        RecipeShort recipeShort = (RecipeShort) queryRecipe.unique();
+        if(recipeShort != null){
+            key = recipeShort.getKey();
+        }else{
+            key = ref.child(user.getUid()).push().getKey();
+        }
 
         RecipeDetailed recipeDetailed = new RecipeDetailed(recipe);
         RecipeTimestamp recipeTimestamp = new RecipeTimestamp();
@@ -77,7 +106,7 @@ public class DatabaseMethods {
                 }
                 recipeList.remove(0);
                 if(!recipeList.isEmpty()){
-                    updateRecipeToPersonalStorage(context, recipeList);
+                    updateRecipesToPersonalStorage(context, recipeList);
                 }
             }
         });
