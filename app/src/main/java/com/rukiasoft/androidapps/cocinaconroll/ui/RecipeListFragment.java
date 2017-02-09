@@ -1018,7 +1018,7 @@ public class RecipeListFragment extends Fragment implements
             Tools tools = new Tools();
             tools.savePreferences(getContext(), RecetasCookeoConstants.PROPERTY_CAN_UPLOAD_OWN_RECIPES, true);
             DatabaseMethods dbMethods = new DatabaseMethods();
-            dbMethods.updateOldRecipesToPersonalStorage(getContext());
+            dbMethods.updateOldRecipesToPersonalStorage(getActivity().getApplicationContext());
             //Llamo a descargar (haya recetas nuevas o no).
             downloadRecipesFromFirebase();
         }

@@ -32,8 +32,13 @@ import java.util.Map;
 
 public class DatabaseMethods {
     private final String TAG = LogHelper.makeLogTag(DatabaseMethods.class);
+    static boolean uploading = false;
 
     public void updateOldRecipesToPersonalStorage(final Context context){
+        if(uploading == true){
+            return;
+        }
+        uploading = !uploading;
         ReadWriteTools readWriteTools = new ReadWriteTools();
         List<String> recipeItemNameList = readWriteTools.loadOldEditedAndOriginalRecipes(context);
         DatabaseMethods databaseMethods = new DatabaseMethods();
@@ -68,6 +73,7 @@ public class DatabaseMethods {
         String key;
         DaoSession session = ((CocinaConRollApplication)context).getDaoSession();
         Query queryRecipe = RecipeQueries.getQueryGetRecipeByName(session);
+        queryRecipe.setParameter(0, recipe.getName());
         RecipeShort recipeShort = (RecipeShort) queryRecipe.unique();
         if(recipeShort != null){
             key = recipeShort.getKey();
@@ -107,6 +113,8 @@ public class DatabaseMethods {
                 recipeList.remove(0);
                 if(!recipeList.isEmpty()){
                     updateRecipesToPersonalStorage(context, recipeList);
+                }else{
+                    uploading = false;
                 }
             }
         });

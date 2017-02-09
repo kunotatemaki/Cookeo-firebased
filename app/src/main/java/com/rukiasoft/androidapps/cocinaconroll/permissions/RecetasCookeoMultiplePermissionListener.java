@@ -36,8 +36,6 @@ public class RecetasCookeoMultiplePermissionListener implements MultiplePermissi
         for (PermissionGrantedResponse response : report.getGrantedPermissionResponses()) {
             if(response.getRequestedPermission().getName().equals(android.Manifest.permission.READ_EXTERNAL_STORAGE)){
                 // TODO: 28/1/17 Aquí es donde leo las recetas antiguas
-                ReadWriteTools readWriteTools = new ReadWriteTools();
-                List<String> recipeItemNameList = readWriteTools.loadOldEditedAndOriginalRecipes(context);
                 DatabaseMethods databaseMethods = new DatabaseMethods();
                 databaseMethods.updateOldRecipesToPersonalStorage(context);
                 Log.d(TAG, "salgo del método");
