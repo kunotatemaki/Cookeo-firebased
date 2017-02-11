@@ -18,9 +18,9 @@ import android.widget.EditText;
 
 import com.rukiasoft.androidapps.cocinaconroll.CocinaConRollApplication;
 import com.rukiasoft.androidapps.cocinaconroll.R;
+import com.rukiasoft.androidapps.cocinaconroll.classes.RecipeItemOld;
 import com.rukiasoft.androidapps.cocinaconroll.dragandswipehelper.OnStartDragListener;
 import com.rukiasoft.androidapps.cocinaconroll.dragandswipehelper.SimpleItemTouchHelperCallback;
-import com.rukiasoft.androidapps.cocinaconroll.classes.RecipeItem;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.Tools;
 import com.squareup.leakcanary.RefWatcher;
@@ -33,7 +33,7 @@ import butterknife.Unbinder;
 public class EditRecipeIngredientsFragment extends Fragment implements OnStartDragListener {
 
     private static final String KEY_ITEM_TO_ADD = RecetasCookeoConstants.PACKAGE_NAME + ".itemtoadd";
-    private RecipeItem recipeItem;
+    private RecipeItemOld recipeItemOld;
     //private static final String TAG = "EditRecipeIngredientsFragment";
     private Boolean showSwipe = true;
     @BindView(R.id.edit_recipe_add_item)EditText addItem;
@@ -86,7 +86,7 @@ public class EditRecipeIngredientsFragment extends Fragment implements OnStartDr
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mAdapter = new EditRecipeRecyclerViewAdapter(recipeItem.getIngredients(), this);
+        mAdapter = new EditRecipeRecyclerViewAdapter(recipeItemOld.getIngredients(), this);
 
         //recyclerView.setHasFixedSize(true);
         recyclerView.setAdapter(mAdapter);
@@ -104,12 +104,12 @@ public class EditRecipeIngredientsFragment extends Fragment implements OnStartDr
 
     private void setRecipe(){
         if(getActivity() instanceof EditRecipeActivity){
-            recipeItem = ((EditRecipeActivity) getActivity()).getRecipe();
+            recipeItemOld = ((EditRecipeActivity) getActivity()).getRecipe();
         }
     }
 
     public void saveData(){
-        recipeItem.setIngredients(mAdapter.getItems());
+        recipeItemOld.setIngredients(mAdapter.getItems());
     }
 
 

@@ -38,7 +38,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.karumi.dexter.Dexter;
 import com.rukiasoft.androidapps.cocinaconroll.BuildConfig;
 import com.rukiasoft.androidapps.cocinaconroll.R;
-import com.rukiasoft.androidapps.cocinaconroll.classes.RecipeItem;
+import com.rukiasoft.androidapps.cocinaconroll.classes.RecipeItemOld;
 import com.rukiasoft.androidapps.cocinaconroll.classes.ZipItem;
 import com.rukiasoft.androidapps.cocinaconroll.database.DatabaseRelatedTools;
 import com.rukiasoft.androidapps.cocinaconroll.gcm.QuickstartPreferences;
@@ -218,13 +218,13 @@ public class RecipeListActivity extends ToolbarAndProgressActivity implements Re
             case RecetasCookeoConstants.REQUEST_DETAILS:
                 //return from RecipeDetailsActivity
                 if (resultCode == RecetasCookeoConstants.RESULT_DELETE_RECIPE && intentData != null && intentData.hasExtra(RecetasCookeoConstants.KEY_RECIPE)) {
-                    RecipeItem recipe = intentData.getParcelableExtra(RecetasCookeoConstants.KEY_RECIPE);
+                    RecipeItemOld recipe = intentData.getParcelableExtra(RecetasCookeoConstants.KEY_RECIPE);
                     if (recipe != null) {
                         removeRecipeFromDiskAndDatabase(recipe);
                     }
                 }else if(resultCode == RecetasCookeoConstants.RESULT_UPDATE_RECIPE){
                     if (intentData != null && intentData.hasExtra(RecetasCookeoConstants.KEY_RECIPE)) {
-                        RecipeItem recipe = intentData.getParcelableExtra(RecetasCookeoConstants.KEY_RECIPE);
+                        RecipeItemOld recipe = intentData.getParcelableExtra(RecetasCookeoConstants.KEY_RECIPE);
                         RecipeListFragment mRecipeListFragment = (RecipeListFragment) getSupportFragmentManager().findFragmentById(R.id.list_recipes_fragment);
                         if (mRecipeListFragment != null) {
                             mRecipeListFragment.updateRecipe(recipe);
@@ -234,7 +234,7 @@ public class RecipeListActivity extends ToolbarAndProgressActivity implements Re
                 break;
             case RecetasCookeoConstants.REQUEST_EDIT_RECIPE:
                 if(resultCode == RecetasCookeoConstants.RESULT_UPDATE_RECIPE && intentData != null && intentData.hasExtra(RecetasCookeoConstants.KEY_RECIPE)) {
-                    RecipeItem recipe = intentData.getParcelableExtra(RecetasCookeoConstants.KEY_RECIPE);
+                    RecipeItemOld recipe = intentData.getParcelableExtra(RecetasCookeoConstants.KEY_RECIPE);
                     CommonRecipeOperations commonRecipeOperations = new CommonRecipeOperations(this, recipe);
                     String oldPicture = "";
                     if (intentData.hasExtra(RecetasCookeoConstants.KEY_DELETE_OLD_PICTURE)) {
@@ -249,7 +249,7 @@ public class RecipeListActivity extends ToolbarAndProgressActivity implements Re
                 break;
             case RecetasCookeoConstants.REQUEST_CREATE_RECIPE:
                 if (resultCode == RecetasCookeoConstants.RESULT_UPDATE_RECIPE && intentData != null && intentData.hasExtra(RecetasCookeoConstants.KEY_RECIPE)) {
-                    RecipeItem recipe = intentData.getParcelableExtra(RecetasCookeoConstants.KEY_RECIPE);
+                    RecipeItemOld recipe = intentData.getParcelableExtra(RecetasCookeoConstants.KEY_RECIPE);
                     RecipeListFragment mRecipeListFragment = (RecipeListFragment) getSupportFragmentManager().findFragmentById(R.id.list_recipes_fragment);
                     ReadWriteTools readWriteTools = new ReadWriteTools();
                     String path = readWriteTools.saveRecipeOnEditedPath(getApplicationContext(), recipe);
@@ -286,7 +286,7 @@ public class RecipeListActivity extends ToolbarAndProgressActivity implements Re
 
     }
 
-    private void removeRecipeFromDiskAndDatabase(RecipeItem recipe){
+    private void removeRecipeFromDiskAndDatabase(RecipeItemOld recipe){
         ReadWriteTools rwTools = new ReadWriteTools();
         rwTools.deleteRecipe(recipe);
         DatabaseRelatedTools dbTools = new DatabaseRelatedTools();

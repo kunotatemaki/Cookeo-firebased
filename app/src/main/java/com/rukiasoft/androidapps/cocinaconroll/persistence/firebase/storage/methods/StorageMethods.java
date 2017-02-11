@@ -11,8 +11,8 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-import com.rukiasoft.androidapps.cocinaconroll.classes.RecipeItem;
-import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.database.methods.DatabaseMethods;
+import com.rukiasoft.androidapps.cocinaconroll.classes.RecipeItemOld;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.database.methods.FirebaseDbMethods;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.LogHelper;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.ReadWriteTools;
 
@@ -23,9 +23,9 @@ import java.io.File;
  */
 
 public class StorageMethods {
-    private final String TAG = LogHelper.makeLogTag(DatabaseMethods.class);
+    private final String TAG = LogHelper.makeLogTag(FirebaseDbMethods.class);
 
-    public void updatePictureToPersonalStorage(final RecipeItem recipe) {
+    public void updatePictureToPersonalStorage(final RecipeItemOld recipe) {
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if(user == null || user.isAnonymous()){
@@ -60,4 +60,6 @@ public class StorageMethods {
         });
 
     }
+
+
 }

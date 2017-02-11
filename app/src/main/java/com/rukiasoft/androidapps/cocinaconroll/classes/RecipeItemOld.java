@@ -14,7 +14,7 @@ import java.util.List;
 
 
 @Root
-public class RecipeItem implements Parcelable {
+public class RecipeItemOld implements Parcelable {
 
     private Integer _id = -1;
     @Element
@@ -51,7 +51,7 @@ public class RecipeItem implements Parcelable {
     private Integer version = 0;
 
 
-    public RecipeItem(Parcel in){
+    public RecipeItemOld(Parcel in){
         this._id = in.readInt();
         this.name = in.readString();
         this.type = in.readString();
@@ -77,7 +77,7 @@ public class RecipeItem implements Parcelable {
 
     }
 
-    public RecipeItem() {
+    public RecipeItemOld() {
 
         ingredients = new ArrayList<>();
     }
@@ -268,13 +268,13 @@ public class RecipeItem implements Parcelable {
         dest.writeInt(getVersion());
     }
 
-    public static final Parcelable.Creator<RecipeItem> CREATOR = new Parcelable.Creator<RecipeItem>() {
-        public RecipeItem createFromParcel(Parcel in) {
-            return new RecipeItem(in);
+    public static final Parcelable.Creator<RecipeItemOld> CREATOR = new Parcelable.Creator<RecipeItemOld>() {
+        public RecipeItemOld createFromParcel(Parcel in) {
+            return new RecipeItemOld(in);
         }
 
-        public RecipeItem[] newArray(int size) {
-            return new RecipeItem[size];
+        public RecipeItemOld[] newArray(int size) {
+            return new RecipeItemOld[size];
         }
     };
 

@@ -38,7 +38,7 @@ public class LikeButtonView extends FrameLayout {
 
 
     Context mContext;
-    private RecipeItem recipeItem;
+    private RecipeItemOld recipeItemOld;
     private AnimatorSet animatorSet;
     private ImageView favoriteIcon;
 
@@ -63,29 +63,29 @@ public class LikeButtonView extends FrameLayout {
         mContext = context;
     }
 
-    public void init(final RecipeItem recipe, ImageView favorite) {
+    public void init(final RecipeItemOld recipe, ImageView favorite) {
         LayoutInflater.from(getContext()).inflate(R.layout.view_like_button, this, true);
         ButterKnife.bind(this);
-        recipeItem = recipe;
+        recipeItemOld = recipe;
         favoriteIcon = favorite;
-        ivStar.setImageResource(recipeItem.getFavourite() ? R.drawable.ic_favorite_white_36dp : R.drawable.ic_favorite_outline_white_36dp);
+        ivStar.setImageResource(recipeItemOld.getFavourite() ? R.drawable.ic_favorite_white_36dp : R.drawable.ic_favorite_outline_white_36dp);
         ivStar.setOnClickListener(new OnClickListener() {
             @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
             @Override
             public void onClick(View v) {
-                recipeItem.setFavourite(!recipeItem.getFavourite());
+                recipeItemOld.setFavourite(!recipeItemOld.getFavourite());
                 DatabaseRelatedTools dbTools = new DatabaseRelatedTools();
-                dbTools.updateFavoriteById(mContext, recipeItem.get_id(), recipeItem.getFavourite());
-                favoriteIcon.setVisibility(recipeItem.getFavourite()? VISIBLE : GONE);
-                //updateRecipe(recipeItem);
+                dbTools.updateFavoriteById(mContext, recipeItemOld.get_id(), recipeItemOld.getFavourite());
+                favoriteIcon.setVisibility(recipeItemOld.getFavourite()? VISIBLE : GONE);
+                //updateRecipe(recipeItemOld);
                 //isChecked = !isChecked;
-                ivStar.setImageResource(recipeItem.getFavourite() ? R.drawable.ic_favorite_white_36dp : R.drawable.ic_favorite_outline_white_36dp);
+                ivStar.setImageResource(recipeItemOld.getFavourite() ? R.drawable.ic_favorite_white_36dp : R.drawable.ic_favorite_outline_white_36dp);
 
                 if (animatorSet != null) {
                     animatorSet.cancel();
                 }
 
-                if (recipeItem.getFavourite()) {
+                if (recipeItemOld.getFavourite()) {
                     ivStar.animate().cancel();
                     ivStar.setScaleX(0);
                     ivStar.setScaleY(0);

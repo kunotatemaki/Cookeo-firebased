@@ -52,7 +52,7 @@ import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.rukiasoft.androidapps.cocinaconroll.CocinaConRollApplication;
 import com.rukiasoft.androidapps.cocinaconroll.R;
-import com.rukiasoft.androidapps.cocinaconroll.classes.RecipeItem;
+import com.rukiasoft.androidapps.cocinaconroll.classes.RecipeItemOld;
 import com.rukiasoft.androidapps.cocinaconroll.database.DatabaseRelatedTools;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.CommonRecipeOperations;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
@@ -96,7 +96,7 @@ public class RecipeDetailsFragment extends Fragment implements
     @BindView(R.id.listview_steps_cardview)
     LinearLayout stepsList;
     private Unbinder unbinder;
-    private RecipeItem recipe;
+    private RecipeItemOld recipe;
     private boolean recipeLoaded = false;
     private ActionBar actionBar;
     @BindView(R.id.cardview_link_textview) TextView author;
@@ -414,7 +414,7 @@ public class RecipeDetailsFragment extends Fragment implements
         }
     }
 
-    public void setRecipe(RecipeItem recipe) {
+    public void setRecipe(RecipeItemOld recipe) {
         this.recipe = recipe;
         loadRecipe();
     }
@@ -564,7 +564,7 @@ public class RecipeDetailsFragment extends Fragment implements
 
 
     @SuppressLint("NewApi")
-    public void updateRecipe(RecipeItem recipe) {
+    public void updateRecipe(RecipeItemOld recipe) {
         this.recipe = recipe;
         loadRecipe();
         Boolean compatRequired = Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB;

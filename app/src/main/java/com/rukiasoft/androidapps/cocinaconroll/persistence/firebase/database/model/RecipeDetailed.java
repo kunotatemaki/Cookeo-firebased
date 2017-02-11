@@ -6,7 +6,7 @@ package com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.database.mo
 
 import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
-import com.rukiasoft.androidapps.cocinaconroll.classes.RecipeItem;
+import com.rukiasoft.androidapps.cocinaconroll.classes.RecipeItemOld;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 
 import java.util.HashMap;
@@ -55,18 +55,18 @@ public class RecipeDetailed{
     }
 
 
-    public RecipeDetailed(RecipeItem recipeItem) {
-        this.name = recipeItem.getName();
-        this.type = recipeItem.getType();
-        this.picture = recipeItem.getPicture().equals(RecetasCookeoConstants.DEFAULT_PICTURE_NAME)? null : recipeItem.getPicture();
-        this.ingredients = recipeItem.getIngredients();
-        this.steps = recipeItem.getSteps();
-        this.author = recipeItem.getAuthor();
-        this.vegetarian = recipeItem.getVegetarian();
-        this.portions = recipeItem.getPortions();
-        this.minutes = recipeItem.getMinutes();
+    public RecipeDetailed(RecipeItemOld recipeItemOld) {
+        this.name = recipeItemOld.getName();
+        this.type = recipeItemOld.getType();
+        this.picture = recipeItemOld.getPicture().equals(RecetasCookeoConstants.DEFAULT_PICTURE_NAME)? null : recipeItemOld.getPicture();
+        this.ingredients = recipeItemOld.getIngredients();
+        this.steps = recipeItemOld.getSteps();
+        this.author = recipeItemOld.getAuthor();
+        this.vegetarian = recipeItemOld.getVegetarian();
+        this.portions = recipeItemOld.getPortions();
+        this.minutes = recipeItemOld.getMinutes();
         this.language = RecetasCookeoConstants.LANG_SPANISH;
-        this.tip = recipeItem.getTip();
+        this.tip = recipeItemOld.getTip();
     }
 
 

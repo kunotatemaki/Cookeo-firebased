@@ -5,7 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.rukiasoft.androidapps.cocinaconroll.classes.RecipeItem;
+import com.rukiasoft.androidapps.cocinaconroll.classes.RecipeItemOld;
 import com.rukiasoft.androidapps.cocinaconroll.database.DatabaseRelatedTools;
 import com.rukiasoft.androidapps.cocinaconroll.ui.EditRecipeActivity;
 
@@ -14,19 +14,19 @@ import com.rukiasoft.androidapps.cocinaconroll.ui.EditRecipeActivity;
  */
 public class CommonRecipeOperations {
 
-    private RecipeItem recipe;
+    private RecipeItemOld recipe;
     private Activity activity;
     //private Context context;
 
-    public CommonRecipeOperations(Activity activity, RecipeItem recipeItem){
+    public CommonRecipeOperations(Activity activity, RecipeItemOld recipeItemOld){
         this.activity = activity;
-        this.recipe = recipeItem;
+        this.recipe = recipeItemOld;
     }
-    public CommonRecipeOperations(Context context, RecipeItem recipeItem){
+    public CommonRecipeOperations(Context context, RecipeItemOld recipeItemOld){
         if(context instanceof Activity) {
             this.activity = (Activity)context;
         }
-        this.recipe = recipeItem;
+        this.recipe = recipeItemOld;
     }
 
     public void editRecipe(){
@@ -56,10 +56,10 @@ public class CommonRecipeOperations {
         }
     }
 
-    public RecipeItem loadRecipeDetailsFromRecipeCard(){
+    public RecipeItemOld loadRecipeDetailsFromRecipeCard(){
         ReadWriteTools rwTools = new ReadWriteTools();
         if(recipe.getIngredients() == null || recipe.getIngredients().size() == 0){
-            RecipeItem item = rwTools.readRecipeInfo(activity.getApplicationContext(), recipe.getPathRecipe());
+            RecipeItemOld item = rwTools.readRecipeInfo(activity.getApplicationContext(), recipe.getPathRecipe());
             if(item == null)
                 return null;
             recipe.setMinutes(item.getMinutes());

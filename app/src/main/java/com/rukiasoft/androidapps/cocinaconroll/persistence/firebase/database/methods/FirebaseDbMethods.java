@@ -1,6 +1,8 @@
 package com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.database.methods;
 
+import android.app.Application;
 import android.content.Context;
+import android.util.Log;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -8,10 +10,11 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.rukiasoft.androidapps.cocinaconroll.CocinaConRollApplication;
-import com.rukiasoft.androidapps.cocinaconroll.classes.RecipeItem;
+import com.rukiasoft.androidapps.cocinaconroll.classes.RecipeItemOld;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.controllers.RecipeController;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.daoqueries.RecipeQueries;
-import com.rukiasoft.androidapps.cocinaconroll.persistence.daos.DaoSession;
-import com.rukiasoft.androidapps.cocinaconroll.persistence.daos.RecipeShort;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.model.DaoSession;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.model.Recipe;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.database.model.RecipeDetailed;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.database.model.RecipeTimestamp;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.storage.methods.StorageMethods;
@@ -30,19 +33,25 @@ import java.util.Map;
  * Created by iRoll on 7/2/17.
  */
 
-public class DatabaseMethods {
-    private final String TAG = LogHelper.makeLogTag(DatabaseMethods.class);
+public class FirebaseDbMethods {
+    private final String TAG = LogHelper.makeLogTag(FirebaseDbMethods.class);
     static boolean uploading = false;
+    private RecipeController recipeController;
+
+    public FirebaseDbMethods(RecipeController recipeController) {
+        this.recipeController = recipeController;
+    }
 
     public void updateOldRecipesToPersonalStorage(final Context context){
         if(uploading == true){
+            Log.d(TAG, "Estaba descargando");
             return;
         }
         uploading = !uploading;
         ReadWriteTools readWriteTools = new ReadWriteTools();
         List<String> recipeItemNameList = readWriteTools.loadOldEditedAndOriginalRecipes(context);
-        DatabaseMethods databaseMethods = new DatabaseMethods();
-        databaseMethods.updateRecipesToPersonalStorage(context, recipeItemNameList);
+        //Log.d(TAG, "numero recetas: " + recipeItemNameList.size());
+        updateRecipesToPersonalStorage(context, recipeItemNameList);
 
     }
 
@@ -50,18 +59,30 @@ public class DatabaseMethods {
 
         Tools tools = new Tools();
         if(!tools.getBooleanFromPreferences(context, RecetasCookeoConstants.PROPERTY_CAN_UPLOAD_OWN_RECIPES)){
+            Log.d(TAG, "No puede subir recetas por el flag");
+            uploading = false;
             return;
         }
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if(user == null || user.isAnonymous()){
+            Log.d(TAG, "No puede subir recetas por el user");
+            uploading = false;
             return;
         }
 
         final ReadWriteTools readWriteTools = new ReadWriteTools();
-        if(recipeList.isEmpty())    return;
-        final RecipeItem recipe = readWriteTools.readRecipe(context, recipeList.get(0),
+        if(recipeList.isEmpty()) {
+            Log.d(TAG, "No hay recetas que subir");
+            uploading = false;
+            return;
+        }
+        final RecipeItemOld recipeOld = readWriteTools.readRecipe(context, recipeList.get(0),
                 RecetasCookeoConstants.PATH_TYPE_EDITED);
-        if(recipe == null)  return;
+        if(recipeOld == null){
+            Log.d(TAG, "La OWN receta a guardar es null");
+            uploadNextRecipe(context, recipeList);
+            return;
+        }
 
         DatabaseReference ref = FirebaseDatabase
                 .getInstance()
@@ -71,17 +92,18 @@ public class DatabaseMethods {
         //String key = ref.child(user.getUid()).push().getKey();
         //Si la receta está en base de datos, era una editada, no una nueva. Me quedo con la key
         String key;
-        DaoSession session = ((CocinaConRollApplication)context).getDaoSession();
-        Query queryRecipe = RecipeQueries.getQueryGetRecipeByName(session);
-        queryRecipe.setParameter(0, recipe.getName());
-        RecipeShort recipeShort = (RecipeShort) queryRecipe.unique();
-        if(recipeShort != null){
-            key = recipeShort.getKey();
+
+        Recipe recipe = recipeController.getRecipeByName((Application)context.getApplicationContext(),
+                recipeOld.getName());
+        if(recipe != null){
+            Log.d(TAG, "La receta " + recipe.getName() + "tenía key " + recipe.getKey());
+            key = recipe.getKey();
         }else{
             key = ref.child(user.getUid()).push().getKey();
+            Log.d(TAG, "Para la receta " + recipeOld.getName() + "genero key " + key);
         }
 
-        RecipeDetailed recipeDetailed = new RecipeDetailed(recipe);
+        RecipeDetailed recipeDetailed = new RecipeDetailed(recipeOld);
         RecipeTimestamp recipeTimestamp = new RecipeTimestamp();
 
         Map<String, Object> postDetailedValues = recipeDetailed.toMap();
@@ -98,6 +120,7 @@ public class DatabaseMethods {
                 
                 if (databaseError != null) {
                     System.out.println("Data could not be saved " + databaseError.getMessage());
+                    uploadNextRecipe(context, recipeList);
                     return;
                 }
                 StringBuilder sbPath = new StringBuilder(100);
@@ -105,18 +128,42 @@ public class DatabaseMethods {
                 sbPath.append(recipeList.get(0));
                 // TODO: 7/2/17 descomentar lo de borrar receta cuando verifique que el proceso funciona 
                 //readWriteTools.deleteFile(sbPath.toString());
-                if(recipe.getPicture() != null && !recipe.getPicture().isEmpty()
-                        && !recipe.getPicture().equals(RecetasCookeoConstants.DEFAULT_PICTURE_NAME)) {
+                if(recipeOld.getPicture() != null && !recipeOld.getPicture().isEmpty()
+                        && !recipeOld.getPicture().equals(RecetasCookeoConstants.DEFAULT_PICTURE_NAME)) {
                     StorageMethods storageMethods = new StorageMethods();
-                    storageMethods.updatePictureToPersonalStorage(recipe);
+                    storageMethods.updatePictureToPersonalStorage(recipeOld);
                 }
-                recipeList.remove(0);
-                if(!recipeList.isEmpty()){
-                    updateRecipesToPersonalStorage(context, recipeList);
-                }else{
-                    uploading = false;
-                }
+                //Log.d(TAG, "se ha subido correctamente las receta " +  recipe.getName());
+                uploadNextRecipe(context, recipeList);
             }
         });
+    }
+
+    private void uploadNextRecipe(Context context, List<String> recipeList){
+        if(recipeList.isEmpty()){
+            return;
+        }
+        recipeList.remove(0);
+        if(!recipeList.isEmpty()){
+            updateRecipesToPersonalStorage(context, recipeList);
+        }else{
+            uploading = false;
+        }
+    }
+
+    public static Integer getFlagRecipeFromNode(String node){
+        Integer flag;
+        switch(node){
+            case RecetasCookeoConstants.ALLOWED_RECIPES_NODE:
+                flag = RecetasCookeoConstants.FLAG_ALLOWED_RECIPE;
+                break;
+            case RecetasCookeoConstants.FORBIDDEN_RECIPES_NODE:
+                flag = RecetasCookeoConstants.FLAG_FORBIDDEN_RECIPE;
+                break;
+            default:
+                flag = RecetasCookeoConstants.FLAG_PERSONAL_RECIPE;
+                break;
+        }
+        return flag;
     }
 }

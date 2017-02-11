@@ -37,11 +37,11 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.rukiasoft.androidapps.cocinaconroll.classes.LikeButtonView;
+import com.rukiasoft.androidapps.cocinaconroll.classes.RecipeItemOld;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.CommonRecipeOperations;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 import com.rukiasoft.androidapps.cocinaconroll.R;
 import com.rukiasoft.androidapps.cocinaconroll.database.DatabaseRelatedTools;
-import com.rukiasoft.androidapps.cocinaconroll.classes.RecipeItem;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.ReadWriteTools;
 
 
@@ -55,14 +55,14 @@ import butterknife.Unbinder;
 public class RecipeListRecyclerViewAdapter extends RecyclerView.Adapter<RecipeListRecyclerViewAdapter.RecipeViewHolder>
         implements View.OnClickListener, View.OnLongClickListener {
 
-    private final List<RecipeItem> mItems;
+    private final List<RecipeItemOld> mItems;
     private OnCardClickListener onCardClickListener;
     private final Context mContext;
     private View frontCard = null;
     private View backCard = null;
 
 
-    public RecipeListRecyclerViewAdapter(Context context, List<RecipeItem> items) {
+    public RecipeListRecyclerViewAdapter(Context context, List<RecipeItemOld> items) {
         this.mItems = new ArrayList<>(items);
         this.mContext = context;
     }
@@ -87,7 +87,7 @@ public class RecipeListRecyclerViewAdapter extends RecyclerView.Adapter<RecipeLi
             @Override
             public void onClick(View v) {
                 if (onBackFavoriteClickListener != null) {
-                    final RecipeItem recipe = getRecipeFromParent(v);
+                    final RecipeItemOld recipe = getRecipeFromParent(v);
                     if (v instanceof ImageView) {
                         ((ImageView) v).setImageDrawable(
                                 (!recipe.getFavourite()) ? ContextCompat.getDrawable(mContext, R.drawable.ic_favorite_white_48dp) :
@@ -110,13 +110,13 @@ public class RecipeListRecyclerViewAdapter extends RecyclerView.Adapter<RecipeLi
         return new RecipeViewHolder(v);*/
     }
 
-    private RecipeItem getRecipeFromParent(View v){
-        RecipeItem recipe = null;
+    private RecipeItemOld getRecipeFromParent(View v){
+        RecipeItemOld recipe = null;
         View aux = v;
         ViewParent parent;
         while((parent = aux.getParent()) != null){
             if(parent instanceof CardView){
-                recipe = (RecipeItem) ((View)parent).getTag();
+                recipe = (RecipeItemOld) ((View)parent).getTag();
                 break;
             }else{
                 aux = (View) parent;
@@ -131,7 +131,7 @@ public class RecipeListRecyclerViewAdapter extends RecyclerView.Adapter<RecipeLi
 
     @Override
     public void onBindViewHolder(RecipeViewHolder holder, int position) {
-        RecipeItem item = mItems.get(position);
+        RecipeItemOld item = mItems.get(position);
         holder.bindRecipe(mContext, item);
         holder.itemView.setTag(item);
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
@@ -170,7 +170,7 @@ public class RecipeListRecyclerViewAdapter extends RecyclerView.Adapter<RecipeLi
         if (onCardClickListener != null) {
             new Handler().postDelayed(new Runnable() {
                 @Override public void run() {
-                    onCardClickListener.onCardClick(v, (RecipeItem) v.getTag());
+                    onCardClickListener.onCardClick(v, (RecipeItemOld) v.getTag());
                 }
             }, 200);
         }
@@ -282,7 +282,7 @@ public class RecipeListRecyclerViewAdapter extends RecyclerView.Adapter<RecipeLi
 
         }
 
-        public void bindRecipe(Context context, RecipeItem item) {
+        public void bindRecipe(Context context, RecipeItemOld item) {
             if(dbTools == null) dbTools = new DatabaseRelatedTools();
             if(rwTools == null) rwTools = new ReadWriteTools();
             recipeTitle.setText(item.getName());
@@ -328,7 +328,7 @@ public class RecipeListRecyclerViewAdapter extends RecyclerView.Adapter<RecipeLi
     }
 
     public interface OnCardClickListener {
-        void onCardClick(View view, RecipeItem recipeItem);
+        void onCardClick(View view, RecipeItemOld recipeItemOld);
     }
 
 

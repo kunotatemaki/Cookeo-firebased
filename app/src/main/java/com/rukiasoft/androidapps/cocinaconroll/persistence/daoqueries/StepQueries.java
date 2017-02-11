@@ -1,15 +1,11 @@
 package com.rukiasoft.androidapps.cocinaconroll.persistence.daoqueries;
 
-import com.rukiasoft.androidapps.cocinaconroll.persistence.daos.DaoSession;
-import com.rukiasoft.androidapps.cocinaconroll.persistence.daos.Ingredient;
-import com.rukiasoft.androidapps.cocinaconroll.persistence.daos.IngredientDao;
-import com.rukiasoft.androidapps.cocinaconroll.persistence.daos.RecipeShortDao;
-import com.rukiasoft.androidapps.cocinaconroll.persistence.daos.Step;
-import com.rukiasoft.androidapps.cocinaconroll.persistence.daos.StepDao;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.model.DaoSession;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.model.Step;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.model.StepDao;
 
 import org.greenrobot.greendao.query.DeleteQuery;
 import org.greenrobot.greendao.query.Query;
-import org.greenrobot.greendao.query.QueryBuilder;
 
 /**
  * Created by iRoll on 27/1/17.

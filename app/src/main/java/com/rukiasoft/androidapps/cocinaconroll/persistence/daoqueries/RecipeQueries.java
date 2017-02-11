@@ -1,7 +1,7 @@
 package com.rukiasoft.androidapps.cocinaconroll.persistence.daoqueries;
 
-import com.rukiasoft.androidapps.cocinaconroll.persistence.daos.DaoSession;
-import com.rukiasoft.androidapps.cocinaconroll.persistence.daos.RecipeShortDao;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.model.DaoSession;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.model.RecipeDao;
 
 import org.greenrobot.greendao.query.Query;
 import org.greenrobot.greendao.query.QueryBuilder;
@@ -12,24 +12,24 @@ import org.greenrobot.greendao.query.QueryBuilder;
 
 public class RecipeQueries {
 
-    private static Query queryRecipesAndPicturesToDownload;
-    private static Query queryRecipesToDownload;
+    private static Query queryBothRecipesAndPicturesToDownload;
+    private static Query queryOnlyRecipesToDownload;
     private static Query queryGetRecipeByPictureName;
     private static Query queryGetRecipeByKey;
     private static Query queryGetRecipeByName;
 
-    public static Query getQueryRecipesAndPicturesToDownload(DaoSession session) {
-        if(queryRecipesAndPicturesToDownload == null){
-            initializeQueryRecipesAndPicturesToDownload(session);
+    public static Query getQueryBothRecipesAndPicturesToDownload(DaoSession session) {
+        if(queryBothRecipesAndPicturesToDownload == null){
+            initializeQueryBothRecipesAndPicturesToDownload(session);
         }
-        return queryRecipesAndPicturesToDownload.forCurrentThread();
+        return queryBothRecipesAndPicturesToDownload.forCurrentThread();
     }
 
-    public static Query getQueryRecipesToDownload(DaoSession session) {
-        if(queryRecipesToDownload == null){
-            initializeQueryRecipesToDownload(session);
+    public static Query getQueryOnlyRecipesToDownload(DaoSession session) {
+        if(queryOnlyRecipesToDownload == null){
+            initializeQueryOnlyRecipesToDownload(session);
         }
-        return queryRecipesToDownload.forCurrentThread();
+        return queryOnlyRecipesToDownload.forCurrentThread();
     }
 
     public static Query getQueryGetRecipeByPictureName(DaoSession session) {
@@ -53,47 +53,47 @@ public class RecipeQueries {
         return queryGetRecipeByName.forCurrentThread();
     }
 
-    private static void initializeQueryRecipesAndPicturesToDownload(DaoSession session){
-        RecipeShortDao recipeShortDao = session.getRecipeShortDao();
-        recipeShortDao.detachAll();
-        QueryBuilder qb = recipeShortDao.queryBuilder();
-        queryRecipesAndPicturesToDownload = qb.where(
-                qb.or(RecipeShortDao.Properties.DownloadRecipe.eq(1),
-                        RecipeShortDao.Properties.DownloadPicture.eq(1))
+    private static void initializeQueryBothRecipesAndPicturesToDownload(DaoSession session){
+        RecipeDao recipeDao = session.getRecipeDao();
+        recipeDao.detachAll();
+        QueryBuilder qb = recipeDao.queryBuilder();
+        queryBothRecipesAndPicturesToDownload = qb.where(
+                qb.or(RecipeDao.Properties.DownloadRecipe.eq(1),
+                        RecipeDao.Properties.DownloadPicture.eq(1))
         ).build();
     }
 
-    private static void initializeQueryRecipesToDownload(DaoSession session){
-        RecipeShortDao recipeShortDao = session.getRecipeShortDao();
-        recipeShortDao.detachAll();
-        QueryBuilder qb = recipeShortDao.queryBuilder();
-        queryRecipesToDownload = qb.where(
-                RecipeShortDao.Properties.DownloadRecipe.eq(1)
+    private static void initializeQueryOnlyRecipesToDownload(DaoSession session){
+        RecipeDao recipeDao = session.getRecipeDao();
+        recipeDao.detachAll();
+        QueryBuilder qb = recipeDao.queryBuilder();
+        queryOnlyRecipesToDownload = qb.where(
+                RecipeDao.Properties.DownloadRecipe.eq(1)
         ).build();
     }
 
     private static void initializeQueryGetRecipeByPictureName(DaoSession session){
-        RecipeShortDao recipeShortDao = session.getRecipeShortDao();
-        recipeShortDao.detachAll();
-        QueryBuilder qb = recipeShortDao.queryBuilder();
+        RecipeDao recipeDao = session.getRecipeDao();
+        recipeDao.detachAll();
+        QueryBuilder qb = recipeDao.queryBuilder();
         queryGetRecipeByPictureName = qb.where(
-                RecipeShortDao.Properties.Picture.eq("")
+                RecipeDao.Properties.Picture.eq("")
         ).build();
     }
 
     private static void initializeQueryGetRecipeByKey(DaoSession session){
-        RecipeShortDao recipeShortDao = session.getRecipeShortDao();
-        recipeShortDao.detachAll();
-        queryGetRecipeByKey = recipeShortDao.queryBuilder().where(
-                RecipeShortDao.Properties.Key.eq("")
+        RecipeDao recipeDao = session.getRecipeDao();
+        recipeDao.detachAll();
+        queryGetRecipeByKey = recipeDao.queryBuilder().where(
+                RecipeDao.Properties.Key.eq("")
         ).build();
     }
 
     private static void initializeQueryGetRecipeByName(DaoSession session){
-        RecipeShortDao recipeShortDao = session.getRecipeShortDao();
-        recipeShortDao.detachAll();
-        queryGetRecipeByName = recipeShortDao.queryBuilder().where(
-                RecipeShortDao.Properties.Name.eq("")
+        RecipeDao recipeDao = session.getRecipeDao();
+        recipeDao.detachAll();
+        queryGetRecipeByName = recipeDao.queryBuilder().where(
+                RecipeDao.Properties.Name.eq("")
         ).build();
     }
 

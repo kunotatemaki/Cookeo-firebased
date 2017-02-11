@@ -8,7 +8,7 @@ import android.net.Uri;
 import android.os.Build;
 
 import com.rukiasoft.androidapps.cocinaconroll.R;
-import com.rukiasoft.androidapps.cocinaconroll.classes.RecipeItem;
+import com.rukiasoft.androidapps.cocinaconroll.classes.RecipeItemOld;
 import com.rukiasoft.androidapps.cocinaconroll.classes.ZipItem;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 
@@ -23,9 +23,9 @@ public class DatabaseRelatedTools {
 
     }
 
-    public void addRecipeToArrayAndDatabase(Context mContext, List<RecipeItem> recipeItemList, RecipeItem recipeItem){
-        recipeItemList.add(recipeItem);
-        insertRecipeIntoDatabase(mContext, recipeItem, true);
+    public void addRecipeToArrayAndDatabase(Context mContext, List<RecipeItemOld> recipeItemOldList, RecipeItemOld recipeItemOld){
+        recipeItemOldList.add(recipeItemOld);
+        insertRecipeIntoDatabase(mContext, recipeItemOld, true);
     }
 
     public void updateFavoriteById(Context mContext, int id, boolean favorite) {
@@ -59,7 +59,7 @@ public class DatabaseRelatedTools {
     }
 
 
-    public void updatePathsAndVersion(Context mContext, RecipeItem recipe) {
+    public void updatePathsAndVersion(Context mContext, RecipeItemOld recipe) {
         ContentValues values = new ContentValues();
 
         values.put(RecipesTable.FIELD_PATH_RECIPE_EDITED, recipe.getPathRecipe());
@@ -75,15 +75,15 @@ public class DatabaseRelatedTools {
         mContext.getContentResolver().update(CocinaConRollContentProvider.CONTENT_URI_RECIPES, values, clause, args);
     }
 
-    public void insertRecipeIntoDatabase(Context mContext, RecipeItem recipeItem, boolean update) {
+    public void insertRecipeIntoDatabase(Context mContext, RecipeItemOld recipeItemOld, boolean update) {
         //set values
         ContentValues values = new ContentValues();
-        values.put(RecipesTable.FIELD_NAME, recipeItem.getName());
-        values.put(RecipesTable.FIELD_NAME_NORMALIZED, getNormalizedString(recipeItem.getName()));
-        values.put(RecipesTable.FIELD_TYPE, recipeItem.getType());
-        values.put(RecipesTable.FIELD_VERSION, recipeItem.getVersion());
+        values.put(RecipesTable.FIELD_NAME, recipeItemOld.getName());
+        values.put(RecipesTable.FIELD_NAME_NORMALIZED, getNormalizedString(recipeItemOld.getName()));
+        values.put(RecipesTable.FIELD_TYPE, recipeItemOld.getType());
+        values.put(RecipesTable.FIELD_VERSION, recipeItemOld.getVersion());
         int icon;
-        switch (recipeItem.getType()) {
+        switch (recipeItemOld.getType()) {
             case RecetasCookeoConstants.TYPE_DESSERTS:
                 icon = R.drawable.ic_dessert_24;
                 break;
@@ -98,22 +98,22 @@ public class DatabaseRelatedTools {
                 break;
         }
         values.put(RecipesTable.FIELD_ICON, icon);
-        values.put(RecipesTable.FIELD_VEGETARIAN, recipeItem.getVegetarian()?1:0);
-        values.put(RecipesTable.FIELD_STATE, recipeItem.getState());
+        values.put(RecipesTable.FIELD_VEGETARIAN, recipeItemOld.getVegetarian()?1:0);
+        values.put(RecipesTable.FIELD_STATE, recipeItemOld.getState());
         values.put(RecipesTable.FIELD_FAVORITE, 0);
-        values.put(RecipesTable.FIELD_DATE, recipeItem.getDate());
-        if((recipeItem.getState()&(RecetasCookeoConstants.FLAG_EDITED| RecetasCookeoConstants.FLAG_OWN))!=0) {
-            values.put(RecipesTable.FIELD_PATH_RECIPE_EDITED, recipeItem.getPathRecipe());
+        values.put(RecipesTable.FIELD_DATE, recipeItemOld.getDate());
+        if((recipeItemOld.getState()&(RecetasCookeoConstants.FLAG_EDITED| RecetasCookeoConstants.FLAG_OWN))!=0) {
+            values.put(RecipesTable.FIELD_PATH_RECIPE_EDITED, recipeItemOld.getPathRecipe());
         }else {
-            values.put(RecipesTable.FIELD_PATH_RECIPE, recipeItem.getPathRecipe());
+            values.put(RecipesTable.FIELD_PATH_RECIPE, recipeItemOld.getPathRecipe());
         }
-        if((recipeItem.getState()& RecetasCookeoConstants.FLAG_EDITED_PICTURE)!=0) {
-            values.put(RecipesTable.FIELD_PATH_PICTURE_EDITED, recipeItem.getPathPicture());
+        if((recipeItemOld.getState()& RecetasCookeoConstants.FLAG_EDITED_PICTURE)!=0) {
+            values.put(RecipesTable.FIELD_PATH_PICTURE_EDITED, recipeItemOld.getPathPicture());
         }else {
-            values.put(RecipesTable.FIELD_PATH_PICTURE, recipeItem.getPathPicture());
+            values.put(RecipesTable.FIELD_PATH_PICTURE, recipeItemOld.getPathPicture());
         }
         //check if recipe exists. If not, insert. Otherwise, update
-        RecipeItem coincidence = getRecipeByPathName(mContext, recipeItem.getPathRecipe());
+        RecipeItemOld coincidence = getRecipeByPathName(mContext, recipeItemOld.getPathRecipe());
         if(coincidence == null) {
             mContext.getContentResolver().insert(CocinaConRollContentProvider.CONTENT_URI_RECIPES, values);
         }else if(update){
@@ -129,9 +129,9 @@ public class DatabaseRelatedTools {
                 null,
                 null,
                 null, null);
-        List<RecipeItem> list = getRecipesFromCursor(cursor);
+        List<RecipeItemOld> list = getRecipesFromCursor(cursor);
         if(list.size() > 0){
-            RecipeItem item = list.get(0);
+            RecipeItemOld item = list.get(0);
             int state = item.getState();
             String selection = RecipesTable.FIELD_ID + " = ? ";
             String[] selectionArgs = {String.valueOf(id)};
@@ -153,41 +153,41 @@ public class DatabaseRelatedTools {
     }
 
 
-    public List<RecipeItem> searchRecipesInDatabase(Context mContext) {
+    public List<RecipeItemOld> searchRecipesInDatabase(Context mContext) {
         String[] sSelectionArgs = new String[1];
         return searchRecipesInDatabase(mContext, null, sSelectionArgs);
     }
 
-    public List<RecipeItem> searchRecipesInDatabase(Context mContext, String field, int selectionArgs) {
+    public List<RecipeItemOld> searchRecipesInDatabase(Context mContext, String field, int selectionArgs) {
         String[] sSelectionArgs = new String[1];
         sSelectionArgs[0] = String.valueOf(selectionArgs);
         return searchRecipesInDatabase(mContext, field, sSelectionArgs);
     }
 
-    public List<RecipeItem> searchRecipesInDatabaseByState(Context mContext, int state){
-        List<RecipeItem> list = searchRecipesInDatabase(mContext);
-        List<RecipeItem> listFiltered = new ArrayList<>();
-        for(RecipeItem recipeItem : list){
-            if((recipeItem.getState() & state) != 0){
-                listFiltered.add(recipeItem);
+    public List<RecipeItemOld> searchRecipesInDatabaseByState(Context mContext, int state){
+        List<RecipeItemOld> list = searchRecipesInDatabase(mContext);
+        List<RecipeItemOld> listFiltered = new ArrayList<>();
+        for(RecipeItemOld recipeItemOld : list){
+            if((recipeItemOld.getState() & state) != 0){
+                listFiltered.add(recipeItemOld);
             }
         }
         return listFiltered;
     }
 
-    public List<RecipeItem> searchRecipesInDatabase(Context mContext, String field, long selectionArgs) {
+    public List<RecipeItemOld> searchRecipesInDatabase(Context mContext, String field, long selectionArgs) {
         String[] sSelectionArgs = new String[1];
         sSelectionArgs[0] = String.valueOf(selectionArgs);
         return searchRecipesInDatabase(mContext, field, sSelectionArgs);
     }
 
-    public List<RecipeItem> searchRecipesInDatabase(Context mContext, String field, String selectionArgs){
+    public List<RecipeItemOld> searchRecipesInDatabase(Context mContext, String field, String selectionArgs){
         String[] sSelectionArgs = new String[1];
         sSelectionArgs[0] = selectionArgs;
         return searchRecipesInDatabase(mContext, field, sSelectionArgs);
     }
 
-    private List<RecipeItem> searchRecipesInDatabase(Context mContext, String field, String[] selectionArgs){
+    private List<RecipeItemOld> searchRecipesInDatabase(Context mContext, String field, String[] selectionArgs){
         if(selectionArgs[0] == null || selectionArgs[0].isEmpty()){
             selectionArgs = null;
         }
@@ -209,10 +209,10 @@ public class DatabaseRelatedTools {
         return getRecipesFromCursor(cursor);
     }
 
-    public List<RecipeItem> getRecipesByState(Context mContext, Integer flag){
-        List<RecipeItem> recipes = searchRecipesInDatabase(mContext);
-        List<RecipeItem> coincidences = new ArrayList<>();
-        for(RecipeItem recipe : recipes){
+    public List<RecipeItemOld> getRecipesByState(Context mContext, Integer flag){
+        List<RecipeItemOld> recipes = searchRecipesInDatabase(mContext);
+        List<RecipeItemOld> coincidences = new ArrayList<>();
+        for(RecipeItemOld recipe : recipes){
             if((recipe.getState() & flag) !=0){
                 coincidences.add(recipe);
             }
@@ -231,12 +231,12 @@ public class DatabaseRelatedTools {
 
     }
 
-    public RecipeItem getRecipeByPathName(Context mContext, String path){
+    public RecipeItemOld getRecipeByPathName(Context mContext, String path){
         Uri uPath = Uri.parse(path);
         return getRecipeByFileName(mContext, uPath.getLastPathSegment());
     }
 
-    public RecipeItem getRecipeByFileName(Context mContext, String name){
+    public RecipeItemOld getRecipeByFileName(Context mContext, String name){
         String[] sSelectionArgs = new String[2];
         sSelectionArgs[0] = "%" + name;
         sSelectionArgs[1] = "%" + name;
@@ -252,7 +252,7 @@ public class DatabaseRelatedTools {
                 selection,
                 sSelectionArgs, sortOrder);
 
-        List<RecipeItem> list = getRecipesFromCursor(cursor);
+        List<RecipeItemOld> list = getRecipesFromCursor(cursor);
         if(list.size()>0){
             return list.get(0);
         }else{
@@ -310,11 +310,11 @@ public class DatabaseRelatedTools {
         mContext.getContentResolver().update(CocinaConRollContentProvider.CONTENT_URI_ZIPS, values, clause, args);
     }
 
-    public List<RecipeItem> getRecipesFromCursor(Cursor cursor) {
-        List<RecipeItem> list = new ArrayList<>();
+    public List<RecipeItemOld> getRecipesFromCursor(Cursor cursor) {
+        List<RecipeItemOld> list = new ArrayList<>();
         if(cursor != null && cursor.moveToFirst()){
             do {
-                RecipeItem item =  new RecipeItem();
+                RecipeItemOld item =  new RecipeItemOld();
                 item.set_id(cursor.getInt(cursor.getColumnIndexOrThrow(RecipesTable.FIELD_ID)));
                 item.setName(cursor.getString(cursor.getColumnIndexOrThrow(RecipesTable.FIELD_NAME)));
                 item.setIcon(cursor.getInt(cursor.getColumnIndexOrThrow(RecipesTable.FIELD_ICON)));

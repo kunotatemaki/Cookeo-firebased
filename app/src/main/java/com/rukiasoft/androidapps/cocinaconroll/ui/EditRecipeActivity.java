@@ -15,7 +15,7 @@ import android.view.MenuItem;
 import android.widget.TextView;
 
 import com.rukiasoft.androidapps.cocinaconroll.R;
-import com.rukiasoft.androidapps.cocinaconroll.classes.RecipeItem;
+import com.rukiasoft.androidapps.cocinaconroll.classes.RecipeItemOld;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.LogHelper;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.ReadWriteTools;
@@ -33,7 +33,7 @@ public class EditRecipeActivity extends AppCompatActivity {
     private EditRecipePhotoFragment editRecipePhotoFragment;
     private EditRecipeIngredientsFragment editRecipeIngredientsFragment;
     private EditRecipeStepsFragment editRecipeStepsFragment;
-    private RecipeItem recipe;
+    private RecipeItemOld recipe;
     private final static String TAG = LogHelper.makeLogTag(EditRecipeActivity.class);
     private final static String KEY_FRAGMENT = RecetasCookeoConstants.PACKAGE_NAME + ".fragment";
     private final static String KEY_TITLE = RecetasCookeoConstants.PACKAGE_NAME + ".title";
@@ -61,7 +61,7 @@ public class EditRecipeActivity extends AppCompatActivity {
             recipe = getIntent().getExtras().getParcelable(RecetasCookeoConstants.KEY_RECIPE);
             //check if the picture is previosly edited, to delete the old picture
             if(recipe == null){
-                recipe = new RecipeItem();
+                recipe = new RecipeItemOld();
                 setResult(RESULT_CANCELED);
                 finish();
             }
@@ -72,7 +72,7 @@ public class EditRecipeActivity extends AppCompatActivity {
             recipe.setState(RecetasCookeoConstants.FLAG_EDITED);
         }else{
             title = getResources().getString(R.string.create_recipe);
-            recipe = new RecipeItem();
+            recipe = new RecipeItemOld();
             recipe.setState(RecetasCookeoConstants.FLAG_OWN);
         }
 
@@ -267,7 +267,7 @@ public class EditRecipeActivity extends AppCompatActivity {
         }
     };
 
-    public RecipeItem getRecipe() {
+    public RecipeItemOld getRecipe() {
         return recipe;
     }
 

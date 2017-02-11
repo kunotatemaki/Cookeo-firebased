@@ -66,7 +66,7 @@
   public void set*(***);
 }
 
--keep public class com.rukiasoft.androidapps.cocinaconroll.classes.RecipeItem {
+-keep public class com.rukiasoft.androidapps.cocinaconroll.classes.RecipeItemOld {
   public *** get*();
   public void set*(***);
 }

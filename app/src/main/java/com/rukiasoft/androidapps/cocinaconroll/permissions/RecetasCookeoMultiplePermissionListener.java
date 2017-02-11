@@ -10,10 +10,11 @@ import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import com.rukiasoft.androidapps.cocinaconroll.R;
-import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.database.methods.DatabaseMethods;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.controllers.RecipeController;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.database.methods.FirebaseDbMethods;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.model.Recipe;
 import com.rukiasoft.androidapps.cocinaconroll.ui.RecipeListActivity;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.LogHelper;
-import com.rukiasoft.androidapps.cocinaconroll.utilities.ReadWriteTools;
 
 import java.util.List;
 
@@ -35,13 +36,13 @@ public class RecetasCookeoMultiplePermissionListener implements MultiplePermissi
     @Override public void onPermissionsChecked(MultiplePermissionsReport report) {
         for (PermissionGrantedResponse response : report.getGrantedPermissionResponses()) {
             if(response.getRequestedPermission().getName().equals(android.Manifest.permission.READ_EXTERNAL_STORAGE)){
-                // TODO: 28/1/17 Aquí es donde leo las recetas antiguas
-                DatabaseMethods databaseMethods = new DatabaseMethods();
-                databaseMethods.updateOldRecipesToPersonalStorage(context);
-                Log.d(TAG, "salgo del método");
-                /*for(String name : recipeItemNameList) {
-                    databaseMethods.updateRecipesToPersonalStorage(context, name);
-                }*/
+                RecipeController recipeController = new RecipeController();
+                FirebaseDbMethods firebaseDbMethods = new FirebaseDbMethods(recipeController);
+                //Log.d(TAG, "***********************************************************");
+                //Log.d(TAG, "llamo en permission listener");
+                firebaseDbMethods.updateOldRecipesToPersonalStorage(context);
+                //Log.d(TAG, "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+                //Log.d(TAG, "salgo del método");
             }
         }
 

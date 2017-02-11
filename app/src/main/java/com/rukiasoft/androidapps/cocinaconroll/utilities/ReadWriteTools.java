@@ -17,7 +17,7 @@ import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.bumptech.glide.signature.MediaStoreSignature;
 import com.rukiasoft.androidapps.cocinaconroll.R;
 import com.rukiasoft.androidapps.cocinaconroll.classes.PreinstalledRecipeNamesList;
-import com.rukiasoft.androidapps.cocinaconroll.classes.RecipeItem;
+import com.rukiasoft.androidapps.cocinaconroll.classes.RecipeItemOld;
 import com.rukiasoft.androidapps.cocinaconroll.database.DatabaseRelatedTools;
 
 import org.apache.commons.io.FileUtils;
@@ -150,8 +150,8 @@ public class ReadWriteTools {
     /**
      * Read recipe from xml
      */
-    public RecipeItem readRecipe(Context mContext, String name, Integer type) {
-        RecipeItem recipeItem;
+    public RecipeItemOld readRecipe(Context mContext, String name, Integer type) {
+        RecipeItemOld recipeItemOld;
         String path = "";
         File source;
         if(type.equals(RecetasCookeoConstants.PATH_TYPE_ASSETS)) {
@@ -165,12 +165,12 @@ public class ReadWriteTools {
             source = createFileFromInputStream(mContext, inputStream);
             if(source == null)
                 return null;
-            recipeItem = parseFileIntoRecipe(source);
-            if(recipeItem == null){
+            recipeItemOld = parseFileIntoRecipe(source);
+            if(recipeItemOld == null){
                 return null;
             }
-            recipeItem.setState(RecetasCookeoConstants.FLAG_ASSETS);
-            recipeItem.setPathRecipe(RecetasCookeoConstants.ASSETS_PATH + name);
+            recipeItemOld.setState(RecetasCookeoConstants.FLAG_ASSETS);
+            recipeItemOld.setPathRecipe(RecetasCookeoConstants.ASSETS_PATH + name);
             source.delete();
         }else {
             if (type.equals(RecetasCookeoConstants.PATH_TYPE_ORIGINAL)) {
@@ -181,26 +181,26 @@ public class ReadWriteTools {
                 path = getOldEditedStorageDir() + name;
             }
             source = new File(path);
-            recipeItem = parseFileIntoRecipe(source);
-            if(recipeItem == null)
+            recipeItemOld = parseFileIntoRecipe(source);
+            if(recipeItemOld == null)
                 return null;
-            recipeItem.setPathRecipe(path);
+            recipeItemOld.setPathRecipe(path);
             if (type.equals(RecetasCookeoConstants.PATH_TYPE_ORIGINAL)) {
-                recipeItem.setState(RecetasCookeoConstants.FLAG_ORIGINAL);
-                if(recipeItem.getDate() == -1L){
-                    recipeItem.setDate(System.currentTimeMillis());
+                recipeItemOld.setState(RecetasCookeoConstants.FLAG_ORIGINAL);
+                if(recipeItemOld.getDate() == -1L){
+                    recipeItemOld.setDate(System.currentTimeMillis());
                 }
             }
         }
 
-        if((recipeItem.getState() & RecetasCookeoConstants.FLAG_EDITED_PICTURE) != 0)
-            recipeItem.setPathPicture(RecetasCookeoConstants.FILE_PATH + getEditedStorageDir() + recipeItem.getPicture());
-        else if((recipeItem.getState() & RecetasCookeoConstants.FLAG_ORIGINAL) != 0)
-            recipeItem.setPathPicture(RecetasCookeoConstants.FILE_PATH + getOriginalStorageDir(mContext) + recipeItem.getPicture());
-        else if((recipeItem.getState() & RecetasCookeoConstants.FLAG_ASSETS) != 0)
-            recipeItem.setPathPicture(RecetasCookeoConstants.ASSETS_PATH + recipeItem.getPicture());
+        if((recipeItemOld.getState() & RecetasCookeoConstants.FLAG_EDITED_PICTURE) != 0)
+            recipeItemOld.setPathPicture(RecetasCookeoConstants.FILE_PATH + getEditedStorageDir() + recipeItemOld.getPicture());
+        else if((recipeItemOld.getState() & RecetasCookeoConstants.FLAG_ORIGINAL) != 0)
+            recipeItemOld.setPathPicture(RecetasCookeoConstants.FILE_PATH + getOriginalStorageDir(mContext) + recipeItemOld.getPicture());
+        else if((recipeItemOld.getState() & RecetasCookeoConstants.FLAG_ASSETS) != 0)
+            recipeItemOld.setPathPicture(RecetasCookeoConstants.ASSETS_PATH + recipeItemOld.getPicture());
 
-        return recipeItem;
+        return recipeItemOld;
     }
 
 
@@ -240,11 +240,11 @@ public class ReadWriteTools {
         return null;
     }
 
-    private RecipeItem parseFileIntoRecipe(File source){
-        RecipeItem recipeItem;
+    private RecipeItemOld parseFileIntoRecipe(File source){
+        RecipeItemOld recipeItemOld;
         Serializer serializer = new Persister();
         try {
-            recipeItem = serializer.read(RecipeItem.class, source, false);
+            recipeItemOld = serializer.read(RecipeItemOld.class, source, false);
         } catch (IOException e) {
             e.printStackTrace();
             return null;
@@ -252,15 +252,15 @@ public class ReadWriteTools {
             e.printStackTrace();
             return null;
         }
-        return recipeItem;
+        return recipeItemOld;
     }
 
-    /*public void saveRecipeOnOrigialPath(RecipeItem recipe){
+    /*public void saveRecipeOnOrigialPath(RecipeItemOld recipe){
         String path = getOriginalStorageDir();
         saveRecipe(recipe, path);
     }*/
 
-    public String saveRecipeOnEditedPath(Context mContext, RecipeItem recipe){
+    public String saveRecipeOnEditedPath(Context mContext, RecipeItemOld recipe){
         String dir = getEditedStorageDir();
         String pathFile = recipe.getPathRecipe();
         String name;
@@ -274,7 +274,7 @@ public class ReadWriteTools {
         return saveRecipe(mContext, recipe, dir, name);
     }
 
-    public String saveRecipe(Context mContext, RecipeItem recipe, String dir, String name){
+    public String saveRecipe(Context mContext, RecipeItemOld recipe, String dir, String name){
         if(!isExternalStorageWritable()){
             if(mContext instanceof AppCompatActivity) {
                 Toast.makeText(mContext, mContext.getResources().getString(R.string.no_storage_available), Toast.LENGTH_LONG)
@@ -304,14 +304,14 @@ public class ReadWriteTools {
 
     }
 
-    public void deleteRecipe(RecipeItem recipeItem){
+    public void deleteRecipe(RecipeItemOld recipeItemOld){
 
         try {
-            File file = new File(recipeItem.getPathRecipe());
+            File file = new File(recipeItemOld.getPathRecipe());
             if (file.exists())
                 file.delete();
-            if ((recipeItem.getState() & RecetasCookeoConstants.FLAG_EDITED_PICTURE) != 0) {
-                file = new File(String.valueOf(Uri.parse(recipeItem.getPathPicture())));
+            if ((recipeItemOld.getState() & RecetasCookeoConstants.FLAG_EDITED_PICTURE) != 0) {
+                file = new File(String.valueOf(Uri.parse(recipeItemOld.getPathPicture())));
                 if (file.exists()) {
                     file.delete();
                 } else {
@@ -441,7 +441,7 @@ public class ReadWriteTools {
                 .into(bitmapImageViewTarget);
     }
 
-    public void share(final Activity activity, RecipeItem recipe)
+    public void share(final Activity activity, RecipeItemOld recipe)
     {
         //need to "send multiple" to get more than one attachment
         Tools tools = new Tools();
@@ -513,20 +513,20 @@ public class ReadWriteTools {
 
         List<String> listAssets = loadRecipesFromAssets(mContext);
         for(int i=0; i<listAssets.size(); i++) {
-            RecipeItem recipeItem;
-            recipeItem = readRecipe(mContext, listAssets.get(i),
+            RecipeItemOld recipeItemOld;
+            recipeItemOld = readRecipe(mContext, listAssets.get(i),
                     RecetasCookeoConstants.PATH_TYPE_ASSETS);
-            if (recipeItem != null) {
-                dbTools.insertRecipeIntoDatabase(mContext, recipeItem, true);
+            if (recipeItemOld != null) {
+                dbTools.insertRecipeIntoDatabase(mContext, recipeItemOld, true);
             }
         }
 
         List<String> listOriginal = loadFiles(mContext, filter, false);
         for(int i=0; i<listOriginal.size(); i++) {
-            RecipeItem recipeItem= readRecipe(mContext, listOriginal.get(i),
+            RecipeItemOld recipeItemOld = readRecipe(mContext, listOriginal.get(i),
                     RecetasCookeoConstants.PATH_TYPE_ORIGINAL);
-            if(recipeItem != null) {
-                dbTools.insertRecipeIntoDatabase(mContext, recipeItem, true);
+            if(recipeItemOld != null) {
+                dbTools.insertRecipeIntoDatabase(mContext, recipeItemOld, true);
             }
         }
 
@@ -539,22 +539,22 @@ public class ReadWriteTools {
         //files created or modified from previous versions
         List<String> listOldFiles = loadRecipesFromOldDirectory(filter);
         for(int i=0; i<listOldFiles.size(); i++) {
-            RecipeItem recipeItem = readRecipe(mContext, listOldFiles.get(i),
+            RecipeItemOld recipeItemOld = readRecipe(mContext, listOldFiles.get(i),
                     RecetasCookeoConstants.PATH_TYPE_OLD_EDITED);
-            if(recipeItem != null) {
-                if((recipeItem.getState()&(RecetasCookeoConstants.FLAG_EDITED | RecetasCookeoConstants.FLAG_OWN)) == 0){
+            if(recipeItemOld != null) {
+                if((recipeItemOld.getState()&(RecetasCookeoConstants.FLAG_EDITED | RecetasCookeoConstants.FLAG_OWN)) == 0){
                     //not created nor edited. It was an original recipe set as favorite
-                    dbTools.updateFavoriteByFileName(mContext, recipeItem.getName(), recipeItem.getFavourite());
+                    dbTools.updateFavoriteByFileName(mContext, recipeItemOld.getName(), recipeItemOld.getFavourite());
                     //delete the file
-                    deleteRecipe(recipeItem);
+                    deleteRecipe(recipeItemOld);
                 }else{
                     String picture = "";
-                    if((recipeItem.getState() & RecetasCookeoConstants.FLAG_EDITED_PICTURE) != 0) {
-                        picture = recipeItem.getPicture();
+                    if((recipeItemOld.getState() & RecetasCookeoConstants.FLAG_EDITED_PICTURE) != 0) {
+                        picture = recipeItemOld.getPicture();
                     }
                     moveFileToEditedStorageAndDeleteOriginal(listOldFiles.get(i), picture);
                 }
-                //dbTools.insertRecipeIntoDatabase(recipeItem, true);
+                //dbTools.insertRecipeIntoDatabase(recipeItemOld, true);
             }
         }
 
@@ -570,10 +570,10 @@ public class ReadWriteTools {
         //edited directory
         List<String> listEdited = loadFiles(mContext, filter, true);
         for(int i=0; i<listEdited.size(); i++) {
-            RecipeItem recipeItem= readRecipe(mContext, listEdited.get(i),
+            RecipeItemOld recipeItemOld = readRecipe(mContext, listEdited.get(i),
                     RecetasCookeoConstants.PATH_TYPE_EDITED);
-            if(recipeItem != null) {
-                dbTools.insertRecipeIntoDatabase(mContext, recipeItem, true);
+            if(recipeItemOld != null) {
+                dbTools.insertRecipeIntoDatabase(mContext, recipeItemOld, true);
             }
         }
 
@@ -614,8 +614,8 @@ public class ReadWriteTools {
         }
     }
 
-    public RecipeItem readRecipeInfo(Context mContext, String pathRecipe) {
-        RecipeItem recipeItem;
+    public RecipeItemOld readRecipeInfo(Context mContext, String pathRecipe) {
+        RecipeItemOld recipeItemOld;
         File source;
         if(pathRecipe == null){
             Exception caughtException = new Exception("Error intentado leer una receta sin pathRecipe");
@@ -635,24 +635,24 @@ public class ReadWriteTools {
             source = createFileFromInputStream(mContext, inputStream);
             if(source == null)
                 return null;
-            recipeItem = parseFileIntoRecipe(source);
-            if(recipeItem == null){
+            recipeItemOld = parseFileIntoRecipe(source);
+            if(recipeItemOld == null){
                 return null;
             }
-            recipeItem.setState(RecetasCookeoConstants.FLAG_ASSETS);
-            //recipeItem.setFileName(name);
-            recipeItem.setPathRecipe(RecetasCookeoConstants.ASSETS_PATH + "/" + name);
+            recipeItemOld.setState(RecetasCookeoConstants.FLAG_ASSETS);
+            //recipeItemOld.setFileName(name);
+            recipeItemOld.setPathRecipe(RecetasCookeoConstants.ASSETS_PATH + "/" + name);
             source.delete();
         }else {
             source = new File(pathRecipe);
-            recipeItem = parseFileIntoRecipe(source);
-            if(recipeItem == null)
+            recipeItemOld = parseFileIntoRecipe(source);
+            if(recipeItemOld == null)
                 return null;
-            recipeItem.setPathRecipe(pathRecipe);
+            recipeItemOld.setPathRecipe(pathRecipe);
 
         }
 
-        return recipeItem;
+        return recipeItemOld;
 
     }
 
@@ -661,21 +661,21 @@ public class ReadWriteTools {
         MyFileFilter filter = new MyFileFilter();
         List<String> listOriginal = loadFiles(mContext, filter, false);
         for(int i=0; i<listOriginal.size(); i++) {
-            RecipeItem recipeItem= readRecipe(mContext, listOriginal.get(i),
+            RecipeItemOld recipeItemOld = readRecipe(mContext, listOriginal.get(i),
                     RecetasCookeoConstants.PATH_TYPE_ORIGINAL);
-            if(recipeItem != null) {
-                dbTools.insertRecipeIntoDatabase(mContext, recipeItem, false);
+            if(recipeItemOld != null) {
+                dbTools.insertRecipeIntoDatabase(mContext, recipeItemOld, false);
             }
         }
     }
 
     public void loadUpdatedFilesAndInsertInDatabase(Context mContext, String name, int version) {
         DatabaseRelatedTools dbTools = new DatabaseRelatedTools();
-        RecipeItem recipeItem= readRecipe(mContext, name,
+        RecipeItemOld recipeItemOld = readRecipe(mContext, name,
                 RecetasCookeoConstants.PATH_TYPE_EDITED);
-        if(recipeItem != null) {
-            recipeItem.setVersion(version);
-            dbTools.insertRecipeIntoDatabase(mContext, recipeItem, true);
+        if(recipeItemOld != null) {
+            recipeItemOld.setVersion(version);
+            dbTools.insertRecipeIntoDatabase(mContext, recipeItemOld, true);
         }
     }
 

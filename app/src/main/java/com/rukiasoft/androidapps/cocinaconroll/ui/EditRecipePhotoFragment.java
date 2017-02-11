@@ -36,7 +36,7 @@ import android.widget.Toast;
 
 import com.rukiasoft.androidapps.cocinaconroll.CocinaConRollApplication;
 import com.rukiasoft.androidapps.cocinaconroll.R;
-import com.rukiasoft.androidapps.cocinaconroll.classes.RecipeItem;
+import com.rukiasoft.androidapps.cocinaconroll.classes.RecipeItemOld;
 import com.rukiasoft.androidapps.cocinaconroll.database.DatabaseRelatedTools;
 import com.rukiasoft.androidapps.cocinaconroll.database.RecipesTable;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
@@ -61,7 +61,7 @@ public class EditRecipePhotoFragment extends Fragment {
     
 
     private Bitmap photo;
-    private RecipeItem recipeItem;
+    private RecipeItemOld recipeItemOld;
     private Tools mTools;
     private DatabaseRelatedTools dbTools;
     private ReadWriteTools rwTools;
@@ -119,11 +119,11 @@ public class EditRecipePhotoFragment extends Fragment {
             return null;
         }
         View view;
-        if(recipeItem == null){
+        if(recipeItemOld == null){
             setRecipe();
         }
-        if(((recipeItem.getState() & RecetasCookeoConstants.FLAG_OWN) != 0) &&
-                ((recipeItem.getState() & RecetasCookeoConstants.FLAG_EDITED) == 0)) {
+        if(((recipeItemOld.getState() & RecetasCookeoConstants.FLAG_OWN) != 0) &&
+                ((recipeItemOld.getState() & RecetasCookeoConstants.FLAG_EDITED) == 0)) {
             view = inflater.inflate(R.layout.fragment_edit_recipe_foto_create, container, false);
             //author.setText(mTools.getOwnerName(getActivity()));
 
@@ -157,21 +157,21 @@ public class EditRecipePhotoFragment extends Fragment {
             authorRecipe.setText(mTools.getStringFromPreferences(getActivity(), RecetasCookeoConstants.PROPERTY_DEVICE_OWNER_EMAIL));
         }
         if(editRecipeName != null){
-            editRecipeName.setText(recipeItem.getName());
+            editRecipeName.setText(recipeItemOld.getName());
         }
 
         rwTools.loadImageFromPath(getActivity().getApplicationContext(), mImageView,
-                recipeItem.getPathPicture(),
-                R.drawable.default_dish, recipeItem.getVersion());
+                recipeItemOld.getPathPicture(),
+                R.drawable.default_dish, recipeItemOld.getVersion());
 
         
-        if(recipeItem.getMinutes()>0)
-            minutes.setText(recipeItem.getMinutes().toString());
+        if(recipeItemOld.getMinutes()>0)
+            minutes.setText(recipeItemOld.getMinutes().toString());
         else
             minutes.setText("0");
         
-        if(recipeItem.getPortions()>0)
-            portions.setText(recipeItem.getPortions().toString());
+        if(recipeItemOld.getPortions()>0)
+            portions.setText(recipeItemOld.getPortions().toString());
         else
             portions.setText("0");
         
@@ -212,12 +212,12 @@ public class EditRecipePhotoFragment extends Fragment {
         });
 
         if(checkBox != null) {
-            checkBox.setChecked(recipeItem.getVegetarian());
+            checkBox.setChecked(recipeItemOld.getVegetarian());
             checkBox.setOnClickListener(new View.OnClickListener() {
 
                 @Override
                 public void onClick(View v) {
-                    recipeItem.setVegetarian(((CheckBox) v).isChecked());
+                    recipeItemOld.setVegetarian(((CheckBox) v).isChecked());
                 }
             });
         }
@@ -245,11 +245,11 @@ public class EditRecipePhotoFragment extends Fragment {
         spinner1.setAdapter(dataAdapter);
         spinner1.setOnItemSelectedListener(new CustomOnItemSelectedListener());
         String type = "";
-        if(recipeItem.getType().compareTo(RecetasCookeoConstants.TYPE_STARTERS) == 0)
+        if(recipeItemOld.getType().compareTo(RecetasCookeoConstants.TYPE_STARTERS) == 0)
             type = getResources().getString(R.string.starters);
-        else if(recipeItem.getType().compareTo(RecetasCookeoConstants.TYPE_MAIN) == 0)
+        else if(recipeItemOld.getType().compareTo(RecetasCookeoConstants.TYPE_MAIN) == 0)
             type = getResources().getString(R.string.main_courses);
-        else if(recipeItem.getType().compareTo(RecetasCookeoConstants.TYPE_DESSERTS) == 0)
+        else if(recipeItemOld.getType().compareTo(RecetasCookeoConstants.TYPE_DESSERTS) == 0)
             type = getResources().getString(R.string.desserts);
         spinner1.setSelection(dataAdapter.getPosition(type));
 
@@ -262,13 +262,13 @@ public class EditRecipePhotoFragment extends Fragment {
                                    long id) {
             switch (pos){
                 case 0:
-                    recipeItem.setType(RecetasCookeoConstants.TYPE_STARTERS);
+                    recipeItemOld.setType(RecetasCookeoConstants.TYPE_STARTERS);
                     break;
                 case 1:
-                    recipeItem.setType(RecetasCookeoConstants.TYPE_MAIN);
+                    recipeItemOld.setType(RecetasCookeoConstants.TYPE_MAIN);
                     break;
                 case 2:
-                    recipeItem.setType(RecetasCookeoConstants.TYPE_DESSERTS);
+                    recipeItemOld.setType(RecetasCookeoConstants.TYPE_DESSERTS);
                     break;
                 default:
                     break;
@@ -341,12 +341,12 @@ public class EditRecipePhotoFragment extends Fragment {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            recipeItem.setPathPicture(rwTools.saveBitmap(photo, recipeItem.getPicture()));
-            //if(recipeItem.getState().compareTo(RecetasCookeoConstants.STATE_OWN) != 0)
-            recipeItem.setState(RecetasCookeoConstants.FLAG_EDITED_PICTURE);
+            recipeItemOld.setPathPicture(rwTools.saveBitmap(photo, recipeItemOld.getPicture()));
+            //if(recipeItemOld.getState().compareTo(RecetasCookeoConstants.STATE_OWN) != 0)
+            recipeItemOld.setState(RecetasCookeoConstants.FLAG_EDITED_PICTURE);
 
-            rwTools.loadImageFromPath(getActivity().getApplicationContext(), mImageView, recipeItem.getPathPicture(),
-                    R.drawable.default_dish, recipeItem.getVersion());
+            rwTools.loadImageFromPath(getActivity().getApplicationContext(), mImageView, recipeItemOld.getPathPicture(),
+                    R.drawable.default_dish, recipeItemOld.getVersion());
 
             return;
         }
@@ -407,15 +407,15 @@ public class EditRecipePhotoFragment extends Fragment {
                 Bundle extras = data.getExtras();
                 if (extras != null) {
                     photo = extras.getParcelable("data");
-                    recipeItem.setPicture(getPictureNameFromFileName());
-                    updateNameOfNewImage(recipeItem.getPicture());
-                    recipeItem.setPathPicture(rwTools.saveBitmap(photo, recipeItem.getPicture()));
-                    //if(recipeItem.getState().compareTo(RecetasCookeoConstants.STATE_OWN) != 0)
-                    recipeItem.setState(RecetasCookeoConstants.FLAG_EDITED_PICTURE);
+                    recipeItemOld.setPicture(getPictureNameFromFileName());
+                    updateNameOfNewImage(recipeItemOld.getPicture());
+                    recipeItemOld.setPathPicture(rwTools.saveBitmap(photo, recipeItemOld.getPicture()));
+                    //if(recipeItemOld.getState().compareTo(RecetasCookeoConstants.STATE_OWN) != 0)
+                    recipeItemOld.setState(RecetasCookeoConstants.FLAG_EDITED_PICTURE);
 
                     rwTools.loadImageFromPath(getActivity().getApplicationContext(),
-                            mImageView, recipeItem.getPathPicture(),
-                            R.drawable.default_dish, recipeItem.getVersion());
+                            mImageView, recipeItemOld.getPathPicture(),
+                            R.drawable.default_dish, recipeItemOld.getVersion());
                 }
                 File f = new File(mImageCaptureUri.getPath());
                 if (f.exists()) {
@@ -426,14 +426,14 @@ public class EditRecipePhotoFragment extends Fragment {
                 Bundle extras2 = data.getExtras();
                 if (extras2 != null) {
                     photo = extras2.getParcelable("data");
-                    recipeItem.setPicture(getPictureNameFromFileName());
-                    updateNameOfNewImage(recipeItem.getPicture());
-                    recipeItem.setPathPicture(rwTools.saveBitmap(photo, recipeItem.getPicture()));
-                    //if(recipeItem.getState().compareTo(RecetasCookeoConstants.STATE_OWN) != 0)
-                    recipeItem.setState(RecetasCookeoConstants.FLAG_EDITED_PICTURE);
+                    recipeItemOld.setPicture(getPictureNameFromFileName());
+                    updateNameOfNewImage(recipeItemOld.getPicture());
+                    recipeItemOld.setPathPicture(rwTools.saveBitmap(photo, recipeItemOld.getPicture()));
+                    //if(recipeItemOld.getState().compareTo(RecetasCookeoConstants.STATE_OWN) != 0)
+                    recipeItemOld.setState(RecetasCookeoConstants.FLAG_EDITED_PICTURE);
                     rwTools.loadImageFromPath(getActivity().getApplicationContext(),
-                            mImageView, recipeItem.getPathPicture(),
-                            R.drawable.default_dish, recipeItem.getVersion());
+                            mImageView, recipeItemOld.getPathPicture(),
+                            R.drawable.default_dish, recipeItemOld.getVersion());
                 }
                 break;
         }
@@ -456,7 +456,7 @@ public class EditRecipePhotoFragment extends Fragment {
 
     private void setRecipe(){
         if(getActivity() instanceof EditRecipeActivity){
-            recipeItem = ((EditRecipeActivity) getActivity()).getRecipe();
+            recipeItemOld = ((EditRecipeActivity) getActivity()).getRecipe();
         }
     }
 
@@ -488,18 +488,18 @@ public class EditRecipePhotoFragment extends Fragment {
 
         try {
             int min = Integer.valueOf(minutes.getText().toString());
-            recipeItem.setMinutes(min);
+            recipeItemOld.setMinutes(min);
         }catch (NumberFormatException e){
             minutes.setText("0");
-            recipeItem.setMinutes(0);
+            recipeItemOld.setMinutes(0);
         }
 
         try {
             int port = Integer.valueOf(portions.getText().toString());
-            recipeItem.setPortions(port);
+            recipeItemOld.setPortions(port);
         }catch (NumberFormatException e){
             portions.setText("0");
-            recipeItem.setPortions(0);
+            recipeItemOld.setPortions(0);
         }
 
         if(createRecipeName == null) {
@@ -520,14 +520,14 @@ public class EditRecipePhotoFragment extends Fragment {
         }
 
         if(authorRecipe != null) {
-            recipeItem.setAuthor(authorRecipe.getText().toString());
+            recipeItemOld.setAuthor(authorRecipe.getText().toString());
         }
 
         return ret;
     }
 
     private void checkIfNameExists(String sName){
-        List<RecipeItem> coincidences = dbTools.searchRecipesInDatabase(getActivity().getApplicationContext(),
+        List<RecipeItemOld> coincidences = dbTools.searchRecipesInDatabase(getActivity().getApplicationContext(),
                 RecipesTable.FIELD_NAME_NORMALIZED, dbTools.getNormalizedString(sName));
         String error = null;
         if (coincidences.size() > 0) {
@@ -549,7 +549,7 @@ public class EditRecipePhotoFragment extends Fragment {
     public void onPause(){
         if(createRecipeName != null) {
             String name = createRecipeName.getText().toString();
-            recipeItem.setName(name);
+            recipeItemOld.setName(name);
         }
         super.onPause();
     }

@@ -1,4 +1,4 @@
-package com.rukiasoft.androidapps.cocinaconroll.persistence.daos;
+package com.rukiasoft.androidapps.cocinaconroll.persistence.model;
 
 import com.rukiasoft.androidapps.cocinaconroll.R;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.database.model.RecipeDetailed;
@@ -16,7 +16,7 @@ import org.greenrobot.greendao.DaoException;
         active = true,
         nameInDb = "SHORT_RECIPES"
 )
-public class RecipeShort {
+public class Recipe {
 
     @Id(autoincrement = true)
     private Long id;
@@ -45,13 +45,14 @@ public class RecipeShort {
     @Generated(hash = 2040040024)
     private transient DaoSession daoSession;
     /** Used for active entity operations. */
-    @Generated(hash = 1756051443)
-    private transient RecipeShortDao myDao;
+    @Generated(hash = 1947830398)
+    private transient RecipeDao myDao;
 
-    public RecipeShort() {
+
+    public Recipe() {
     }
 
-    public RecipeShort(RecipeDetailed recipe, String key, Integer owner){
+    public Recipe(RecipeDetailed recipe, String key, Integer owner){
         this.key = key;
         this.owner = owner;
         this.name = recipe.getName();
@@ -85,11 +86,10 @@ public class RecipeShort {
 
     }
 
-    @Generated(hash = 820236592)
-    public RecipeShort(Long id, @NotNull String key, String name, String type, Integer icon, String picture,
-            Boolean vegetarian, Boolean favourite, Integer minutes, Integer portions, Integer language, String author,
-            String link, String tip, Integer owner, @NotNull Long timestamp, @NotNull Boolean downloadRecipe,
-            Boolean downloadPicture) {
+    @Generated(hash = 2012203826)
+    public Recipe(Long id, @NotNull String key, String name, String type, Integer icon, String picture, Boolean vegetarian,
+            Boolean favourite, Integer minutes, Integer portions, Integer language, String author, String link, String tip,
+            Integer owner, @NotNull Long timestamp, @NotNull Boolean downloadRecipe, Boolean downloadPicture) {
         this.id = id;
         this.key = key;
         this.name = name;
@@ -291,12 +291,11 @@ public class RecipeShort {
     }
 
     /** called by internal mechanisms, do not call yourself. */
-    @Generated(hash = 1159410144)
+    @Generated(hash = 1484851246)
     public void __setDaoSession(DaoSession daoSession) {
         this.daoSession = daoSession;
-        myDao = daoSession != null ? daoSession.getRecipeShortDao() : null;
+        myDao = daoSession != null ? daoSession.getRecipeDao() : null;
     }
 
-
-    
+        
 }

@@ -9,8 +9,8 @@ import android.support.multidex.MultiDexApplication;
 
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
-import com.rukiasoft.androidapps.cocinaconroll.persistence.daos.DaoMaster;
-import com.rukiasoft.androidapps.cocinaconroll.persistence.daos.DaoSession;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.model.DaoMaster;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.model.DaoSession;
 import com.squareup.leakcanary.LeakCanary;
 import com.squareup.leakcanary.RefWatcher;
 
