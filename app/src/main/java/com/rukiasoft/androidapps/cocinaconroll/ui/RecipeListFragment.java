@@ -128,6 +128,7 @@ public class RecipeListFragment extends Fragment implements
     private DatabaseReference mRecipeTimestamps;
     private ValueEventListener timestampListener;
     @State Boolean checkRecipesTimestampFromFirebase = true;
+    @State Boolean checkPersonalRecipesTimestampFromFirebase = true;
     //Firebase storage
     FirebaseStorage storage;
     FirebaseDbMethods firebaseDbMethods;
@@ -365,6 +366,13 @@ public class RecipeListFragment extends Fragment implements
 
 
         return view;
+    }
+
+    public void checkPersonalRecipesFromFirebase(){
+        if(checkPersonalRecipesTimestampFromFirebase) {
+            connectToFirebaseForNewRecipes(RecetasCookeoConstants.PERSONAL_RECIPES_NODE);
+            checkPersonalRecipesTimestampFromFirebase = false;
+        }
     }
 
     public void createRecipe(){
@@ -774,13 +782,13 @@ public class RecipeListFragment extends Fragment implements
         //Descargo las recetas de Firebase
         for(Recipe recipe : recipes){
             if(recipe.getDownloadRecipe()) {
-                String node = getNodeRecipeFromFlag(recipe.getOwner());
+                String node = FirebaseDbMethods.getNodeNameFromRecipeFlag(recipe.getOwner());
 
 
-                if(node == null){
+                if(node.equals(RecetasCookeoConstants.PERSONAL_RECIPES_NODE)){
                     FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                    if(user != null) {
-                        node = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                    if(user != null && !user.isAnonymous()) {
+                        node += "/" + user.getUid();
                     }else{
                         return;
                     }
@@ -854,6 +862,16 @@ public class RecipeListFragment extends Fragment implements
     }
 
     private void connectToFirebaseForNewRecipes(String node){
+        if(node.equals(RecetasCookeoConstants.PERSONAL_RECIPES_NODE)){
+            if(!((RecipeListActivity)getActivity()).isSignedIn) {
+                Log.d(TAG, "Era no sé");
+                return;
+            }else{
+                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                node += "/" + user.getUid();
+            }
+
+        }
         mRecipeTimestamps = FirebaseDatabase.getInstance().getReference(node +
                 "/" + RecetasCookeoConstants.TIMESTAMP_RECIPES_NODE);
         timestampListener = new ValueEventListener() {
@@ -911,18 +929,39 @@ public class RecipeListFragment extends Fragment implements
         @Override
         protected Void doInBackground(DataSnapshot... dataSnapshots) {
             DataSnapshot dataSnapshot = dataSnapshots[0];
-            Integer recipeOwner = FirebaseDbMethods.getFlagRecipeFromNode(dataSnapshot.getRef().getParent().getKey());
+            Integer recipeOwner = FirebaseDbMethods.getRecipeFlagFromNodeName(dataSnapshot.getRef().getParent().getKey());
             for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
                 RecipeTimestamp recipeTimestamp = postSnapshot.getValue(RecipeTimestamp.class);
                 String key = postSnapshot.getKey();
-
                 Recipe recipeFromDatabase = recipeController.getRecipeByKey(getActivity().getApplication(), key);
                 if(recipeFromDatabase == null){
                     //no existía, la creo
                     recipeFromDatabase = new Recipe();
-                }else if(recipeFromDatabase.getTimestamp() >= recipeTimestamp.getTimestamp()){
-                    //ya está actualizada
-                    continue;
+                }else{
+                    //compruebo si la receta es personal
+                    if(recipeFromDatabase.getName() != null && recipeFromDatabase.getName().equals("Albaricoques al vapor")){
+                        recipeFromDatabase.setVegetarian(recipeFromDatabase.getVegetarian());
+                    }
+                    String nodeName = dataSnapshot.getRef().getParent().getRef().getParent().getKey();
+                    Boolean recipeDownloadedOwn = true;
+                    if(nodeName == null || !nodeName.equals(RecetasCookeoConstants.PERSONAL_RECIPES_NODE)){
+                        recipeDownloadedOwn = false;
+                    }
+                    Boolean recipeStoredOwn = recipeFromDatabase.getOwner().equals(RecetasCookeoConstants.FLAG_PERSONAL_RECIPE);
+                    //Casos para continuar y no guardar
+                    //  Receta descargada personal, receta almacenada personal con timestamp superior
+                    if(recipeDownloadedOwn && recipeStoredOwn &&
+                            recipeFromDatabase.getTimestamp() >= recipeTimestamp.getTimestamp()){
+                        continue;
+                    }
+                    //  receta descargada original, receta almacenada personal (da igual el timestamp)
+                    if(!recipeDownloadedOwn && recipeStoredOwn){
+                        continue;
+                    }
+                    //  Receta descargada original, receta almacenada original con timestamp superior
+                    if(!recipeDownloadedOwn && recipeFromDatabase.getTimestamp() >= recipeTimestamp.getTimestamp()){
+                        continue;
+                    }
                 }
                 if(recipeFromDatabase.getTimestamp() == null ||
                         recipeFromDatabase.getTimestamp() < recipeTimestamp.getTimestamp()) {
@@ -939,33 +978,10 @@ public class RecipeListFragment extends Fragment implements
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            //pongo la variable a true para que pueda subir recetas propias a la cuenta pesonal
-            //Tools tools = new Tools();
-            //tools.savePreferences(getContext(), RecetasCookeoConstants.PROPERTY_CAN_UPLOAD_OWN_RECIPES, true);
-            //Log.d(TAG, "=====================================================================");
-            //firebaseDbMethods.updateOldRecipesToPersonalStorage(getActivity().getApplicationContext());
-            //Log.d(TAG, "oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo");
             //Llamo a descargar (haya recetas nuevas o no).
             downloadRecipesFromFirebase();
         }
     }
-
-    private String getNodeRecipeFromFlag(Integer flag){
-        String node;
-        switch(flag){
-            case RecetasCookeoConstants.FLAG_ALLOWED_RECIPE:
-                node = RecetasCookeoConstants.ALLOWED_RECIPES_NODE;
-                break;
-            case RecetasCookeoConstants.FLAG_FORBIDDEN_RECIPE:
-                node = RecetasCookeoConstants.FORBIDDEN_RECIPES_NODE;
-                break;
-            default:
-                node = null;
-                break;
-        }
-        return node;
-    }
-
 
 }
 

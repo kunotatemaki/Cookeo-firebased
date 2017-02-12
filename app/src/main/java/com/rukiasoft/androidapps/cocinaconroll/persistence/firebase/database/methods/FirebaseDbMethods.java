@@ -126,8 +126,7 @@ public class FirebaseDbMethods {
                 StringBuilder sbPath = new StringBuilder(100);
                 sbPath.append(readWriteTools.getEditedStorageDir());
                 sbPath.append(recipeList.get(0));
-                // TODO: 7/2/17 descomentar lo de borrar receta cuando verifique que el proceso funciona 
-                //readWriteTools.deleteFile(sbPath.toString());
+                readWriteTools.deleteFile(sbPath.toString());
                 if(recipeOld.getPicture() != null && !recipeOld.getPicture().isEmpty()
                         && !recipeOld.getPicture().equals(RecetasCookeoConstants.DEFAULT_PICTURE_NAME)) {
                     StorageMethods storageMethods = new StorageMethods();
@@ -151,7 +150,7 @@ public class FirebaseDbMethods {
         }
     }
 
-    public static Integer getFlagRecipeFromNode(String node){
+    public static Integer getRecipeFlagFromNodeName(String node){
         Integer flag;
         switch(node){
             case RecetasCookeoConstants.ALLOWED_RECIPES_NODE:
@@ -165,5 +164,24 @@ public class FirebaseDbMethods {
                 break;
         }
         return flag;
+    }
+
+    public static String getNodeNameFromRecipeFlag(Integer flag){
+        String node;
+        switch(flag){
+            case RecetasCookeoConstants.FLAG_ALLOWED_RECIPE:
+                node = RecetasCookeoConstants.ALLOWED_RECIPES_NODE;
+                break;
+            case RecetasCookeoConstants.FLAG_FORBIDDEN_RECIPE:
+                node = RecetasCookeoConstants.FORBIDDEN_RECIPES_NODE;
+                break;
+            case RecetasCookeoConstants.FLAG_PERSONAL_RECIPE:
+                node = RecetasCookeoConstants.PERSONAL_RECIPES_NODE;
+                break;
+            default:
+                node = null;
+                break;
+        }
+        return node;
     }
 }

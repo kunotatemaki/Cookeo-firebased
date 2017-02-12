@@ -2,10 +2,8 @@ package com.rukiasoft.androidapps.cocinaconroll.persistence.controllers;
 
 
 import android.app.Application;
-import android.util.Log;
 
 import com.google.firebase.database.DataSnapshot;
-import com.rukiasoft.androidapps.cocinaconroll.CocinaConRollApplication;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.daoqueries.RecipeQueries;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.database.methods.FirebaseDbMethods;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.database.model.RecipeDetailed;
@@ -70,7 +68,7 @@ public class RecipeController {
 
     public Recipe insertRecipeFromFirebase(Application application, DataSnapshot dataSnapshot, RecipeDetailed recipeFromFirebase) {
         DaoSession session = CommonController.getDaosessionFromApplication(application, "Recipe");
-        Integer flag = FirebaseDbMethods.getFlagRecipeFromNode(dataSnapshot.getRef().getParent().getParent().getKey());
+        Integer flag = FirebaseDbMethods.getRecipeFlagFromNodeName(dataSnapshot.getRef().getParent().getParent().getKey());
         Recipe recipe = new Recipe(recipeFromFirebase, dataSnapshot.getKey(), flag);
         RecipeDao recipeDao = session.getRecipeDao();
         recipeDao.detachAll();
@@ -90,7 +88,12 @@ public class RecipeController {
         DaoSession session = CommonController.getDaosessionFromApplication(application, "Recipe");
         Query queryRecipe = RecipeQueries.getQueryGetRecipeByName(session);
         queryRecipe.setParameter(0, name);
-        return (Recipe) queryRecipe.unique();
+        List<Recipe> recipeList = queryRecipe.list();
+        Recipe recipe = null;
+        if(recipeList != null && recipeList.size()>0){
+            recipe = recipeList.get(0);
+        }
+        return recipe;
 
     }
 }

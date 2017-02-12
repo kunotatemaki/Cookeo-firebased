@@ -54,8 +54,7 @@ public class StorageMethods {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                 // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
-                // TODO: 8/2/17 eliminar la foto cuando compruebe que todo funciona ok
-                //rwTools.deleteFile(rwTools.getEditedStorageDir() + recipe.getPathPicture());
+                rwTools.deleteFile(rwTools.getEditedStorageDir() + recipe.getPathPicture());
             }
         });
 
