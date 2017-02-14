@@ -18,7 +18,6 @@ import org.greenrobot.greendao.DaoException;
 public class Ingredient {
     @Id(autoincrement = true)
     private Long id;
-    @Index
     @NotNull
     private String key;
     @Index
@@ -54,6 +53,12 @@ public String getKey() {
 }
 public void setKey(String key) {
     this.key = key;
+}
+public int getPosition() {
+    return this.position;
+}
+public void setPosition(int position) {
+    this.position = position;
 }
 public String getIngredient() {
     return this.ingredient;
@@ -94,18 +99,10 @@ public void update() {
     }
     myDao.update(this);
 }
-public int getPosition() {
-    return this.position;
-}
-public void setPosition(int position) {
-    this.position = position;
-}
 /** called by internal mechanisms, do not call yourself. */
 @Generated(hash = 1386056592)
 public void __setDaoSession(DaoSession daoSession) {
     this.daoSession = daoSession;
     myDao = daoSession != null ? daoSession.getIngredientDao() : null;
 }
-
-
 }

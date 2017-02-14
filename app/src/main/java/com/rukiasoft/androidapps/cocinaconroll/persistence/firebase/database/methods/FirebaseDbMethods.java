@@ -51,7 +51,9 @@ public class FirebaseDbMethods {
         ReadWriteTools readWriteTools = new ReadWriteTools();
         List<String> recipeItemNameList = readWriteTools.loadOldEditedAndOriginalRecipes(context);
         //Log.d(TAG, "numero recetas: " + recipeItemNameList.size());
-        updateRecipesToPersonalStorage(context, recipeItemNameList);
+        if(recipeItemNameList != null) {
+            updateRecipesToPersonalStorage(context, recipeItemNameList);
+        }
 
     }
 

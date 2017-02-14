@@ -7,14 +7,20 @@ import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Index;
+import org.greenrobot.greendao.annotation.JoinProperty;
 import org.greenrobot.greendao.annotation.NotNull;
 import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.DaoException;
+import org.greenrobot.greendao.annotation.OrderBy;
+import org.greenrobot.greendao.annotation.ToMany;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Entity(
         active = true,
-        nameInDb = "SHORT_RECIPES"
+        nameInDb = "RECIPES"
 )
 public class Recipe {
 
@@ -41,12 +47,25 @@ public class Recipe {
     @NotNull
     private Boolean downloadRecipe = false;
     private Boolean downloadPicture;
+
+    @ToMany(joinProperties = {
+            @JoinProperty(name = "key", referencedName = "key")
+    })
+    @OrderBy("position ASC")
+    private List<Ingredient> ingredients;
+
+    @ToMany(joinProperties = {
+            @JoinProperty(name = "key", referencedName = "key")
+    })
+    @OrderBy("position ASC")
+    private List<Step> steps;
     /** Used to resolve relations */
     @Generated(hash = 2040040024)
     private transient DaoSession daoSession;
     /** Used for active entity operations. */
     @Generated(hash = 1947830398)
     private transient RecipeDao myDao;
+    /** Used to resolve relations */
 
 
     public Recipe() {
@@ -83,6 +102,22 @@ public class Recipe {
         this.tip = recipe.getTip();
         this.language = recipe.getLanguage();
         this.link = recipe.getLink();
+//        this.ingredients = new ArrayList<>();
+//        for(int i=0; i<recipe.getIngredients().size(); i++){
+//            Ingredient ingredient = new Ingredient();
+//            ingredient.setIngredient(recipe.getIngredients().get(i));
+//            ingredient.setPosition(i);
+//            ingredient.setKey(key);
+//            this.ingredients.add(ingredient);
+//        }
+//        this.steps = new ArrayList<>();
+//        for(int i=0; i<recipe.getSteps().size(); i++){
+//            Step step = new Step();
+//            step.setStep(recipe.getSteps().get(i));
+//            step.setPosition(i);
+//            step.setKey(key);
+//            this.steps.add(step);
+//        }
 
     }
 
@@ -255,6 +290,62 @@ public class Recipe {
     }
 
     /**
+     * To-many relationship, resolved on first access (and after reset).
+     * Changes to to-many relations are not persisted, make changes to the target entity.
+     */
+    @Generated(hash = 1528725721)
+    public List<Ingredient> getIngredients() {
+        if (ingredients == null) {
+            final DaoSession daoSession = this.daoSession;
+            if (daoSession == null) {
+                throw new DaoException("Entity is detached from DAO context");
+            }
+            IngredientDao targetDao = daoSession.getIngredientDao();
+            List<Ingredient> ingredientsNew = targetDao._queryRecipe_Ingredients(key);
+            synchronized (this) {
+                if (ingredients == null) {
+                    ingredients = ingredientsNew;
+                }
+            }
+        }
+        return ingredients;
+    }
+
+    /** Resets a to-many relationship, making the next get call to query for a fresh result. */
+    @Generated(hash = 183837919)
+    public synchronized void resetIngredients() {
+        ingredients = null;
+    }
+
+    /**
+     * To-many relationship, resolved on first access (and after reset).
+     * Changes to to-many relations are not persisted, make changes to the target entity.
+     */
+    @Generated(hash = 1983973260)
+    public List<Step> getSteps() {
+        if (steps == null) {
+            final DaoSession daoSession = this.daoSession;
+            if (daoSession == null) {
+                throw new DaoException("Entity is detached from DAO context");
+            }
+            StepDao targetDao = daoSession.getStepDao();
+            List<Step> stepsNew = targetDao._queryRecipe_Steps(key);
+            synchronized (this) {
+                if (steps == null) {
+                    steps = stepsNew;
+                }
+            }
+        }
+        return steps;
+    }
+
+    /** Resets a to-many relationship, making the next get call to query for a fresh result. */
+    @Generated(hash = 1662411893)
+    public synchronized void resetSteps() {
+        steps = null;
+    }
+
+    /**
      * Convenient call for {@link org.greenrobot.greendao.AbstractDao#delete(Object)}.
      * Entity must attached to an entity context.
      */
@@ -297,5 +388,4 @@ public class Recipe {
         myDao = daoSession != null ? daoSession.getRecipeDao() : null;
     }
 
-        
 }

@@ -8,6 +8,7 @@ import com.rukiasoft.androidapps.cocinaconroll.persistence.daoqueries.RecipeQuer
 import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.database.methods.FirebaseDbMethods;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.database.model.RecipeDetailed;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.model.DaoSession;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.model.Ingredient;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.model.Recipe;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.model.RecipeDao;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.LogHelper;
@@ -42,7 +43,10 @@ public class RecipeController {
         DaoSession session = CommonController.getDaosessionFromApplication(application, "Recipe");
         Query query = RecipeQueries.getQueryGetRecipeByKey(session);
         query.forCurrentThread().setParameter(0, key);
-        return (Recipe) query.unique();
+        Recipe recipe = (Recipe) query.unique();
+        recipe.getIngredients();
+        recipe.getSteps();
+        return recipe;
     }
 
     public List<Recipe> getListBothRecipeAndPicturesToDownload(Application application){
@@ -73,6 +77,10 @@ public class RecipeController {
         RecipeDao recipeDao = session.getRecipeDao();
         recipeDao.detachAll();
         recipeDao.insertOrReplace(recipe);
+        //Saco la receta y descacheo los ingredientes y pasos
+        recipe = getRecipeByKey(application, dataSnapshot.getKey());
+        recipe.resetIngredients();
+        recipe.resetSteps();
         //grabo los ingredientes
         IngredientController ingredientController = new IngredientController();
         ingredientController.saveIngredientsToDatabase(application, recipeFromFirebase.getIngredients(), dataSnapshot.getKey());
@@ -92,6 +100,8 @@ public class RecipeController {
         Recipe recipe = null;
         if(recipeList != null && recipeList.size()>0){
             recipe = recipeList.get(0);
+            recipe.getIngredients();
+            recipe.getSteps();
         }
         return recipe;
 

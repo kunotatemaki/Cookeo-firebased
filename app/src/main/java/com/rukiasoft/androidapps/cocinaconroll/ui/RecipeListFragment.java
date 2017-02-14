@@ -900,7 +900,7 @@ public class RecipeListFragment extends Fragment implements
             DataSnapshot dataSnapshot = snapshot[0];
             RecipeDetailed recipeFromFirebase = dataSnapshot.getValue(RecipeDetailed.class);
             if(recipeFromFirebase == null)  return null;
-            String key = dataSnapshot.getRef().getParent().getParent().getKey();
+            //String key = dataSnapshot.getRef().getParent().getParent().getKey();
             Recipe recipe = recipeController.insertRecipeFromFirebase(getActivity().getApplication(),
                     dataSnapshot, recipeFromFirebase);
             return recipe;
@@ -933,6 +933,10 @@ public class RecipeListFragment extends Fragment implements
             for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
                 RecipeTimestamp recipeTimestamp = postSnapshot.getValue(RecipeTimestamp.class);
                 String key = postSnapshot.getKey();
+                if(key.equals("-KaplijStKu03-HNpnxG")){
+                    int i=0;
+                    i++;
+                }
                 Recipe recipeFromDatabase = recipeController.getRecipeByKey(getActivity().getApplication(), key);
                 if(recipeFromDatabase == null){
                     //no existía, la creo
