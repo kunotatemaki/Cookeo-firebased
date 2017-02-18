@@ -26,7 +26,7 @@ import butterknife.Unbinder;
 
 public class SearchableActivity extends ToolbarAndProgressActivity implements LoaderCallbacks<Cursor> {
 	
-	private ListView mLVRecipes;
+	@BindView(R.id.lv_recipes) ListView mLVRecipes;
 	private SimpleCursorAdapter mCursorAdapter;
 	@BindView(R.id.standard_toolbar)
 	Toolbar mToolbarSearchActivity;
@@ -47,7 +47,7 @@ public class SearchableActivity extends ToolbarAndProgressActivity implements Lo
 		unbinder = ButterKnife.bind(this);
 		setToolbar(mToolbarSearchActivity);
 		// Getting reference to Country List
-		mLVRecipes = (ListView)findViewById(R.id.lv_recipes);
+		//mLVRecipes = (ListView)findViewById(R.id.lv_recipes);
 		
 		// Setting item click listener		
 		mLVRecipes.setOnItemClickListener(new OnItemClickListener() {

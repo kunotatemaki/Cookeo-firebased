@@ -1,5 +1,7 @@
 package com.rukiasoft.androidapps.cocinaconroll.persistence.daoqueries;
 
+import android.database.Cursor;
+
 import com.rukiasoft.androidapps.cocinaconroll.persistence.model.DaoSession;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.model.RecipeDao;
 
@@ -97,4 +99,7 @@ public class RecipeQueries {
         ).build();
     }
 
+    /*session.getMyObjectDao().queryBuilder()
+    .where(MyObjectDao.Properties.Locale.eq("en")))
+            .buildCursor().forCurrentThread().query()*/
 }

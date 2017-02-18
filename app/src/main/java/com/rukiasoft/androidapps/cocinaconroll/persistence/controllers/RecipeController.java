@@ -13,6 +13,7 @@ import com.rukiasoft.androidapps.cocinaconroll.persistence.model.Recipe;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.model.RecipeDao;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.LogHelper;
 
+import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.query.Query;
 
 import java.util.List;
@@ -44,8 +45,10 @@ public class RecipeController {
         Query query = RecipeQueries.getQueryGetRecipeByKey(session);
         query.forCurrentThread().setParameter(0, key);
         Recipe recipe = (Recipe) query.unique();
-        recipe.getIngredients();
-        recipe.getSteps();
+        if(recipe != null) {
+            recipe.getIngredients();
+            recipe.getSteps();
+        }
         return recipe;
     }
 
