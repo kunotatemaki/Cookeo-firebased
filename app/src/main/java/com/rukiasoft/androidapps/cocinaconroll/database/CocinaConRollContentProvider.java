@@ -1,5 +1,6 @@
 package com.rukiasoft.androidapps.cocinaconroll.database;
 
+import android.app.Application;
 import android.app.SearchManager;
 import android.content.ContentProvider;
 import android.content.ContentValues;
@@ -9,25 +10,23 @@ import android.database.SQLException;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 
+import com.rukiasoft.androidapps.cocinaconroll.persistence.controllers.RecipeController;
+
 public class CocinaConRollContentProvider extends ContentProvider {
 
 
 	public static final String AUTHORITY = "com.rukiasoft.androidapps.cocinaconroll.database.cocinaconrollcontentprovider";
 	public static final Uri CONTENT_URI_SUGGESTIONS_WHEN_KEYBOARD_GO = Uri.parse("content://" + AUTHORITY + "/suggestions");
 	public static final Uri CONTENT_URI_RECIPES = Uri.parse("content://" + AUTHORITY + "/" + RecipesTable.TABLE_NAME);
-	public static final Uri CONTENT_URI_ZIPS = Uri.parse("content://" + AUTHORITY + "/" + ZipsTable.TABLE_NAME);
 
     private RecipesDB mRecipesDB = null;
-    private ZipsDB mZipsDB = null;
+    private RecipeController recipeController = null;
 
     private static final int SUGGESTIONS_RECIPE = 1;
     private static final int SEARCH_SUGGESTION = 2;
     private static final int GET_SUGGESTION = 3;
-    private static final int SEARCH_RECIPE = 4;
+    private static final int GET_ALL_RECIPES = 4;
     private static final int GET_RECIPE = 5;
-    private static final int SEARCH_ZIP = 6;
-    private static final int GET_ZIP = 7;
-
 
     private final UriMatcher mUriMatcher = buildUriMatcher();
 
@@ -43,13 +42,9 @@ public class CocinaConRollContentProvider extends ContentProvider {
         // This URI is invoked, when user selects a suggestion from search dialog or an item from the listview
         uriMatcher.addURI(AUTHORITY, "suggestions/#", GET_SUGGESTION);
 
-        uriMatcher.addURI(AUTHORITY, RecipesTable.TABLE_NAME, SEARCH_RECIPE);
+        uriMatcher.addURI(AUTHORITY, RecipesTable.TABLE_NAME, GET_ALL_RECIPES);
         // This URI is invoked, when user selects a suggestion from search dialog or an item from the listview
         uriMatcher.addURI(AUTHORITY, RecipesTable.TABLE_NAME + "/#", GET_RECIPE);
-
-        uriMatcher.addURI(AUTHORITY, "zips", SEARCH_ZIP);
-
-        uriMatcher.addURI(AUTHORITY, "zips/#", GET_ZIP);
 
         return uriMatcher;
     }
@@ -57,7 +52,7 @@ public class CocinaConRollContentProvider extends ContentProvider {
     @Override
     public boolean onCreate() {
         mRecipesDB = new RecipesDB(getContext());
-        mZipsDB = new ZipsDB(getContext());
+        recipeController = new RecipeController();
         return true;
     }
 
@@ -78,19 +73,13 @@ public class CocinaConRollContentProvider extends ContentProvider {
                 id_recipe = uri.getLastPathSegment();
                 c = mRecipesDB.getSuggestion(id_recipe);
                 break;
-            case SEARCH_RECIPE:
-                c = mRecipesDB.getRecipes(projection, selection, selectionArgs, sortOrder);
+            case GET_ALL_RECIPES:
+                c = recipeController.getRecipesInCursorFormat((Application)getContext().getApplicationContext());
+                //c = mRecipesDB.getRecipes(projection, selection, selectionArgs, sortOrder);
                 break;
             case GET_RECIPE:
                 id_recipe = uri.getLastPathSegment();
                 c = mRecipesDB.getRecipe(id_recipe);
-                break;
-            case SEARCH_ZIP:
-                c = mZipsDB.getZips(projection, selection, selectionArgs, sortOrder);
-                break;
-            case GET_ZIP:
-                String id_zip = uri.getLastPathSegment();
-                c = mZipsDB.getZip(id_zip);
                 break;
         }
         return c;
@@ -99,11 +88,9 @@ public class CocinaConRollContentProvider extends ContentProvider {
     @Override
     public int delete(@NonNull Uri uri, String selection, String[] selectionArgs) {
         switch (mUriMatcher.match(uri)){
-            case SEARCH_RECIPE:
+            case GET_ALL_RECIPES:
                 return mRecipesDB.delete(selection, selectionArgs);
-            case SEARCH_ZIP:
-                return mZipsDB.delete(selection, selectionArgs);
-            default: throw new SQLException("Failed to insert row into " + uri);
+            default: throw new SQLException("Failed to delete row " + uri);
         }
     }
 
@@ -116,11 +103,8 @@ public class CocinaConRollContentProvider extends ContentProvider {
     public Uri insert(@NonNull Uri uri, ContentValues values) {
         Uri returnUri;
         switch (mUriMatcher.match(uri)){
-            case SEARCH_RECIPE:
+            case GET_ALL_RECIPES:
                 returnUri = mRecipesDB.insert(values);
-                break;
-            case SEARCH_ZIP:
-                returnUri = mZipsDB.insert(values);
                 break;
             default: throw new SQLException("Failed to insert row into " + uri);
         }
@@ -133,11 +117,8 @@ public class CocinaConRollContentProvider extends ContentProvider {
                       String[] selectionArgs) {
         int index;
         switch (mUriMatcher.match(uri)){
-            case SEARCH_RECIPE:
+            case GET_ALL_RECIPES:
                 index = mRecipesDB.updateFavorite(values, selection, selectionArgs);
-                break;
-            case SEARCH_ZIP:
-                index = mZipsDB.updateState(values, selection, selectionArgs);
                 break;
             default: throw new SQLException("Failed to insert row into " + uri);
         }

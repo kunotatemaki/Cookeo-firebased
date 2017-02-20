@@ -9,7 +9,7 @@ android {
     //useLibrary 'org.apache.http.legacy'
     defaultConfig {
         applicationId "com.rukiasoft.androidapps.cocinaconroll"
-        minSdkVersion 10
+        minSdkVersion 14
         targetSdkVersion 25
         versionCode 321
         versionName "3.2.1"

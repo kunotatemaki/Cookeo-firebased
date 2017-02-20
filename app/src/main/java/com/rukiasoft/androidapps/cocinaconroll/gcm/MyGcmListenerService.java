@@ -16,18 +16,10 @@
 
 package com.rukiasoft.androidapps.cocinaconroll.gcm;
 
-import android.content.ContentUris;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
-
 
 import com.google.android.gms.gcm.GcmListenerService;
-import com.rukiasoft.androidapps.cocinaconroll.database.DatabaseRelatedTools;
-import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.LogHelper;
-import com.rukiasoft.androidapps.cocinaconroll.utilities.Tools;
 
 
 
@@ -45,39 +37,5 @@ public class MyGcmListenerService extends GcmListenerService {
     // [START receive_message]
     @Override
     public void onMessageReceived(String from, Bundle data) {
-        String name, link;
-        Log.v(TAG, "recibo notificación");
-        if(data != null && data.containsKey("name") && data.containsKey("link")){
-            name = data.getString("name");
-            if(name != null && !name.contains("zip")){
-                return;
-            }
-            link = data.getString("link");
-        }else{
-            return;
-        }
-
-        DatabaseRelatedTools dbTools = new DatabaseRelatedTools();
-        Uri uri = dbTools.insertNewZip(getApplicationContext(), name, link);
-        if(uri == null){
-            Log.d(TAG, "Null uri");
-            return;
-        }
-        Log.d(TAG, "Uri: " + uri.toString());
-        try {
-            long id = ContentUris.parseId(uri);
-            if (id != -1) {
-                Tools mTools = new Tools();
-                if (mTools.hasPermissionForDownloading(getApplicationContext())) {
-                    //Intent intent = new Intent(this, DownloadAndUnzipIntentService.class);
-                    //intent.putExtra(RecetasCookeoConstants.KEY_TYPE, RecetasCookeoConstants.FILTER_LATEST_RECIPES);
-                    //startService(intent);
-                }
-            }
-        }catch (NumberFormatException e){
-            e.printStackTrace();
-            // TODO: 14/1/17 aquí mandaba excepción con ACRA
-        }
     }
-    // [END receive_message]
 }

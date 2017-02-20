@@ -3,8 +3,10 @@ package com.rukiasoft.androidapps.cocinaconroll.persistence.daoqueries;
 import android.database.Cursor;
 
 import com.rukiasoft.androidapps.cocinaconroll.persistence.model.DaoSession;
-import com.rukiasoft.androidapps.cocinaconroll.persistence.model.RecipeDao;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.model.RecipeDbDao;
+import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 
+import org.greenrobot.greendao.query.CursorQuery;
 import org.greenrobot.greendao.query.Query;
 import org.greenrobot.greendao.query.QueryBuilder;
 
@@ -16,9 +18,17 @@ public class RecipeQueries {
 
     private static Query queryBothRecipesAndPicturesToDownload;
     private static Query queryOnlyRecipesToDownload;
-    private static Query queryGetRecipeByPictureName;
-    private static Query queryGetRecipeByKey;
-    private static Query queryGetRecipeByName;
+    private static Query queryRecipeByPictureName;
+    private static Query queryRecipeByKey;
+    private static Query queryRecipeById;
+    private static Query queryRecipesByName;
+    private static Query queryRecipesByType;
+    private static Query queryFavouriteRecipes;
+    private static Query queryVegetarianRecipes;
+    private static Query queryOwnRecipes;
+    private static Query queryLatestRecipes;
+    private static CursorQuery cursorAllRecipes;
+    private static Query queryAllRecipes;
 
     public static Query getQueryBothRecipesAndPicturesToDownload(DaoSession session) {
         if(queryBothRecipesAndPicturesToDownload == null){
@@ -34,72 +44,191 @@ public class RecipeQueries {
         return queryOnlyRecipesToDownload.forCurrentThread();
     }
 
-    public static Query getQueryGetRecipeByPictureName(DaoSession session) {
-        if(queryGetRecipeByPictureName == null){
-            initializeQueryGetRecipeByPictureName(session);
+    public static Query getQueryRecipeByPictureName(DaoSession session) {
+        if(queryRecipeByPictureName == null){
+            initializeQueryRecipeByPictureName(session);
         }
-        return queryGetRecipeByPictureName.forCurrentThread();
+        return queryRecipeByPictureName.forCurrentThread();
     }
 
-    public static Query getQueryGetRecipeByKey(DaoSession session) {
-        if(queryGetRecipeByKey == null){
-            initializeQueryGetRecipeByKey(session);
+    public static Query getQueryRecipeByKey(DaoSession session) {
+        if(queryRecipeByKey == null){
+            initializeQueryRecipeByKey(session);
         }
-        return queryGetRecipeByKey.forCurrentThread();
+        return queryRecipeByKey.forCurrentThread();
     }
 
-    public static Query getQueryGetRecipeByName(DaoSession session) {
-        if(queryGetRecipeByName == null){
-            initializeQueryGetRecipeByName(session);
+    public static Query getQueryRecipeById(DaoSession session) {
+        if(queryRecipeById == null){
+            initializeQueryRecipeById(session);
         }
-        return queryGetRecipeByName.forCurrentThread();
+        return queryRecipeById.forCurrentThread();
+    }
+
+    public static Cursor getCursorAllRecipes(DaoSession session) {
+        if(cursorAllRecipes == null){
+            initializeCursorAllRecipes(session);
+        }
+        return cursorAllRecipes.forCurrentThread().query();
+    }
+
+    public static Query getQueryAllRecipes(DaoSession session) {
+        if(queryAllRecipes == null){
+            initializeQueryAllRecipes(session);
+        }
+        return queryAllRecipes.forCurrentThread();
+    }
+
+    public static Query getQueryRecipesByName(DaoSession session) {
+        if(queryRecipesByName == null){
+            initializeQueryRecipesByName(session);
+        }
+        return queryRecipesByName.forCurrentThread();
+    }
+
+    public static Query getQueryRecipesByType(DaoSession session) {
+        if(queryRecipesByType == null){
+            initializeQueryRecipesByType(session);
+        }
+        return queryRecipesByType.forCurrentThread();
+    }
+
+    public static Query getQueryVegetarianRecipes(DaoSession session) {
+        if(queryVegetarianRecipes == null){
+            initializeQueryVegetarianRecipes(session);
+        }
+        return queryVegetarianRecipes.forCurrentThread();
+    }
+
+    public static Query getQueryFavouriteRecipes(DaoSession session) {
+        if(queryFavouriteRecipes == null){
+            initializeQueryFavouriteRecipes(session);
+        }
+        return queryFavouriteRecipes.forCurrentThread();
+    }
+
+    public static Query getQueryOwnRecipes(DaoSession session) {
+        if(queryOwnRecipes == null){
+            initializeQueryOwnRecipes(session);
+        }
+        return queryOwnRecipes.forCurrentThread();
+    }
+
+    public static Query getQueryLatestRecipes(DaoSession session) {
+        if(queryLatestRecipes== null){
+            initializeQueryLatestRecipes(session);
+        }
+        return queryLatestRecipes.forCurrentThread();
     }
 
     private static void initializeQueryBothRecipesAndPicturesToDownload(DaoSession session){
-        RecipeDao recipeDao = session.getRecipeDao();
-        recipeDao.detachAll();
-        QueryBuilder qb = recipeDao.queryBuilder();
+        RecipeDbDao recipeDbDao = session.getRecipeDbDao();
+        recipeDbDao.detachAll();
+        QueryBuilder qb = recipeDbDao.queryBuilder();
         queryBothRecipesAndPicturesToDownload = qb.where(
-                qb.or(RecipeDao.Properties.DownloadRecipe.eq(1),
-                        RecipeDao.Properties.DownloadPicture.eq(1))
+                qb.or(RecipeDbDao.Properties.DownloadRecipe.eq(1),
+                        RecipeDbDao.Properties.DownloadPicture.eq(1))
         ).build();
     }
 
     private static void initializeQueryOnlyRecipesToDownload(DaoSession session){
-        RecipeDao recipeDao = session.getRecipeDao();
-        recipeDao.detachAll();
-        QueryBuilder qb = recipeDao.queryBuilder();
+        RecipeDbDao recipeDbDao = session.getRecipeDbDao();
+        recipeDbDao.detachAll();
+        QueryBuilder qb = recipeDbDao.queryBuilder();
         queryOnlyRecipesToDownload = qb.where(
-                RecipeDao.Properties.DownloadRecipe.eq(1)
+                RecipeDbDao.Properties.DownloadRecipe.eq(1)
         ).build();
     }
 
-    private static void initializeQueryGetRecipeByPictureName(DaoSession session){
-        RecipeDao recipeDao = session.getRecipeDao();
-        recipeDao.detachAll();
-        QueryBuilder qb = recipeDao.queryBuilder();
-        queryGetRecipeByPictureName = qb.where(
-                RecipeDao.Properties.Picture.eq("")
+    private static void initializeQueryRecipeByPictureName(DaoSession session){
+        RecipeDbDao recipeDbDao = session.getRecipeDbDao();
+        recipeDbDao.detachAll();
+        QueryBuilder qb = recipeDbDao.queryBuilder();
+        queryRecipeByPictureName = qb.where(
+                RecipeDbDao.Properties.Picture.eq(null)
         ).build();
     }
 
-    private static void initializeQueryGetRecipeByKey(DaoSession session){
-        RecipeDao recipeDao = session.getRecipeDao();
-        recipeDao.detachAll();
-        queryGetRecipeByKey = recipeDao.queryBuilder().where(
-                RecipeDao.Properties.Key.eq("")
+    private static void initializeQueryRecipeByKey(DaoSession session){
+        RecipeDbDao recipeDbDao = session.getRecipeDbDao();
+        recipeDbDao.detachAll();
+        queryRecipeByKey = recipeDbDao.queryBuilder().where(
+                RecipeDbDao.Properties.Key.eq(null)
         ).build();
     }
 
-    private static void initializeQueryGetRecipeByName(DaoSession session){
-        RecipeDao recipeDao = session.getRecipeDao();
-        recipeDao.detachAll();
-        queryGetRecipeByName = recipeDao.queryBuilder().where(
-                RecipeDao.Properties.Name.eq("")
+    private static void initializeQueryRecipeById(DaoSession session){
+        RecipeDbDao recipeDbDao = session.getRecipeDbDao();
+        recipeDbDao.detachAll();
+        queryRecipeById = recipeDbDao.queryBuilder().where(
+                RecipeDbDao.Properties.Id.eq(null)
         ).build();
     }
 
-    /*session.getMyObjectDao().queryBuilder()
-    .where(MyObjectDao.Properties.Locale.eq("en")))
-            .buildCursor().forCurrentThread().query()*/
+    private static void initializeQueryRecipesByName(DaoSession session){
+        RecipeDbDao recipeDbDao = session.getRecipeDbDao();
+        recipeDbDao.detachAll();
+        queryRecipesByName = recipeDbDao.queryBuilder().where(
+                RecipeDbDao.Properties.NormalizedName.like(null)
+        ).build();
+    }
+
+    private static void initializeQueryFavouriteRecipes(DaoSession session){
+        RecipeDbDao recipeDbDao = session.getRecipeDbDao();
+        recipeDbDao.detachAll();
+        queryRecipesByName = recipeDbDao.queryBuilder().where(
+                RecipeDbDao.Properties.Favourite.eq(1)
+        ).build();
+    }
+
+    private static void initializeQueryVegetarianRecipes(DaoSession session){
+        RecipeDbDao recipeDbDao = session.getRecipeDbDao();
+        recipeDbDao.detachAll();
+        queryRecipesByName = recipeDbDao.queryBuilder().where(
+                RecipeDbDao.Properties.Vegetarian.eq(1)
+        ).build();
+    }
+
+    private static void initializeQueryOwnRecipes(DaoSession session){
+        RecipeDbDao recipeDbDao = session.getRecipeDbDao();
+        recipeDbDao.detachAll();
+        queryRecipesByName = recipeDbDao.queryBuilder().where(
+                RecipeDbDao.Properties.Owner.eq(RecetasCookeoConstants.FLAG_PERSONAL_RECIPE)
+        ).build();
+    }
+
+    private static void initializeQueryLatestRecipes(DaoSession session){
+        RecipeDbDao recipeDbDao = session.getRecipeDbDao();
+        recipeDbDao.detachAll();
+//        queryRecipesByName = recipeDbDao.queryBuilder().where(
+//                RecipeDbDao.Properties.Favourite.eq(1)
+//        ).build();
+    }
+
+    private static void initializeQueryRecipesByType(DaoSession session){
+        RecipeDbDao recipeDbDao = session.getRecipeDbDao();
+        recipeDbDao.detachAll();
+        queryRecipesByType = recipeDbDao.queryBuilder().where(
+                RecipeDbDao.Properties.Type.like(null)
+        ).build();
+    }
+
+    private static void initializeCursorAllRecipes(DaoSession session){
+        RecipeDbDao recipeDbDao = session.getRecipeDbDao();
+        recipeDbDao.detachAll();
+        cursorAllRecipes = recipeDbDao.queryBuilder()
+                .orderAsc(RecipeDbDao.Properties.NormalizedName)
+                .buildCursor();
+    }
+
+    private static void initializeQueryAllRecipes(DaoSession session){
+        RecipeDbDao recipeDbDao = session.getRecipeDbDao();
+        recipeDbDao.detachAll();
+        queryAllRecipes = recipeDbDao.queryBuilder()
+                .orderAsc(RecipeDbDao.Properties.NormalizedName)
+                .build();
+    }
+
+
+
 }

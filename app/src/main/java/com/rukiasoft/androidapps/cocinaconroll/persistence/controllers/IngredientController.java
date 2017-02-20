@@ -4,11 +4,10 @@ import android.app.Application;
 
 import com.rukiasoft.androidapps.cocinaconroll.persistence.daoqueries.IngredientQueries;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.model.DaoSession;
-import com.rukiasoft.androidapps.cocinaconroll.persistence.model.Ingredient;
-import com.rukiasoft.androidapps.cocinaconroll.persistence.model.IngredientDao;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.model.IngredientDb;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.model.IngredientDbDao;
 
 import org.greenrobot.greendao.query.DeleteQuery;
-import org.greenrobot.greendao.query.Query;
 
 import java.util.List;
 
@@ -24,31 +23,20 @@ public class IngredientController {
 
     /**
      * Salva los ingredientes de una receta en la base de datos local
-     * @param ingredients lista de ingredientes
-     * @param key identificador de la receta
+     * @param ingredientDbs lista de ingredientes
      */
-    public void saveIngredientsToDatabase(Application application, List<String> ingredients, String key){
-        //Grabo los ingredientes (primero borro los que había)
-        DaoSession session = CommonController.getDaosessionFromApplication(application, "Ingredient");
-        IngredientDao ingredientDao = session.getIngredientDao();
-        Query query = IngredientQueries.getQueryGetIngredientByKeyAndPosition(session);
+    public void saveIngredientsToDatabase(Application application, List<IngredientDb> ingredientDbs, String key){
 
-        DeleteQuery<Ingredient> delete = IngredientQueries.getDeleteQueryIngredientByKey(session);
+        //Grabo los ingredientes (primero borro los que había)
+        DaoSession session = CommonController.getDaosessionFromApplication(application, "IngredientDb");
+        IngredientDbDao ingredientDao = session.getIngredientDbDao();
+
+        DeleteQuery<IngredientDb> delete = IngredientQueries.getDeleteQueryIngredientByKey(session);
         delete.setParameter(0, key);
         delete.executeDeleteWithoutDetachingEntities();
 
-        for(int i=0; i<ingredients.size(); i++){
-            query.setParameter(0, key);
-            query.setParameter(1, i);
-            Ingredient ingredient = (Ingredient) query.unique();
-            if(ingredient == null){
-                ingredient = new Ingredient();
-            }
-            ingredient.setKey(key);
-            ingredient.setPosition(i);
-            ingredient.setIngredient(ingredients.get(i));
-            ingredientDao.insertOrReplace(ingredient);
-
+        for(IngredientDb ingredientDb : ingredientDbs){
+            ingredientDao.insertOrReplace(ingredientDb);
         }
     }
 }

@@ -2,7 +2,6 @@ package com.rukiasoft.androidapps.cocinaconroll.permissions;
 
 
 import android.content.Context;
-import android.util.Log;
 
 import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
@@ -12,7 +11,6 @@ import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import com.rukiasoft.androidapps.cocinaconroll.R;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.controllers.RecipeController;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.database.methods.FirebaseDbMethods;
-import com.rukiasoft.androidapps.cocinaconroll.persistence.model.Recipe;
 import com.rukiasoft.androidapps.cocinaconroll.ui.RecipeListActivity;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.LogHelper;
 

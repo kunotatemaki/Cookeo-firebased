@@ -30,7 +30,6 @@ public class CocinaConRollDatabaseHelper extends SQLiteOpenHelper {
 
         //create tables
         RecipesTable.onCreate(database);
-        ZipsTable.onCreate(database);
 
     }
 
@@ -41,7 +40,6 @@ public class CocinaConRollDatabaseHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase database, int oldVersion,
                           int newVersion) {
         RecipesTable.onUpgrade(database, oldVersion, newVersion);
-        ZipsTable.onUpgrade(database, oldVersion, newVersion);
     }
 
 }

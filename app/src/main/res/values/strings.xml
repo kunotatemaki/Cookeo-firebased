@@ -30,7 +30,7 @@
     <string name="own_recipes">Own recipes</string>
     <string name="screen_of_description">Screen will be turned off, according to the user\'s settings</string>
     <string name="screen_on">Screen remains allways on</string>
-    <string name="search_by_ingredients">Search by ingredients</string>
+    <string name="search_by_ingredients">Search by ingredientDbs</string>
     <string name="starters">Starters</string>
     <string name="update_wifi">Update only when Wifi connected</string>
     <string name="update_wihtout_wifi_description">New recipes will be downloaded at any time</string>
@@ -38,8 +38,8 @@
     <string name="vegetarians">Vegetarian dishes</string>
     <string name="vibrate">Vibrate</string>
     <string name="all_recipes">All recipes</string>
-    <string name="ingredients">Ingredients</string>
-    <string name="steps">Steps</string>
+    <string name="ingredientDbs">Ingredients</string>
+    <string name="stepDbs">Steps</string>
     <string name="null_content_description" translatable="false"> </string>
     <string name="default_author">Preinstalled in Cookeo</string>
     <string name="original_link" translatable="false">Link:</string>
@@ -91,7 +91,7 @@
     <string name="duplicated_recipe">This name already exists</string>
     <string name="no_recipe_name">Add a recipe name</string>
     <string name="no_value">Enter a valid value</string>
-    <string name="indredients_intructions">Type a new ingredient and press the button to add it to the recipe</string>
+    <string name="indredients_intructions">Type a new ingredientDb and press the button to add it to the recipe</string>
     <string name="delete_recipe_confirmation">Delete recipe? This operations can\'t be undone!</string>
     <string name="share_confirmation">Want to share the recipe?</string>
     <string name="ticker">New recipes for your Cookeo</string>

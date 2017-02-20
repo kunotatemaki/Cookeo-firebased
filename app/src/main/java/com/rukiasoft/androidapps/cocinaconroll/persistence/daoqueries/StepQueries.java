@@ -1,8 +1,8 @@
 package com.rukiasoft.androidapps.cocinaconroll.persistence.daoqueries;
 
 import com.rukiasoft.androidapps.cocinaconroll.persistence.model.DaoSession;
-import com.rukiasoft.androidapps.cocinaconroll.persistence.model.Step;
-import com.rukiasoft.androidapps.cocinaconroll.persistence.model.StepDao;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.model.StepDb;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.model.StepDbDao;
 
 import org.greenrobot.greendao.query.DeleteQuery;
 import org.greenrobot.greendao.query.Query;
@@ -14,7 +14,7 @@ import org.greenrobot.greendao.query.Query;
 public class StepQueries {
 
     private static Query queryGetStepByKeyAndPosition;
-    private static DeleteQuery<Step> deleteQueryStepsByKey;
+    private static DeleteQuery<StepDb> deleteQueryStepsByKey;
 
     public static Query getQueryGetStepByKeyAndPosition(DaoSession session) {
         if(queryGetStepByKeyAndPosition == null){
@@ -23,7 +23,7 @@ public class StepQueries {
         return queryGetStepByKeyAndPosition.forCurrentThread();
     }
 
-    public static DeleteQuery<Step> getDeleteQueryStepByKey(DaoSession session) {
+    public static DeleteQuery<StepDb> getDeleteQueryStepByKey(DaoSession session) {
         if(deleteQueryStepsByKey == null){
             initializeDeleteQueryStepsByKey(session);
         }
@@ -31,19 +31,19 @@ public class StepQueries {
     }
 
     private static void initializeQueryGetStepByKeyAndPosition(DaoSession session){
-        StepDao stepDao = session.getStepDao();
+        StepDbDao stepDao = session.getStepDbDao();
         stepDao.detachAll();
         queryGetStepByKeyAndPosition = stepDao.queryBuilder().where(
-                StepDao.Properties.Key.eq(""),
-                StepDao.Properties.Position.eq(0)
+                StepDbDao.Properties.Key.eq(""),
+                StepDbDao.Properties.Position.eq(0)
         ).build();
     }
 
     private static void initializeDeleteQueryStepsByKey(DaoSession session){
-        StepDao stepDao = session.getStepDao();
+        StepDbDao stepDao = session.getStepDbDao();
         stepDao.detachAll();
         deleteQueryStepsByKey = stepDao.queryBuilder().where(
-                StepDao.Properties.Key.eq("")
+                StepDbDao.Properties.Key.eq("")
         ).buildDelete();
     }
 

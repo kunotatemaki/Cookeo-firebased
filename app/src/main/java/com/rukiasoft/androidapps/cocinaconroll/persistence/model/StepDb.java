@@ -15,7 +15,7 @@ import org.greenrobot.greendao.DaoException;
         active = true,
         nameInDb = "STEPS"
 )
-public class Step {
+public class StepDb {
     @Id(autoincrement = true)
     private Long id;
     @Index
@@ -30,17 +30,18 @@ public class Step {
 @Generated(hash = 2040040024)
 private transient DaoSession daoSession;
 /** Used for active entity operations. */
-@Generated(hash = 838845936)
-private transient StepDao myDao;
-@Generated(hash = 1037140008)
-public Step(Long id, @NotNull String key, int position, @NotNull String step) {
+@Generated(hash = 228190560)
+private transient StepDbDao myDao;
+@Generated(hash = 125450922)
+public StepDb(Long id, @NotNull String key, int position,
+        @NotNull String step) {
     this.id = id;
     this.key = key;
     this.position = position;
     this.step = step;
 }
-@Generated(hash = 561308863)
-public Step() {
+@Generated(hash = 2043047701)
+public StepDb() {
 }
 public Long getId() {
     return this.id;
@@ -100,11 +101,10 @@ public void update() {
     myDao.update(this);
 }
 /** called by internal mechanisms, do not call yourself. */
-@Generated(hash = 1241179918)
+@Generated(hash = 872869953)
 public void __setDaoSession(DaoSession daoSession) {
     this.daoSession = daoSession;
-    myDao = daoSession != null ? daoSession.getStepDao() : null;
+    myDao = daoSession != null ? daoSession.getStepDbDao() : null;
 }
-
 
 }

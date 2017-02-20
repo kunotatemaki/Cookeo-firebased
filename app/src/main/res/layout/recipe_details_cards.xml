@@ -94,7 +94,7 @@
                 style="@style/TextAppearance.AppCompat.Headline"
                 android:textStyle="bold"
                 android:textColor="@color/ColorDescriptions"
-                android:text="@string/ingredients"
+                android:text="@string/ingredientDbs"
                 android:layout_alignParentTop="true"
                 android:layout_alignParentStart="true"
                 android:layout_alignParentLeft="true"
@@ -118,7 +118,7 @@
                 android:layout_marginBottom="@dimen/margin_text_cardview"
                 android:src="@drawable/ic_ingredients_32"
                 android:tint="@color/ColorDescriptions"
-                android:contentDescription="@string/ingredients"/>
+                android:contentDescription="@string/ingredientDbs"/>
             <LinearLayout
                 android:id="@+id/listview_ingredients_cardview"
                 android:layout_width="match_parent"
@@ -146,7 +146,7 @@
                 style="@style/TextAppearance.AppCompat.Headline"
                 android:textStyle="bold"
                 android:textColor="@color/ColorDescriptions"
-                android:text="@string/steps"
+                android:text="@string/stepDbs"
                 android:layout_alignParentTop="true"
                 android:layout_alignParentStart="true"
                 android:layout_alignParentLeft="true"
@@ -171,7 +171,7 @@
                 android:layout_marginBottom="@dimen/margin_text_cardview"
                 android:src="@drawable/ic_procedure_32"
                 android:tint="@color/ColorDescriptions"
-                android:contentDescription="@string/steps"/>
+                android:contentDescription="@string/stepDbs"/>
             <LinearLayout
                 android:id="@+id/listview_steps_cardview"
                 android:layout_width="match_parent"
@@ -226,7 +226,7 @@
                 android:layout_marginBottom="@dimen/margin_text_cardview"
                 android:src="@drawable/ic_tip_36dp"
                 android:tint="@color/ColorDescriptions"
-                android:contentDescription="@string/steps"/>
+                android:contentDescription="@string/stepDbs"/>
             <TextView
                 android:id="@+id/tip_body_cardview"
                 android:layout_width="wrap_content"

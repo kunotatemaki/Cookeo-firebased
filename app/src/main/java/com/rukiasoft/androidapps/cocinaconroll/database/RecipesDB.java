@@ -13,15 +13,13 @@ import java.util.HashMap;
 
 public class RecipesDB {
 
-    private final DatabaseRelatedTools dbTools;
-	private final CocinaConRollDatabaseHelper mCocinaConRollDatabaseHelper;
+    private final CocinaConRollDatabaseHelper mCocinaConRollDatabaseHelper;
 
 	private final HashMap<String, String> mAliasMap;
 
 
 	public RecipesDB(Context context){
-        dbTools = new DatabaseRelatedTools();
-		mCocinaConRollDatabaseHelper = new CocinaConRollDatabaseHelper(context);
+        mCocinaConRollDatabaseHelper = new CocinaConRollDatabaseHelper(context);
 		
 		// This HashMap is used to map table fields to Custom Suggestion fields
     	mAliasMap = new HashMap<>();
@@ -45,7 +43,7 @@ public class RecipesDB {
         //call from search widget
     	String selection =  RecipesTable.FIELD_NAME_NORMALIZED + " like ? ";
         if(selectionArgs!=null){
-    		selectionArgs[0] = "%"+dbTools.getNormalizedString(selectionArgs[0]) + "%";
+    		selectionArgs[0] = "%" + dbTools.getNormalizedString(selectionArgs[0]) + "%";
     	}    	    	
     	
     	SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
@@ -134,7 +132,7 @@ public class RecipesDB {
     }
 
 
-    /** Return Recipe corresponding to the id */
+    /** Return RecipeDb corresponding to the id */
     public Cursor getRecipe(String id){
     	SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
     	queryBuilder.setTables( RecipesTable.TABLE_NAME);

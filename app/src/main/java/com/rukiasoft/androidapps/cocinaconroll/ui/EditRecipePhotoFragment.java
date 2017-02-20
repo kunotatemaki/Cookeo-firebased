@@ -37,7 +37,6 @@ import android.widget.Toast;
 import com.rukiasoft.androidapps.cocinaconroll.CocinaConRollApplication;
 import com.rukiasoft.androidapps.cocinaconroll.R;
 import com.rukiasoft.androidapps.cocinaconroll.classes.RecipeItemOld;
-import com.rukiasoft.androidapps.cocinaconroll.database.DatabaseRelatedTools;
 import com.rukiasoft.androidapps.cocinaconroll.database.RecipesTable;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.ReadWriteTools;
@@ -63,7 +62,6 @@ public class EditRecipePhotoFragment extends Fragment {
     private Bitmap photo;
     private RecipeItemOld recipeItemOld;
     private Tools mTools;
-    private DatabaseRelatedTools dbTools;
     private ReadWriteTools rwTools;
     private String nameOfNewImage = "";
 
@@ -105,7 +103,6 @@ public class EditRecipePhotoFragment extends Fragment {
         //setRetainInstance(true);
         mTools = new Tools();
         rwTools = new ReadWriteTools();
-        dbTools = new DatabaseRelatedTools();
     }
 
 
@@ -527,15 +524,16 @@ public class EditRecipePhotoFragment extends Fragment {
     }
 
     private void checkIfNameExists(String sName){
-        List<RecipeItemOld> coincidences = dbTools.searchRecipesInDatabase(getActivity().getApplicationContext(),
-                RecipesTable.FIELD_NAME_NORMALIZED, dbTools.getNormalizedString(sName));
-        String error = null;
-        if (coincidences.size() > 0) {
-            error = getResources().getString(R.string.duplicated_recipe);
-        }
-        if(createRecipeNameLayout != null){
-            createRecipeNameLayout.setError(error);
-        }
+        //// TODO: 21/2/17 habrá que repasaro todo este proceso
+//        List<RecipeItemOld> coincidences = dbTools.searchRecipesInDatabase(getActivity().getApplicationContext(),
+//                RecipesTable.FIELD_NAME_NORMALIZED, dbTools.getNormalizedString(sName));
+//        String error = null;
+//        if (coincidences.size() > 0) {
+//            error = getResources().getString(R.string.duplicated_recipe);
+//        }
+//        if(createRecipeNameLayout != null){
+//            createRecipeNameLayout.setError(error);
+//        }
     }
 
     @Override

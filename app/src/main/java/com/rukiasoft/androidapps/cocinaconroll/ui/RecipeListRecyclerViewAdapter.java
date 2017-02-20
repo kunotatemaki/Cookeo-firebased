@@ -38,10 +38,9 @@ import android.widget.TextView;
 
 import com.rukiasoft.androidapps.cocinaconroll.classes.LikeButtonView;
 import com.rukiasoft.androidapps.cocinaconroll.classes.RecipeItemOld;
-import com.rukiasoft.androidapps.cocinaconroll.utilities.CommonRecipeOperations;
+import com.rukiasoft.androidapps.cocinaconroll.ui.model.RecipeReduced;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 import com.rukiasoft.androidapps.cocinaconroll.R;
-import com.rukiasoft.androidapps.cocinaconroll.database.DatabaseRelatedTools;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.ReadWriteTools;
 
 
@@ -55,14 +54,14 @@ import butterknife.Unbinder;
 public class RecipeListRecyclerViewAdapter extends RecyclerView.Adapter<RecipeListRecyclerViewAdapter.RecipeViewHolder>
         implements View.OnClickListener, View.OnLongClickListener {
 
-    private final List<RecipeItemOld> mItems;
+    private final List<RecipeReduced> mItems;
     private OnCardClickListener onCardClickListener;
     private final Context mContext;
     private View frontCard = null;
     private View backCard = null;
 
 
-    public RecipeListRecyclerViewAdapter(Context context, List<RecipeItemOld> items) {
+    public RecipeListRecyclerViewAdapter(Context context, List<RecipeReduced> items) {
         this.mItems = new ArrayList<>(items);
         this.mContext = context;
     }
@@ -110,28 +109,29 @@ public class RecipeListRecyclerViewAdapter extends RecyclerView.Adapter<RecipeLi
         return new RecipeViewHolder(v);*/
     }
 
-    private RecipeItemOld getRecipeFromParent(View v){
-        RecipeItemOld recipe = null;
+    private RecipeReduced getRecipeFromParent(View v){
+        RecipeReduced recipe = null;
         View aux = v;
         ViewParent parent;
         while((parent = aux.getParent()) != null){
             if(parent instanceof CardView){
-                recipe = (RecipeItemOld) ((View)parent).getTag();
+                recipe = (RecipeReduced) ((View)parent).getTag();
                 break;
             }else{
                 aux = (View) parent;
             }
         }
         if(recipe != null){
-            CommonRecipeOperations commonRecipeOperations = new CommonRecipeOperations(mContext, recipe);
-            recipe = commonRecipeOperations.loadRecipeDetailsFromRecipeCard();
+            //// TODO: 20/2/17 descomentar estas dos lineas y ver si son necesarias
+            /*CommonRecipeOperations commonRecipeOperations = new CommonRecipeOperations(mContext, recipe);
+            recipe = commonRecipeOperations.loadRecipeDetailsFromRecipeCard();*/
         }
         return recipe;
     }
 
     @Override
     public void onBindViewHolder(RecipeViewHolder holder, int position) {
-        RecipeItemOld item = mItems.get(position);
+        RecipeReduced item = mItems.get(position);
         holder.bindRecipe(mContext, item);
         holder.itemView.setTag(item);
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
@@ -273,7 +273,6 @@ public class RecipeListRecyclerViewAdapter extends RecyclerView.Adapter<RecipeLi
         public @Nullable @BindView(R.id.recipe_item_favorite_button)
         LikeButtonView favoriteButton;
         ReadWriteTools rwTools;
-        DatabaseRelatedTools dbTools;
         private Unbinder unbinder;
 
         public RecipeViewHolder(View itemView) {
@@ -282,8 +281,7 @@ public class RecipeListRecyclerViewAdapter extends RecyclerView.Adapter<RecipeLi
 
         }
 
-        public void bindRecipe(Context context, RecipeItemOld item) {
-            if(dbTools == null) dbTools = new DatabaseRelatedTools();
+        public void bindRecipe(Context context, RecipeReduced item) {
             if(rwTools == null) rwTools = new ReadWriteTools();
             recipeTitle.setText(item.getName());
             int visibilityProtection = View.GONE;
@@ -296,7 +294,7 @@ public class RecipeListRecyclerViewAdapter extends RecyclerView.Adapter<RecipeLi
             }else{
                 favoriteIcon.setVisibility(View.GONE);
             }
-            if((item.getState() & (RecetasCookeoConstants.FLAG_OWN | RecetasCookeoConstants.FLAG_EDITED)) !=0){
+            if(item.getOwner().equals(RecetasCookeoConstants.FLAG_PERSONAL_RECIPE)){
                 visibilityProtection = View.VISIBLE;
                 ownRecipeIcon.setVisibility(View.VISIBLE);
             }else{
@@ -310,19 +308,10 @@ public class RecipeListRecyclerViewAdapter extends RecyclerView.Adapter<RecipeLi
             }
             backgroundProtection.setVisibility(visibilityProtection);
 
-            switch (item.getType()) {
-                case RecetasCookeoConstants.TYPE_DESSERTS:
-                    typeIcon.setImageDrawable(ContextCompat.getDrawable(context, (R.drawable.ic_dessert_18)));
-                    break;
-                case RecetasCookeoConstants.TYPE_MAIN:
-                    typeIcon.setImageDrawable(ContextCompat.getDrawable(context, (R.drawable.ic_main_18)));
-                    break;
-                case RecetasCookeoConstants.TYPE_STARTERS:
-                    typeIcon.setImageDrawable(ContextCompat.getDrawable(context, (R.drawable.ic_starters_18)));
-                    break;
-            }
-            rwTools.loadImageFromPath(context, recipeThumbnail, item.getPathPicture(),
-                    R.drawable.default_dish_thumb, item.getVersion());
+            typeIcon.setImageDrawable(ContextCompat.getDrawable(context, (item.getIcon())));
+
+            rwTools.loadImageFromPath(context, recipeThumbnail, item.getPicture(),
+                    R.drawable.default_dish_thumb, item.getTimestamp());
         }
 
     }

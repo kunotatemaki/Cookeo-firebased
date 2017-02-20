@@ -18,6 +18,7 @@ import com.google.gson.GsonBuilder;
 import com.rukiasoft.androidapps.cocinaconroll.wifi.WifiHandler;
 
 
+import java.text.Normalizer;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
@@ -202,6 +203,14 @@ public class Tools {
                 .getSystemService(Context.INPUT_METHOD_SERVICE);
 
         return imm.isAcceptingText();
+    }
+
+    public String getNormalizedString(String input){
+        String normalized;
+        normalized = Normalizer.normalize(input, Normalizer.Form.NFD);
+        input = normalized.replaceAll("[^\\p{ASCII}]", "");
+        input = input.trim();
+        return input.toLowerCase();
     }
 
 

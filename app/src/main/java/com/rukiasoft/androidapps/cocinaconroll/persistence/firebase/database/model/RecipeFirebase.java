@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 @IgnoreExtraProperties
-public class RecipeDetailed{
+public class RecipeFirebase {
 
     private String name;
     private String type;
@@ -50,12 +50,12 @@ public class RecipeDetailed{
         return result;
     }
 
-    public RecipeDetailed() {
+    public RecipeFirebase() {
 
     }
 
 
-    public RecipeDetailed(RecipeItemOld recipeItemOld) {
+    public RecipeFirebase(RecipeItemOld recipeItemOld) {
         this.name = recipeItemOld.getName();
         this.type = recipeItemOld.getType();
         this.picture = recipeItemOld.getPicture().equals(RecetasCookeoConstants.DEFAULT_PICTURE_NAME)? null : recipeItemOld.getPicture();

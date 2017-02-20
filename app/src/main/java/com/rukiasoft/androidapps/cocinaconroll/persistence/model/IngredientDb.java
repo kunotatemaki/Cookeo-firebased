@@ -15,7 +15,7 @@ import org.greenrobot.greendao.DaoException;
         active = true,
         nameInDb = "INGREDIENTS"
 )
-public class Ingredient {
+public class IngredientDb {
     @Id(autoincrement = true)
     private Long id;
     @NotNull
@@ -29,18 +29,18 @@ public class Ingredient {
 @Generated(hash = 2040040024)
 private transient DaoSession daoSession;
 /** Used for active entity operations. */
-@Generated(hash = 942581853)
-private transient IngredientDao myDao;
-@Generated(hash = 1315817613)
-public Ingredient(Long id, @NotNull String key, int position,
+@Generated(hash = 277625371)
+private transient IngredientDbDao myDao;
+@Generated(hash = 779520936)
+public IngredientDb(Long id, @NotNull String key, int position,
         @NotNull String ingredient) {
     this.id = id;
     this.key = key;
     this.position = position;
     this.ingredient = ingredient;
 }
-@Generated(hash = 1584798654)
-public Ingredient() {
+@Generated(hash = 775569234)
+public IngredientDb() {
 }
 public Long getId() {
     return this.id;
@@ -100,9 +100,10 @@ public void update() {
     myDao.update(this);
 }
 /** called by internal mechanisms, do not call yourself. */
-@Generated(hash = 1386056592)
+@Generated(hash = 2004575383)
 public void __setDaoSession(DaoSession daoSession) {
     this.daoSession = daoSession;
-    myDao = daoSession != null ? daoSession.getIngredientDao() : null;
+    myDao = daoSession != null ? daoSession.getIngredientDbDao() : null;
 }
+
 }

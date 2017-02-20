@@ -1,28 +1,30 @@
 package com.rukiasoft.androidapps.cocinaconroll.persistence.model;
 
 import com.rukiasoft.androidapps.cocinaconroll.R;
-import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.database.model.RecipeDetailed;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.database.model.RecipeFirebase;
+import com.rukiasoft.androidapps.cocinaconroll.ui.model.RecipeReduced;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
+import com.rukiasoft.androidapps.cocinaconroll.utilities.Tools;
 
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Index;
 import org.greenrobot.greendao.annotation.JoinProperty;
 import org.greenrobot.greendao.annotation.NotNull;
-import org.greenrobot.greendao.annotation.Generated;
-import org.greenrobot.greendao.DaoException;
 import org.greenrobot.greendao.annotation.OrderBy;
 import org.greenrobot.greendao.annotation.ToMany;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.greenrobot.greendao.annotation.Generated;
+import org.greenrobot.greendao.DaoException;
 
 
 @Entity(
         active = true,
         nameInDb = "RECIPES"
 )
-public class Recipe {
+public class RecipeDb {
 
     @Id(autoincrement = true)
     private Long id;
@@ -30,6 +32,7 @@ public class Recipe {
     @NotNull
     private String key;
     private String name;
+    private String normalizedName;
     private String type;
     private Integer icon;
     private String picture;
@@ -52,42 +55,42 @@ public class Recipe {
             @JoinProperty(name = "key", referencedName = "key")
     })
     @OrderBy("position ASC")
-    private List<Ingredient> ingredients;
+    private List<IngredientDb> ingredients;
 
     @ToMany(joinProperties = {
             @JoinProperty(name = "key", referencedName = "key")
     })
     @OrderBy("position ASC")
-    private List<Step> steps;
+    private List<StepDb> steps;
     /** Used to resolve relations */
     @Generated(hash = 2040040024)
     private transient DaoSession daoSession;
     /** Used for active entity operations. */
-    @Generated(hash = 1947830398)
-    private transient RecipeDao myDao;
-    /** Used to resolve relations */
+    @Generated(hash = 261850341)
+    private transient RecipeDbDao myDao;
 
-
-    public Recipe() {
+    public RecipeDb() {
     }
 
-    public Recipe(RecipeDetailed recipe, String key, Integer owner){
+    public RecipeDb(RecipeFirebase recipe, String key, Integer owner){
         this.key = key;
         this.owner = owner;
         this.name = recipe.getName();
+        Tools tools = new Tools();
+        this.normalizedName = tools.getNormalizedString(recipe.getName());
         this.type = recipe.getType();
         switch (recipe.getType()) {
             case RecetasCookeoConstants.TYPE_DESSERTS:
-                this.icon = R.drawable.ic_dessert_24;
+                this.icon = R.drawable.ic_dessert_18;
                 break;
             case RecetasCookeoConstants.TYPE_STARTERS:
-                this.icon = R.drawable.ic_starters_24;
+                this.icon = R.drawable.ic_starters_18;
                 break;
             case RecetasCookeoConstants.TYPE_MAIN:
-                this.icon = R.drawable.ic_main_24;
+                this.icon = R.drawable.ic_main_18;
                 break;
             default:
-                this.icon = R.drawable.ic_all_24;
+                this.icon = R.drawable.ic_all_18;
                 break;
         }
         this.picture = recipe.getPicture()!=null? recipe.getPicture() : RecetasCookeoConstants.DEFAULT_PICTURE_NAME;
@@ -102,32 +105,34 @@ public class Recipe {
         this.tip = recipe.getTip();
         this.language = recipe.getLanguage();
         this.link = recipe.getLink();
-//        this.ingredients = new ArrayList<>();
-//        for(int i=0; i<recipe.getIngredients().size(); i++){
-//            Ingredient ingredient = new Ingredient();
-//            ingredient.setIngredient(recipe.getIngredients().get(i));
-//            ingredient.setPosition(i);
-//            ingredient.setKey(key);
-//            this.ingredients.add(ingredient);
-//        }
-//        this.steps = new ArrayList<>();
-//        for(int i=0; i<recipe.getSteps().size(); i++){
-//            Step step = new Step();
-//            step.setStep(recipe.getSteps().get(i));
-//            step.setPosition(i);
-//            step.setKey(key);
-//            this.steps.add(step);
-//        }
+        this.ingredients = new ArrayList<>();
+        for(int i=0; i<recipe.getIngredients().size(); i++){
+            IngredientDb ingredientDb = new IngredientDb();
+            ingredientDb.setIngredient(recipe.getIngredients().get(i));
+            ingredientDb.setPosition(i);
+            ingredientDb.setKey(key);
+            this.ingredients.add(ingredientDb);
+        }
+        this.steps = new ArrayList<>();
+        for(int i=0; i<recipe.getSteps().size(); i++){
+            StepDb stepDb = new StepDb();
+            stepDb.setStep(recipe.getSteps().get(i));
+            stepDb.setPosition(i);
+            stepDb.setKey(key);
+            this.steps.add(stepDb);
+        }
 
     }
 
-    @Generated(hash = 2012203826)
-    public Recipe(Long id, @NotNull String key, String name, String type, Integer icon, String picture, Boolean vegetarian,
-            Boolean favourite, Integer minutes, Integer portions, Integer language, String author, String link, String tip,
-            Integer owner, @NotNull Long timestamp, @NotNull Boolean downloadRecipe, Boolean downloadPicture) {
+    @Generated(hash = 256029834)
+    public RecipeDb(Long id, @NotNull String key, String name, String normalizedName, String type, Integer icon,
+            String picture, Boolean vegetarian, Boolean favourite, Integer minutes, Integer portions, Integer language,
+            String author, String link, String tip, Integer owner, @NotNull Long timestamp, @NotNull Boolean downloadRecipe,
+            Boolean downloadPicture) {
         this.id = id;
         this.key = key;
         this.name = name;
+        this.normalizedName = normalizedName;
         this.type = type;
         this.icon = icon;
         this.picture = picture;
@@ -167,6 +172,14 @@ public class Recipe {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getNormalizedName() {
+        return this.normalizedName;
+    }
+
+    public void setNormalizedName(String normalizedName) {
+        this.normalizedName = normalizedName;
     }
 
     public String getType() {
@@ -293,15 +306,15 @@ public class Recipe {
      * To-many relationship, resolved on first access (and after reset).
      * Changes to to-many relations are not persisted, make changes to the target entity.
      */
-    @Generated(hash = 1528725721)
-    public List<Ingredient> getIngredients() {
+    @Generated(hash = 221742525)
+    public List<IngredientDb> getIngredients() {
         if (ingredients == null) {
             final DaoSession daoSession = this.daoSession;
             if (daoSession == null) {
                 throw new DaoException("Entity is detached from DAO context");
             }
-            IngredientDao targetDao = daoSession.getIngredientDao();
-            List<Ingredient> ingredientsNew = targetDao._queryRecipe_Ingredients(key);
+            IngredientDbDao targetDao = daoSession.getIngredientDbDao();
+            List<IngredientDb> ingredientsNew = targetDao._queryRecipeDb_Ingredients(key);
             synchronized (this) {
                 if (ingredients == null) {
                     ingredients = ingredientsNew;
@@ -321,15 +334,15 @@ public class Recipe {
      * To-many relationship, resolved on first access (and after reset).
      * Changes to to-many relations are not persisted, make changes to the target entity.
      */
-    @Generated(hash = 1983973260)
-    public List<Step> getSteps() {
+    @Generated(hash = 265820585)
+    public List<StepDb> getSteps() {
         if (steps == null) {
             final DaoSession daoSession = this.daoSession;
             if (daoSession == null) {
                 throw new DaoException("Entity is detached from DAO context");
             }
-            StepDao targetDao = daoSession.getStepDao();
-            List<Step> stepsNew = targetDao._queryRecipe_Steps(key);
+            StepDbDao targetDao = daoSession.getStepDbDao();
+            List<StepDb> stepsNew = targetDao._queryRecipeDb_Steps(key);
             synchronized (this) {
                 if (steps == null) {
                     steps = stepsNew;
@@ -382,10 +395,10 @@ public class Recipe {
     }
 
     /** called by internal mechanisms, do not call yourself. */
-    @Generated(hash = 1484851246)
+    @Generated(hash = 115976254)
     public void __setDaoSession(DaoSession daoSession) {
         this.daoSession = daoSession;
-        myDao = daoSession != null ? daoSession.getRecipeDao() : null;
+        myDao = daoSession != null ? daoSession.getRecipeDbDao() : null;
     }
-
+    
 }

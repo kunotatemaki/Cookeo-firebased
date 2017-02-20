@@ -39,12 +39,11 @@ import com.karumi.dexter.Dexter;
 import com.rukiasoft.androidapps.cocinaconroll.BuildConfig;
 import com.rukiasoft.androidapps.cocinaconroll.R;
 import com.rukiasoft.androidapps.cocinaconroll.classes.RecipeItemOld;
-import com.rukiasoft.androidapps.cocinaconroll.classes.ZipItem;
-import com.rukiasoft.androidapps.cocinaconroll.database.DatabaseRelatedTools;
 import com.rukiasoft.androidapps.cocinaconroll.gcm.QuickstartPreferences;
 import com.rukiasoft.androidapps.cocinaconroll.gcm.RegistrationIntentService;
 import com.rukiasoft.androidapps.cocinaconroll.permissions.ErrorListener;
 import com.rukiasoft.androidapps.cocinaconroll.permissions.RecetasCookeoMultiplePermissionListener;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.controllers.RecipeController;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.CommonRecipeOperations;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.LogHelper;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.ReadWriteTools;
@@ -60,7 +59,7 @@ import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import icepick.State;
 
-public class RecipeListActivity extends ToolbarAndProgressActivity implements RecipeListFragment.TaskCallback{
+public class RecipeListActivity extends ToolbarAndProgressActivity {
 
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     private static final String TAG = LogHelper.makeLogTag(RecipeListActivity.class);
@@ -110,11 +109,6 @@ public class RecipeListActivity extends ToolbarAndProgressActivity implements Re
             }
         }
     };
-
-    @Override
-    public void onInitDatabasePostExecute() {
-        restartLoader();
-    }
 
 
     @Override
@@ -277,21 +271,13 @@ public class RecipeListActivity extends ToolbarAndProgressActivity implements Re
         }
     }
 
-    private void loadEditedRecipes(){
-
-        RecipeListFragment fragment = (RecipeListFragment)getSupportFragmentManager().findFragmentById(R.id.list_recipes_fragment);
-        if(fragment != null) {
-            fragment.loadEditedRecipes();
-        }
-
-    }
-
     private void removeRecipeFromDiskAndDatabase(RecipeItemOld recipe){
-        ReadWriteTools rwTools = new ReadWriteTools();
-        rwTools.deleteRecipe(recipe);
-        DatabaseRelatedTools dbTools = new DatabaseRelatedTools();
-        dbTools.removeRecipefromDatabase(getApplicationContext(), recipe.get_id());
-        restartLoader();
+        //// TODO: 21/2/17 hacer con recipeControler
+//        ReadWriteTools rwTools = new ReadWriteTools();
+//        rwTools.deleteRecipe(recipe);
+//        RecipeController recipeController = new RecipeController();
+//        recipeController.removeRecipe(getApplicationContext(), recipe.get_id());
+//        restartLoader();
     }
 
     @Override
@@ -621,14 +607,7 @@ public class RecipeListActivity extends ToolbarAndProgressActivity implements Re
             }
         }
 
-        //veo si hay algún zip en la base de datos que no tenga el formato correcto
-        DatabaseRelatedTools dbTools = new DatabaseRelatedTools();
-        List<ZipItem> listZips = dbTools.getAllZips(getApplicationContext());
-        for(ZipItem zip : listZips){
-            if(!zip.getName().contains(".zip")){
-                dbTools.removeZipfromDatabase(getApplicationContext(), zip.getId());
-            }
-        }
+
     }
 
 

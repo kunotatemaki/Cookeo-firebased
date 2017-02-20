@@ -18,9 +18,7 @@ import com.bumptech.glide.signature.MediaStoreSignature;
 import com.rukiasoft.androidapps.cocinaconroll.R;
 import com.rukiasoft.androidapps.cocinaconroll.classes.PreinstalledRecipeNamesList;
 import com.rukiasoft.androidapps.cocinaconroll.classes.RecipeItemOld;
-import com.rukiasoft.androidapps.cocinaconroll.database.DatabaseRelatedTools;
 
-import org.apache.commons.io.FileUtils;
 import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.core.Persister;
 
@@ -412,9 +410,12 @@ public class ReadWriteTools {
         return RecetasCookeoConstants.FILE_PATH.concat(filename);
     }
 
-    public void loadImageFromPath(Context mContext, ImageView imageView, String path, int defaultImage, int version) {
-       Glide.with(mContext)
-               .load(Uri.parse(path))
+    public void loadImageFromPath(Context mContext, ImageView imageView, String path, int defaultImage, long version) {
+        String fullPath = getOriginalStorageDir(mContext);
+        StringBuilder stringBuilder = new StringBuilder(fullPath);
+        stringBuilder.append(path);
+        Glide.with(mContext)
+               .load(Uri.parse(stringBuilder.toString()))
                .centerCrop()
                .signature(new MediaStoreSignature(RecetasCookeoConstants.MIME_TYPE_PICTURE, version, 0))
                .error(defaultImage)
@@ -507,113 +508,6 @@ public class ReadWriteTools {
 
 
 
-    public void initDatabaseWithOriginalPath(Context mContext) {
-        DatabaseRelatedTools dbTools = new DatabaseRelatedTools();
-        MyFileFilter filter = new MyFileFilter();
-
-        List<String> listAssets = loadRecipesFromAssets(mContext);
-        for(int i=0; i<listAssets.size(); i++) {
-            RecipeItemOld recipeItemOld;
-            recipeItemOld = readRecipe(mContext, listAssets.get(i),
-                    RecetasCookeoConstants.PATH_TYPE_ASSETS);
-            if (recipeItemOld != null) {
-                dbTools.insertRecipeIntoDatabase(mContext, recipeItemOld, true);
-            }
-        }
-
-        List<String> listOriginal = loadFiles(mContext, filter, false);
-        for(int i=0; i<listOriginal.size(); i++) {
-            RecipeItemOld recipeItemOld = readRecipe(mContext, listOriginal.get(i),
-                    RecetasCookeoConstants.PATH_TYPE_ORIGINAL);
-            if(recipeItemOld != null) {
-                dbTools.insertRecipeIntoDatabase(mContext, recipeItemOld, true);
-            }
-        }
-
-    }
-
-    public void initDatabaseWithEditedPath(Context mContext) {
-        DatabaseRelatedTools dbTools = new DatabaseRelatedTools();
-        MyFileFilter filter = new MyFileFilter();
-
-        //files created or modified from previous versions
-        List<String> listOldFiles = loadRecipesFromOldDirectory(filter);
-        for(int i=0; i<listOldFiles.size(); i++) {
-            RecipeItemOld recipeItemOld = readRecipe(mContext, listOldFiles.get(i),
-                    RecetasCookeoConstants.PATH_TYPE_OLD_EDITED);
-            if(recipeItemOld != null) {
-                if((recipeItemOld.getState()&(RecetasCookeoConstants.FLAG_EDITED | RecetasCookeoConstants.FLAG_OWN)) == 0){
-                    //not created nor edited. It was an original recipe set as favorite
-                    dbTools.updateFavoriteByFileName(mContext, recipeItemOld.getName(), recipeItemOld.getFavourite());
-                    //delete the file
-                    deleteRecipe(recipeItemOld);
-                }else{
-                    String picture = "";
-                    if((recipeItemOld.getState() & RecetasCookeoConstants.FLAG_EDITED_PICTURE) != 0) {
-                        picture = recipeItemOld.getPicture();
-                    }
-                    moveFileToEditedStorageAndDeleteOriginal(listOldFiles.get(i), picture);
-                }
-                //dbTools.insertRecipeIntoDatabase(recipeItemOld, true);
-            }
-        }
-
-        //delete the old directory
-        if(getOldBaseEditedStorageDirToBeDeleted() != null) {
-            try {
-                FileUtils.deleteDirectory(getOldBaseEditedStorageDirToBeDeleted());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        //edited directory
-        List<String> listEdited = loadFiles(mContext, filter, true);
-        for(int i=0; i<listEdited.size(); i++) {
-            RecipeItemOld recipeItemOld = readRecipe(mContext, listEdited.get(i),
-                    RecetasCookeoConstants.PATH_TYPE_EDITED);
-            if(recipeItemOld != null) {
-                dbTools.insertRecipeIntoDatabase(mContext, recipeItemOld, true);
-            }
-        }
-
-
-    }
-
-    private void moveFileToEditedStorageAndDeleteOriginal(String name, String picture){
-        String sourcePath = getOldEditedStorageDir() + name;
-        String sourceImagePath;
-        File source = new File(sourcePath);
-        File sourceImage = null;
-
-        String destinationPath = getEditedStorageDir() + name;
-        String destinationImagePath;
-        File destination = new File(destinationPath);
-        File destinationImage = null;
-
-        if(!picture.isEmpty()) {
-            sourceImagePath = getOldEditedStorageDir() + picture;
-            sourceImage = new File(sourceImagePath);
-            destinationImagePath = getEditedStorageDir() + picture;
-            destinationImage = new File(destinationImagePath);
-        }
-
-        try
-        {
-            FileUtils.copyFile(source, destination);
-            FileUtils.forceDelete(source);
-            if(sourceImage != null && destinationImage != null){
-                FileUtils.copyFile(sourceImage, destinationImage);
-                FileUtils.forceDelete(sourceImage);
-            }
-
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-    }
-
     public RecipeItemOld readRecipeInfo(Context mContext, String pathRecipe) {
         RecipeItemOld recipeItemOld;
         File source;
@@ -656,28 +550,6 @@ public class ReadWriteTools {
 
     }
 
-    public void loadNewFilesAndInsertInDatabase(Context mContext) {
-        DatabaseRelatedTools dbTools = new DatabaseRelatedTools();
-        MyFileFilter filter = new MyFileFilter();
-        List<String> listOriginal = loadFiles(mContext, filter, false);
-        for(int i=0; i<listOriginal.size(); i++) {
-            RecipeItemOld recipeItemOld = readRecipe(mContext, listOriginal.get(i),
-                    RecetasCookeoConstants.PATH_TYPE_ORIGINAL);
-            if(recipeItemOld != null) {
-                dbTools.insertRecipeIntoDatabase(mContext, recipeItemOld, false);
-            }
-        }
-    }
-
-    public void loadUpdatedFilesAndInsertInDatabase(Context mContext, String name, int version) {
-        DatabaseRelatedTools dbTools = new DatabaseRelatedTools();
-        RecipeItemOld recipeItemOld = readRecipe(mContext, name,
-                RecetasCookeoConstants.PATH_TYPE_EDITED);
-        if(recipeItemOld != null) {
-            recipeItemOld.setVersion(version);
-            dbTools.insertRecipeIntoDatabase(mContext, recipeItemOld, true);
-        }
-    }
 
     private class MyFileFilter implements FilenameFilter {
 

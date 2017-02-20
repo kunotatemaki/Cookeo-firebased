@@ -9,21 +9,16 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.rukiasoft.androidapps.cocinaconroll.CocinaConRollApplication;
 import com.rukiasoft.androidapps.cocinaconroll.classes.RecipeItemOld;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.controllers.RecipeController;
-import com.rukiasoft.androidapps.cocinaconroll.persistence.daoqueries.RecipeQueries;
-import com.rukiasoft.androidapps.cocinaconroll.persistence.model.DaoSession;
-import com.rukiasoft.androidapps.cocinaconroll.persistence.model.Recipe;
-import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.database.model.RecipeDetailed;
-import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.database.model.RecipeTimestamp;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.model.RecipeDb;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.database.model.RecipeFirebase;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.database.model.TimestampFirebase;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.storage.methods.StorageMethods;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.LogHelper;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.ReadWriteTools;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.Tools;
-
-import org.greenrobot.greendao.query.Query;
 
 import java.util.HashMap;
 import java.util.List;
@@ -95,21 +90,21 @@ public class FirebaseDbMethods {
         //Si la receta está en base de datos, era una editada, no una nueva. Me quedo con la key
         String key;
 
-        Recipe recipe = recipeController.getRecipeByName((Application)context.getApplicationContext(),
+        RecipeDb recipeDb = recipeController.getRecipeByExactName((Application)context.getApplicationContext(),
                 recipeOld.getName());
-        if(recipe != null){
-            Log.d(TAG, "La receta " + recipe.getName() + "tenía key " + recipe.getKey());
-            key = recipe.getKey();
+        if(recipeDb != null){
+            Log.d(TAG, "La receta " + recipeDb.getName() + "tenía key " + recipeDb.getKey());
+            key = recipeDb.getKey();
         }else{
             key = ref.child(user.getUid()).push().getKey();
             Log.d(TAG, "Para la receta " + recipeOld.getName() + "genero key " + key);
         }
 
-        RecipeDetailed recipeDetailed = new RecipeDetailed(recipeOld);
-        RecipeTimestamp recipeTimestamp = new RecipeTimestamp();
+        RecipeFirebase recipeFirebase = new RecipeFirebase(recipeOld);
+        TimestampFirebase timestampFirebase = new TimestampFirebase();
 
-        Map<String, Object> postDetailedValues = recipeDetailed.toMap();
-        Map<String, Object> postTimestamp = recipeTimestamp.toMap();
+        Map<String, Object> postDetailedValues = recipeFirebase.toMap();
+        Map<String, Object> postTimestamp = timestampFirebase.toMap();
 
         final Map<String, Object> childUpdates = new HashMap<>();
 
@@ -134,7 +129,7 @@ public class FirebaseDbMethods {
                     StorageMethods storageMethods = new StorageMethods();
                     storageMethods.updatePictureToPersonalStorage(recipeOld);
                 }
-                //Log.d(TAG, "se ha subido correctamente las receta " +  recipe.getName());
+                //Log.d(TAG, "se ha subido correctamente las receta " +  recipeDb.getName());
                 uploadNextRecipe(context, recipeList);
             }
         });

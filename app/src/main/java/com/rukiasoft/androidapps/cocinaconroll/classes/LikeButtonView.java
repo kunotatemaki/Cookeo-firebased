@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.annotation.TargetApi;
+import android.app.Application;
 import android.content.Context;
 import android.os.Build;
 import android.util.AttributeSet;
@@ -18,7 +19,8 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import com.rukiasoft.androidapps.cocinaconroll.R;
-import com.rukiasoft.androidapps.cocinaconroll.database.DatabaseRelatedTools;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.controllers.RecipeController;
+import com.rukiasoft.androidapps.cocinaconroll.ui.model.RecipeReduced;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -37,55 +39,49 @@ public class LikeButtonView extends FrameLayout {
     CircleView vCircle;
 
 
-    Context mContext;
-    private RecipeItemOld recipeItemOld;
+    private RecipeReduced recipeItem;
     private AnimatorSet animatorSet;
     private ImageView favoriteIcon;
 
     public LikeButtonView(Context context) {
         super(context);
-        mContext = context;
     }
 
     public LikeButtonView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        mContext = context;
     }
 
     public LikeButtonView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        mContext = context;
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public LikeButtonView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
-        mContext = context;
     }
 
-    public void init(final RecipeItemOld recipe, ImageView favorite) {
+    public void init(final RecipeReduced recipe, ImageView favorite) {
         LayoutInflater.from(getContext()).inflate(R.layout.view_like_button, this, true);
         ButterKnife.bind(this);
-        recipeItemOld = recipe;
+        recipeItem = recipe;
         favoriteIcon = favorite;
-        ivStar.setImageResource(recipeItemOld.getFavourite() ? R.drawable.ic_favorite_white_36dp : R.drawable.ic_favorite_outline_white_36dp);
+        ivStar.setImageResource(recipeItem.getFavourite() ? R.drawable.ic_favorite_white_36dp : R.drawable.ic_favorite_outline_white_36dp);
         ivStar.setOnClickListener(new OnClickListener() {
             @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
             @Override
             public void onClick(View v) {
-                recipeItemOld.setFavourite(!recipeItemOld.getFavourite());
-                DatabaseRelatedTools dbTools = new DatabaseRelatedTools();
-                dbTools.updateFavoriteById(mContext, recipeItemOld.get_id(), recipeItemOld.getFavourite());
-                favoriteIcon.setVisibility(recipeItemOld.getFavourite()? VISIBLE : GONE);
-                //updateRecipe(recipeItemOld);
-                //isChecked = !isChecked;
-                ivStar.setImageResource(recipeItemOld.getFavourite() ? R.drawable.ic_favorite_white_36dp : R.drawable.ic_favorite_outline_white_36dp);
+                RecipeController recipeController = new RecipeController();
+                recipeItem = RecipeReduced.getRecipeFromDatabase(
+                        recipeController.switchFavourite((Application)getContext().getApplicationContext(), recipeItem.getId())
+                );
+                favoriteIcon.setVisibility(recipeItem.getFavourite()? VISIBLE : GONE);
+                ivStar.setImageResource(recipeItem.getFavourite() ? R.drawable.ic_favorite_white_36dp : R.drawable.ic_favorite_outline_white_36dp);
 
                 if (animatorSet != null) {
                     animatorSet.cancel();
                 }
 
-                if (recipeItemOld.getFavourite()) {
+                if (recipeItem.getFavourite()) {
                     ivStar.animate().cancel();
                     ivStar.setScaleX(0);
                     ivStar.setScaleY(0);
