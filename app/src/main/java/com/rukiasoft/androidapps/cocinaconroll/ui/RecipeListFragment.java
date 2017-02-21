@@ -768,7 +768,7 @@ public class RecipeListFragment extends Fragment implements
                 //Log.d(TAG, "Salvado correctamente: " + name);
                 //quito del pull y sigo descargando
                 pullPictures.remove(name);
-                recipeController.updateDownloadRecipeFlag(getActivity().getApplication(), name, false);
+                recipeController.updateDownloadRecipeFlag((Application)getContext().getApplicationContext(), name, false);
                 downloadPictureFromStorage();
             }
         }).addOnFailureListener(new OnFailureListener() {
@@ -826,7 +826,7 @@ public class RecipeListFragment extends Fragment implements
             RecipeFirebase recipeFromFirebase = dataSnapshot.getValue(RecipeFirebase.class);
             if(recipeFromFirebase == null)  return null;
             //String key = dataSnapshot.getRef().getParent().getParent().getKey();
-            RecipeDb recipeDb = recipeController.insertRecipeFromFirebase(getActivity().getApplication(),
+            RecipeDb recipeDb = recipeController.insertRecipeFromFirebase((Application)getContext().getApplicationContext(),
                     dataSnapshot, recipeFromFirebase);
             return recipeDb;
         }
