@@ -22,11 +22,11 @@ public class RecipeQueries {
     private static Query queryRecipeByKey;
     private static Query queryRecipeById;
     private static Query queryRecipesByName;
-    private static Query queryRecipesByType;
-    private static Query queryFavouriteRecipes;
-    private static Query queryVegetarianRecipes;
-    private static Query queryOwnRecipes;
-    private static Query queryLatestRecipes;
+    private static CursorQuery cursorRecipesByType;
+    private static CursorQuery cursorFavouriteRecipes;
+    private static CursorQuery cursorVegetarianRecipes;
+    private static CursorQuery cursorOwnRecipes;
+    private static CursorQuery cursorLatestRecipes;
     private static CursorQuery cursorAllRecipes;
     private static Query queryAllRecipes;
 
@@ -86,39 +86,37 @@ public class RecipeQueries {
         return queryRecipesByName.forCurrentThread();
     }
 
-    public static Query getQueryRecipesByType(DaoSession session) {
-        if(queryRecipesByType == null){
-            initializeQueryRecipesByType(session);
-        }
-        return queryRecipesByType.forCurrentThread();
+    public static Cursor getCursorRecipesByType(DaoSession session, String type) {
+        initializeCursorRecipesByType(session, type);
+        return cursorRecipesByType.forCurrentThread().query();
     }
 
-    public static Query getQueryVegetarianRecipes(DaoSession session) {
-        if(queryVegetarianRecipes == null){
-            initializeQueryVegetarianRecipes(session);
+    public static Cursor getCursorVegetarianRecipes(DaoSession session) {
+        if(cursorVegetarianRecipes == null){
+            initializeCursorVegetarianRecipes(session);
         }
-        return queryVegetarianRecipes.forCurrentThread();
+        return cursorVegetarianRecipes.forCurrentThread().query();
     }
 
-    public static Query getQueryFavouriteRecipes(DaoSession session) {
-        if(queryFavouriteRecipes == null){
-            initializeQueryFavouriteRecipes(session);
+    public static Cursor getCursorFavouriteRecipes(DaoSession session) {
+        if(cursorFavouriteRecipes == null){
+            initializeCursorFavouriteRecipes(session);
         }
-        return queryFavouriteRecipes.forCurrentThread();
+        return cursorFavouriteRecipes.forCurrentThread().query();
     }
 
-    public static Query getQueryOwnRecipes(DaoSession session) {
-        if(queryOwnRecipes == null){
-            initializeQueryOwnRecipes(session);
+    public static Cursor getCursorOwnRecipes(DaoSession session) {
+        if(cursorOwnRecipes == null){
+            initializeCursorOwnRecipes(session);
         }
-        return queryOwnRecipes.forCurrentThread();
+        return cursorOwnRecipes.forCurrentThread().query();
     }
 
-    public static Query getQueryLatestRecipes(DaoSession session) {
-        if(queryLatestRecipes== null){
-            initializeQueryLatestRecipes(session);
+    public static Cursor getCursorLatestRecipes(DaoSession session) {
+        if(cursorLatestRecipes == null){
+            initializeCursorLatestRecipes(session);
         }
-        return queryLatestRecipes.forCurrentThread();
+        return cursorLatestRecipes.forCurrentThread().query();
     }
 
     private static void initializeQueryBothRecipesAndPicturesToDownload(DaoSession session){
@@ -173,31 +171,31 @@ public class RecipeQueries {
         ).build();
     }
 
-    private static void initializeQueryFavouriteRecipes(DaoSession session){
+    private static void initializeCursorFavouriteRecipes(DaoSession session){
         RecipeDbDao recipeDbDao = session.getRecipeDbDao();
         recipeDbDao.detachAll();
-        queryRecipesByName = recipeDbDao.queryBuilder().where(
+        cursorFavouriteRecipes = recipeDbDao.queryBuilder().where(
                 RecipeDbDao.Properties.Favourite.eq(1)
-        ).build();
+        ).buildCursor();
     }
 
-    private static void initializeQueryVegetarianRecipes(DaoSession session){
+    private static void initializeCursorVegetarianRecipes(DaoSession session){
         RecipeDbDao recipeDbDao = session.getRecipeDbDao();
         recipeDbDao.detachAll();
-        queryRecipesByName = recipeDbDao.queryBuilder().where(
+        cursorVegetarianRecipes = recipeDbDao.queryBuilder().where(
                 RecipeDbDao.Properties.Vegetarian.eq(1)
-        ).build();
+        ).buildCursor();
     }
 
-    private static void initializeQueryOwnRecipes(DaoSession session){
+    private static void initializeCursorOwnRecipes(DaoSession session){
         RecipeDbDao recipeDbDao = session.getRecipeDbDao();
         recipeDbDao.detachAll();
-        queryRecipesByName = recipeDbDao.queryBuilder().where(
+        cursorOwnRecipes = recipeDbDao.queryBuilder().where(
                 RecipeDbDao.Properties.Owner.eq(RecetasCookeoConstants.FLAG_PERSONAL_RECIPE)
-        ).build();
+        ).buildCursor();
     }
 
-    private static void initializeQueryLatestRecipes(DaoSession session){
+    private static void initializeCursorLatestRecipes(DaoSession session){
         RecipeDbDao recipeDbDao = session.getRecipeDbDao();
         recipeDbDao.detachAll();
 //        queryRecipesByName = recipeDbDao.queryBuilder().where(
@@ -205,12 +203,12 @@ public class RecipeQueries {
 //        ).build();
     }
 
-    private static void initializeQueryRecipesByType(DaoSession session){
+    private static void initializeCursorRecipesByType(DaoSession session, String type){
         RecipeDbDao recipeDbDao = session.getRecipeDbDao();
         recipeDbDao.detachAll();
-        queryRecipesByType = recipeDbDao.queryBuilder().where(
-                RecipeDbDao.Properties.Type.like(null)
-        ).build();
+        cursorRecipesByType = recipeDbDao.queryBuilder().where(
+                RecipeDbDao.Properties.Type.like(type)
+        ).buildCursor();
     }
 
     private static void initializeCursorAllRecipes(DaoSession session){

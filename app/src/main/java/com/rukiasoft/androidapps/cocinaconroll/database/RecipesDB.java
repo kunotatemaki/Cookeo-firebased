@@ -42,9 +42,10 @@ public class RecipesDB {
     public Cursor getSuggestions(String[] selectionArgs){
         //call from search widget
     	String selection =  RecipesTable.FIELD_NAME_NORMALIZED + " like ? ";
-        if(selectionArgs!=null){
+        // TODO: 21/2/17 revisar con la nueva configuracion
+        /*if(selectionArgs!=null){
     		selectionArgs[0] = "%" + dbTools.getNormalizedString(selectionArgs[0]) + "%";
-    	}    	    	
+    	} */
     	
     	SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
     	queryBuilder.setProjectionMap(mAliasMap);
@@ -77,7 +78,8 @@ public class RecipesDB {
             selection =  RecipesTable.FIELD_NAME_NORMALIZED + " like ? ";
             if(selectionArgs!=null){
                 for(int i=0; i<selectionArgs.length; i++){
-                    selectionArgs[i] = "%"+dbTools.getNormalizedString(selectionArgs[i]) + "%";
+                    // TODO: 21/2/17 descomentar
+                    selectionArgs[i] = "%"+/*dbTools.getNormalizedString(selectionArgs[i]) + */"%";
                 }
             }
         }
@@ -155,7 +157,7 @@ public class RecipesDB {
 		long regId;
 		SQLiteDatabase db = mCocinaConRollDatabaseHelper.getWritableDatabase();
 		regId = db.insert(RecipesTable.TABLE_NAME, null, values);
-        return ContentUris.withAppendedId(CocinaConRollContentProvider.CONTENT_URI_RECIPES, regId);
+        return ContentUris.withAppendedId(CocinaConRollContentProvider.getUri(""), regId);
 	}
 
     public int updateFavorite(ContentValues values, String selection, String[] selectionArgs) {

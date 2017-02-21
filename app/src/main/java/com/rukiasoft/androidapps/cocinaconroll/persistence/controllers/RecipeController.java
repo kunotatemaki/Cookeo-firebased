@@ -58,40 +58,29 @@ public class RecipeController {
         return RecipeController.getListReducedFromDb(listDb);
     }
 
-    public List<RecipeReduced> getRecipesByType(Application application, String type){
+    public Cursor getRecipesByTypeInCursorFormat(Application application, String type){
         DaoSession session = CommonController.getDaosessionFromApplication(application, "RecipeDb");
-        Query query = RecipeQueries.getQueryRecipesByType(session);
-        query.setParameter(0, type);
-        List<RecipeDb> listDb = query.list();
-        return RecipeController.getListReducedFromDb(listDb);
+        return RecipeQueries.getCursorRecipesByType(session, type);
     }
 
-    public List<RecipeReduced> getVegetarianRecipes(Application application){
+    public Cursor getVegetarianRecipesInCursorFormat(Application application){
         DaoSession session = CommonController.getDaosessionFromApplication(application, "RecipeDb");
-        Query query = RecipeQueries.getQueryVegetarianRecipes(session);
-        List<RecipeDb> listDb = query.list();
-        return RecipeController.getListReducedFromDb(listDb);
+        return RecipeQueries.getCursorVegetarianRecipes(session);
     }
 
-    public List<RecipeReduced> getFavouriteRecipes(Application application){
+    public Cursor getFavouriteRecipesInCursorFormat(Application application){
         DaoSession session = CommonController.getDaosessionFromApplication(application, "RecipeDb");
-        Query query = RecipeQueries.getQueryFavouriteRecipes(session);
-        List<RecipeDb> listDb = query.list();
-        return RecipeController.getListReducedFromDb(listDb);
+        return RecipeQueries.getCursorFavouriteRecipes(session);
     }
 
-    public List<RecipeReduced> getOwnRecipes(Application application){
+    public Cursor getOwnRecipesInCursorFormat(Application application){
         DaoSession session = CommonController.getDaosessionFromApplication(application, "RecipeDb");
-        Query query = RecipeQueries.getQueryOwnRecipes(session);
-        List<RecipeDb> listDb = query.list();
-        return RecipeController.getListReducedFromDb(listDb);
+        return RecipeQueries.getCursorOwnRecipes(session);
     }
 
-    public List<RecipeReduced> getLatestRecipes(Application application){
+    public Cursor getLatestRecipesInCursorFormat(Application application){
         DaoSession session = CommonController.getDaosessionFromApplication(application, "RecipeDb");
-        Query query = RecipeQueries.getQueryLatestRecipes(session);
-        List<RecipeDb> listDb = query.list();
-        return RecipeController.getListReducedFromDb(listDb);
+        return RecipeQueries.getCursorLatestRecipes(session);
     }
 
     private static List<RecipeReduced> getListReducedFromDb(List<RecipeDb> listDb){

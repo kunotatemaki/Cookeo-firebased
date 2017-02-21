@@ -1,6 +1,7 @@
 package com.rukiasoft.androidapps.cocinaconroll.ui;
 
 
+import android.app.Application;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -71,6 +72,7 @@ import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.Tools;
 
 import java.io.File;
+import java.nio.channels.NonWritableChannelException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -177,14 +179,15 @@ public class RecipeListFragment extends Fragment implements
             timeoutDownloadingRecipes = new CountDownTimer(MAX_MILI_SECONDS_DOWNLOADING_RECIPES, 10000) {
 
                 public void onTick(long millisUntilFinished) {
-                    List<RecipeDb> recipeDbs = recipeController.getListOnlyRecipeToDownload(getActivity().getApplication());
+                    List<RecipeDb> recipes = recipeController.getListOnlyRecipeToDownload(getActivity().getApplication());
                     //Log.d(TAG, "RECETAS --> " + recipeDbs.size() + " : sec --> " + millisUntilFinished/1000);
-                    if(recipeDbs.isEmpty()){
+                    if(recipes.isEmpty()){
                         Log.d(TAG, "Cancelo el timer recetas");
                         ((RecipeListActivity)getActivity()).hideProgressDialog();
                         isDownloadingRecipes = false;
                         Tools tools = new Tools();
                         tools.savePreferences(getContext(), RecetasCookeoConstants.PROPERTY_CAN_UPLOAD_OWN_RECIPES, true);
+                        // TODO: 21/2/17 revisar nullpointer al arrancar por primera vez y no dar permisos 
                         firebaseDbMethods.updateOldRecipesToPersonalStorage(getActivity().getApplicationContext());
                         this.cancel();
                     }
@@ -370,7 +373,9 @@ public class RecipeListFragment extends Fragment implements
         // Initialize a Loader with id '1'. If the Loader with this id already
         // exists, then the LoaderManager will reuse the existing Loader.
         if(mRecipes == null || mRecipes.size() == 0) {
-            getLoaderManager().initLoader(RecetasCookeoConstants.LOADER_ID, null, this);
+            Bundle bundle = new Bundle();
+            bundle.putString(RecetasCookeoConstants.SEARCH_FIELD, RecetasCookeoConstants.SEARCH_ALL);
+            restartLoader(bundle);
         }else{
             setData();
         }
@@ -409,17 +414,15 @@ public class RecipeListFragment extends Fragment implements
                 //((ToolbarAndProgressActivity) getActivity()).needToShowRefresh = true;
             }
         }
-        //return new RecipeListLoader(getActivity().getApplicationContext());
-        Uri CONTENT_URI = CocinaConRollContentProvider.CONTENT_URI_RECIPES;
-        String sortOrder = RecipesTable.FIELD_NAME_NORMALIZED + " asc ";
-        return new CursorLoader(getActivity(), CONTENT_URI, null, null, null, sortOrder);
+        String endPath = args.getString(RecetasCookeoConstants.SEARCH_FIELD);
+        Uri CONTENT_URI = CocinaConRollContentProvider.getUri(endPath);
+        return new CursorLoader(getActivity(), CONTENT_URI, null, null, null, null);
     }
 
 
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        Log.i("", "+++ onLoadFinished() called! +++");
         if(mRecipes == null){
             mRecipes = new ArrayList<>();
         }else {
@@ -434,7 +437,7 @@ public class RecipeListFragment extends Fragment implements
         }
 
         setData();
-        ((RecipeListActivity)getActivity()).performClickInDrawerIfNecessary();
+        //((RecipeListActivity)getActivity()).performClickInDrawerIfNecessary();
 
     }
 
@@ -445,6 +448,10 @@ public class RecipeListFragment extends Fragment implements
             Tools tools = new Tools();
             //tools.hideRefreshLayout(getActivity());
         }
+    }
+
+    public void restartLoader(Bundle bundle){
+        getActivity().getSupportLoaderManager().restartLoader(RecetasCookeoConstants.LOADER_ID, bundle, this);
     }
 
     private void setData(){
@@ -544,46 +551,52 @@ public class RecipeListFragment extends Fragment implements
         lastFilter = filter;
         String type = "";
         int iconResource = 0;
+        Bundle bundle = new Bundle();
         if(filter.equals(RecetasCookeoConstants.FILTER_ALL_RECIPES)) {
             type = getResources().getString(R.string.all_recipes);
-            mRecipes = recipeController.getAllRecipes(getActivity().getApplication());
+            bundle.putString(RecetasCookeoConstants.SEARCH_FIELD, RecetasCookeoConstants.SEARCH_ALL);
             iconResource = R.drawable.ic_all_24;
         }else if(filter.equals(RecetasCookeoConstants.FILTER_MAIN_COURSES_RECIPES)){
             type = getResources().getString(R.string.main_courses);
-            mRecipes = recipeController.getRecipesByType(getActivity().getApplication(), RecetasCookeoConstants.TYPE_MAIN);
+            bundle.putString(RecetasCookeoConstants.SEARCH_FIELD, RecetasCookeoConstants.SEARCH_MAIN);
             iconResource = R.drawable.ic_main_24;
         }else if(filter.compareTo(RecetasCookeoConstants.FILTER_STARTER_RECIPES) == 0){
             type = getResources().getString(R.string.starters);
-            mRecipes = recipeController.getRecipesByType(getActivity().getApplication(), RecetasCookeoConstants.TYPE_STARTERS);
+            bundle.putString(RecetasCookeoConstants.SEARCH_FIELD, RecetasCookeoConstants.SEARCH_STARTERS);
             iconResource = R.drawable.ic_starters_24;
         }else if(filter.compareTo(RecetasCookeoConstants.FILTER_DESSERT_RECIPES) == 0){
             type = getResources().getString(R.string.desserts);
-            mRecipes = recipeController.getRecipesByType(getActivity().getApplication(), RecetasCookeoConstants.TYPE_DESSERTS);
+            bundle.putString(RecetasCookeoConstants.SEARCH_FIELD, RecetasCookeoConstants.SEARCH_DESSERTS);
             iconResource = R.drawable.ic_dessert_24;
         }else if(filter.compareTo(RecetasCookeoConstants.FILTER_VEGETARIAN_RECIPES) == 0){
             type = getResources().getString(R.string.vegetarians);
-            mRecipes = recipeController.getVegetarianRecipes(getActivity().getApplication());
+            bundle.putString(RecetasCookeoConstants.SEARCH_FIELD, RecetasCookeoConstants.SEARCH_VEGETARIAN);
             iconResource = R.drawable.ic_vegetarians_24;
         }else if(filter.compareTo(RecetasCookeoConstants.FILTER_FAVOURITE_RECIPES) == 0){
             type = getResources().getString(R.string.favourites);
-            mRecipes = recipeController.getFavouriteRecipes(getActivity().getApplication());
+            bundle.putString(RecetasCookeoConstants.SEARCH_FIELD, RecetasCookeoConstants.SEARCH_FAVOURITES);
             iconResource = R.drawable.ic_favorite_black_24dp;
         }else if(filter.compareTo(RecetasCookeoConstants.FILTER_OWN_RECIPES) == 0){
             type = getResources().getString(R.string.own_recipes);
-            mRecipes = recipeController.getOwnRecipes(getActivity().getApplication());
+            bundle.putString(RecetasCookeoConstants.SEARCH_FIELD, RecetasCookeoConstants.SEARCH_OWN);
             iconResource = R.drawable.ic_own_24;
         }else if(filter.compareTo(RecetasCookeoConstants.FILTER_LATEST_RECIPES) == 0){
             type = getResources().getString(R.string.last_downloaded);
-            mRecipes = recipeController.getLatestRecipes(getActivity().getApplication());
+            bundle.putString(RecetasCookeoConstants.SEARCH_FIELD, RecetasCookeoConstants.SEARCH_LATEST);
             Tools mTools = new Tools();
             //mRecipes = dbTools.searchRecipesInDatabase(getActivity().getApplicationContext(),
               //      RecipesTable.FIELD_DATE, mTools.getTimeframe());
             iconResource = R.drawable.ic_latest_24;
         }
+        bundle.putInt(RecetasCookeoConstants.SEARCH_ICON_TYPE, iconResource);
+        bundle.putString(RecetasCookeoConstants.SEARCH_NAME_TYPE, type);
+        restartLoader(bundle);
+
         typeRecipesInRecipeList.setText(type);
-        String nrecipes = String.format(getResources().getString(R.string.recipes), mRecipes.size());
-        nRecipesInRecipeList.setText(nrecipes);
         typeIconInRecipeList.setImageDrawable(ContextCompat.getDrawable(getActivity(), iconResource));
+
+        /*String nrecipes = String.format(getResources().getString(R.string.recipes), mRecipes.size());
+        nRecipesInRecipeList.setText(nrecipes);
         //Change the adapter
         RecipeListRecyclerViewAdapter newAdapter = new RecipeListRecyclerViewAdapter(getActivity(), mRecipes);
         newAdapter.setHasStableIds(true);
@@ -602,17 +615,17 @@ public class RecipeListFragment extends Fragment implements
         StaggeredGridLayoutManager sglm =
                 new StaggeredGridLayoutManager(columnCount, StaggeredGridLayoutManager.VERTICAL);
 
-        /*adapter = newAdapter;
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            slideAdapter = newSlideAdapter;
-        }*/
+        //adapter = newAdapter;
+        //if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+        //    slideAdapter = newSlideAdapter;
+        //}
         mRecyclerView.setLayoutManager(sglm);
         mRecyclerView.scrollToPosition(0);
 
         //Set the fast Scroller
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB && fastScroller != null) {
             fastScroller.setRecyclerView(mRecyclerView);
-        }
+        }*/
     }
 
 
@@ -849,7 +862,7 @@ public class RecipeListFragment extends Fragment implements
                     int i=0;
                     i++;
                 }
-                RecipeDb recipeDbFromDatabase = recipeController.getRecipeByKey(getActivity().getApplication(), key);
+                RecipeDb recipeDbFromDatabase = recipeController.getRecipeByKey((Application)getContext().getApplicationContext(), key);
                 if(recipeDbFromDatabase == null){
                     //no existía, la creo
                     recipeDbFromDatabase = new RecipeDb();

@@ -15,6 +15,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.bumptech.glide.signature.MediaStoreSignature;
+import com.orhanobut.logger.Logger;
 import com.rukiasoft.androidapps.cocinaconroll.R;
 import com.rukiasoft.androidapps.cocinaconroll.classes.PreinstalledRecipeNamesList;
 import com.rukiasoft.androidapps.cocinaconroll.classes.RecipeItemOld;
@@ -412,10 +413,9 @@ public class ReadWriteTools {
 
     public void loadImageFromPath(Context mContext, ImageView imageView, String path, int defaultImage, long version) {
         String fullPath = getOriginalStorageDir(mContext);
-        StringBuilder stringBuilder = new StringBuilder(fullPath);
-        stringBuilder.append(path);
+        File file = new File(fullPath + path);
         Glide.with(mContext)
-               .load(Uri.parse(stringBuilder.toString()))
+               .load(Uri.fromFile(file))
                .centerCrop()
                .signature(new MediaStoreSignature(RecetasCookeoConstants.MIME_TYPE_PICTURE, version, 0))
                .error(defaultImage)

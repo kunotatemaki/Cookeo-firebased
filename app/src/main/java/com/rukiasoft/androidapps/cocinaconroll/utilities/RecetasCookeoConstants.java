@@ -17,6 +17,18 @@ public class RecetasCookeoConstants {
     public static final Integer FLAG_EDITED_PICTURE = 8;
     public static final Integer FLAG_OWN = 16;
 
+    public static final String SEARCH_FIELD = "search_field";
+    public static final String SEARCH_ICON_TYPE = "search_icon_type";
+    public static final String SEARCH_NAME_TYPE = "search_name_type";
+    public static final String SEARCH_ALL = "search_all";
+    public static final String SEARCH_STARTERS = "search_starters";
+    public static final String SEARCH_MAIN = "search_main";
+    public static final String SEARCH_DESSERTS = "search_desserts";
+    public static final String SEARCH_VEGETARIAN = "search_vegetarians";
+    public static final String SEARCH_FAVOURITES = "search_favourites";
+    public static final String SEARCH_OWN = "search_own";
+    public static final String SEARCH_LATEST = "search_latest";
+
     public static final String TYPE_STARTERS = "starter";
     public static final String TYPE_MAIN = "main";
     public static final String TYPE_DESSERTS = "dessert";
@@ -112,6 +124,7 @@ public class RecetasCookeoConstants {
     public static final String SHORT_RECIPE_TABLE_NAME = "SHORT_RECIPES";
     public static final String STORAGE_URL = "gs://hardy-binder-89508.appspot.com";
     public static final String STORAGE_NODE = "recipes";
+    public static final String RUKIA_TAG = "RUKIA";
 
     public static int LANG_SPANISH = 0;
 
