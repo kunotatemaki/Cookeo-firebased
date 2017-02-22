@@ -3,6 +3,7 @@ package com.rukiasoft.androidapps.cocinaconroll.ui.model;
 import android.os.Parcelable;
 
 import com.google.auto.value.AutoValue;
+import com.orhanobut.logger.Logger;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.model.RecipeDb;
 
 /**
@@ -37,16 +38,20 @@ public abstract class RecipeReduced implements Parcelable{
     }
 
     public static RecipeReduced getRecipeFromDatabase(RecipeDb recipeDb) {
-        return RecipeReduced.builder()
-                .setId(recipeDb.getId())
-                .setName(recipeDb.getName())
-                .setIcon(recipeDb.getIcon())
-                .setPicture(recipeDb.getPicture())
-                .setVegetarian(recipeDb.getVegetarian())
-                .setFavourite(recipeDb.getFavourite())
-                .setOwner(recipeDb.getOwner())
-                .setTimestamp(recipeDb.getTimestamp())
-                .build();
+        try {
+            return RecipeReduced.builder()
+                    .setId(recipeDb.getId())
+                    .setName(recipeDb.getName())
+                    .setIcon(recipeDb.getIcon())
+                    .setPicture(recipeDb.getPicture())
+                    .setVegetarian(recipeDb.getVegetarian())
+                    .setFavourite(recipeDb.getFavourite())
+                    .setOwner(recipeDb.getOwner())
+                    .setTimestamp(recipeDb.getTimestamp())
+                    .build();
+        }catch (IllegalStateException e){
+            return null;
+        }
     }
 
     public long getId(){

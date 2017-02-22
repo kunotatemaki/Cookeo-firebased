@@ -10,7 +10,8 @@ public class AlarmReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        // TODO: This method is called when the BroadcastReceiver is receiving
+
+        // TODO: ver si está logueado en firebase
         // an Intent broadcast.
         throw new UnsupportedOperationException("Not yet implemented");
     }

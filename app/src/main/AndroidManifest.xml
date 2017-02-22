@@ -109,7 +109,7 @@
         </activity>
 
         <receiver
-            android:name=".alarm.StartMyServiceAtBootReceiver"
+            android:name=".alarm.AlarmSetterAtBootReceiver"
             android:enabled="true"
             android:exported="true"
             android:label="StartMyServiceAtBootReceiver">
@@ -209,6 +209,10 @@
                 <action android:name="com.rukiasoft.androidapps.cocinaconroll.ALARM_INTENT" />
             </intent-filter>
         </receiver>
+
+        <service
+            android:name=".alarm.AlarmService"
+            android:exported="false"></service>
     </application>
 
 </manifest>

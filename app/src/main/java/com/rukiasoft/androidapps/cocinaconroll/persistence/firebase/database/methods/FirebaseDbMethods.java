@@ -37,6 +37,7 @@ public class FirebaseDbMethods {
         this.recipeController = recipeController;
     }
 
+    // TODO: 22/2/17 llamar a este método cuando corresponda (antes se llamaba en el timer) 
     public void updateOldRecipesToPersonalStorage(final Context context){
         if(uploading == true){
             Log.d(TAG, "Estaba descargando");

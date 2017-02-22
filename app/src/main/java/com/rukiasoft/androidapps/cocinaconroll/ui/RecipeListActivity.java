@@ -654,13 +654,8 @@ public class RecipeListActivity extends ToolbarAndProgressActivity {
                 public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                     FirebaseUser user = firebaseAuth.getCurrentUser();
                     isSignedIn = (user != null && !user.isAnonymous());
-                    if(isSignedIn){
-                        RecipeListFragment fragment = (RecipeListFragment) getSupportFragmentManager()
-                                .findFragmentById(R.id.list_recipes_fragment);
-                        if(fragment != null){
-                            fragment.checkPersonalRecipesFromFirebase();
-                        }
-                    }
+                    Tools tools = new Tools();
+                    tools.savePreferences(getApplicationContext(), RecetasCookeoConstants.PROPERTY_SIGNED_IN, isSignedIn);
                     invalidateOptionsMenu();
                 }
             };
