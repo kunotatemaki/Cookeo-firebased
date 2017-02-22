@@ -52,6 +52,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.orhanobut.logger.Logger;
 import com.rukiasoft.androidapps.cocinaconroll.BuildConfig;
 import com.rukiasoft.androidapps.cocinaconroll.R;
 import com.rukiasoft.androidapps.cocinaconroll.classes.RecipeItemOld;
@@ -228,8 +229,7 @@ public class RecipeListFragment extends Fragment implements
             storage = FirebaseStorage.getInstance();
         }
 
-        recipeController = new RecipeController();
-        firebaseDbMethods = new FirebaseDbMethods(recipeController);
+
     }
 
     private void requestSignInForNewRecipe(){
@@ -272,6 +272,9 @@ public class RecipeListFragment extends Fragment implements
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_recipe_list, container, false);
         unbinder = ButterKnife.bind(this, view);
+
+        recipeController = new RecipeController();
+        firebaseDbMethods = new FirebaseDbMethods(recipeController);
 
         //Set the mToolbarRecipeListFragment
         if(getActivity() instanceof ToolbarAndProgressActivity){
@@ -767,6 +770,10 @@ public class RecipeListFragment extends Fragment implements
                 // Local temp file has been created
                 //Log.d(TAG, "Salvado correctamente: " + name);
                 //quito del pull y sigo descargando
+                if(getContext() == null){
+                    //hago que lo intente otra vez hasta que sea context!=null
+                    downloadPictureFromStorage();
+                }
                 pullPictures.remove(name);
                 recipeController.updateDownloadRecipeFlag((Application)getContext().getApplicationContext(), name, false);
                 downloadPictureFromStorage();
@@ -826,6 +833,9 @@ public class RecipeListFragment extends Fragment implements
             RecipeFirebase recipeFromFirebase = dataSnapshot.getValue(RecipeFirebase.class);
             if(recipeFromFirebase == null)  return null;
             //String key = dataSnapshot.getRef().getParent().getParent().getKey();
+            if(getContext() == null){
+                return null;
+            }
             RecipeDb recipeDb = recipeController.insertRecipeFromFirebase((Application)getContext().getApplicationContext(),
                     dataSnapshot, recipeFromFirebase);
             return recipeDb;
@@ -858,9 +868,8 @@ public class RecipeListFragment extends Fragment implements
             for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
                 TimestampFirebase timestampFirebase = postSnapshot.getValue(TimestampFirebase.class);
                 String key = postSnapshot.getKey();
-                if(key.equals("-KaplijStKu03-HNpnxG")){
-                    int i=0;
-                    i++;
+                if(getContext()==null){
+                    continue;
                 }
                 RecipeDb recipeDbFromDatabase = recipeController.getRecipeByKey((Application)getContext().getApplicationContext(), key);
                 if(recipeDbFromDatabase == null){

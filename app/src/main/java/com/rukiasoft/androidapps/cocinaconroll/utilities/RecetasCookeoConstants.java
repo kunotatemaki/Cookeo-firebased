@@ -140,4 +140,6 @@ public class RecetasCookeoConstants {
     public static final int FLAG_PERSONAL_RECIPE = 4;
 
 
+    //Alarm intent
+    public static final String NAME_ALARM_PENDING_INTENT = PACKAGE_NAME + ".ALARM_INTENT";
 }

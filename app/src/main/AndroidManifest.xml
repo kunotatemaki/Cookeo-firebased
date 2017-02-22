@@ -109,7 +109,7 @@
         </activity>
 
         <receiver
-            android:name=".gcm.StartMyServiceAtBootReceiver"
+            android:name=".alarm.StartMyServiceAtBootReceiver"
             android:enabled="true"
             android:exported="true"
             android:label="StartMyServiceAtBootReceiver">
@@ -201,6 +201,14 @@
             android:name="com.google.android.gms.analytics.globalConfigResource"
             android:resource="@xml/track_app" />
 
+        <receiver
+            android:name=".alarm.AlarmReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.rukiasoft.androidapps.cocinaconroll.ALARM_INTENT" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>
