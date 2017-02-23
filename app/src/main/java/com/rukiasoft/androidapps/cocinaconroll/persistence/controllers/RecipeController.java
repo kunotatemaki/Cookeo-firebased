@@ -133,6 +133,11 @@ public class RecipeController {
         return RecipeQueries.getQueryOnlyRecipesToDownload(session).list();
     }
 
+    public List<RecipeDb> getListOnlyPicturesToDownload(Application application){
+        DaoSession session = CommonController.getDaosessionFromApplication(application, "RecipeDb");
+        return RecipeQueries.getQueryOnlyPicturesToDownload(session).list();
+    }
+
     public void updateDownloadRecipeFlag(Application application, String name, boolean state) {
         DaoSession session = CommonController.getDaosessionFromApplication(application, "RecipeDb");
         Query query = RecipeQueries.getQueryRecipesByName(session);

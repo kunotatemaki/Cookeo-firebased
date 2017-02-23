@@ -18,6 +18,7 @@ public class RecipeQueries {
 
     private static Query queryBothRecipesAndPicturesToDownload;
     private static Query queryOnlyRecipesToDownload;
+    private static Query queryOnlyPicturesToDownload;
     private static Query queryRecipeByPictureName;
     private static Query queryRecipeByKey;
     private static Query queryRecipeById;
@@ -42,6 +43,13 @@ public class RecipeQueries {
             initializeQueryOnlyRecipesToDownload(session);
         }
         return queryOnlyRecipesToDownload.forCurrentThread();
+    }
+
+    public static Query getQueryOnlyPicturesToDownload(DaoSession session) {
+        if(queryOnlyPicturesToDownload == null){
+            initializeQueryOnlyPicturesToDownload(session);
+        }
+        return queryOnlyPicturesToDownload.forCurrentThread();
     }
 
     public static Query getQueryRecipeByPictureName(DaoSession session) {
@@ -135,6 +143,15 @@ public class RecipeQueries {
         QueryBuilder qb = recipeDbDao.queryBuilder();
         queryOnlyRecipesToDownload = qb.where(
                 RecipeDbDao.Properties.DownloadRecipe.eq(1)
+        ).build();
+    }
+
+    private static void initializeQueryOnlyPicturesToDownload(DaoSession session){
+        RecipeDbDao recipeDbDao = session.getRecipeDbDao();
+        recipeDbDao.detachAll();
+        QueryBuilder qb = recipeDbDao.queryBuilder();
+        queryOnlyPicturesToDownload = qb.where(
+                RecipeDbDao.Properties.DownloadPicture.eq(1)
         ).build();
     }
 

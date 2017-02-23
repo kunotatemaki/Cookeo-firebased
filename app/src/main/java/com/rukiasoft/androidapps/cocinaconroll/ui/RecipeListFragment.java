@@ -247,7 +247,7 @@ public class RecipeListFragment extends Fragment implements
     public void checkPersonalRecipesFromFirebase(){
         Tools tools = new Tools();
         Boolean isSignedIn = tools.getBooleanFromPreferences(getContext(), RecetasCookeoConstants.PROPERTY_SIGNED_IN);
-        AlarmService.startActionDownloadRecipes(getContext(),
+        AlarmService.startActionDownloadTimestamps(getContext(),
                 isSignedIn);
     }
 
@@ -532,7 +532,7 @@ public class RecipeListFragment extends Fragment implements
         typeRecipesInRecipeList.setText(type);
         typeIconInRecipeList.setImageDrawable(ContextCompat.getDrawable(getActivity(), iconResource));
 
-        /*String nrecipes = String.format(getResources().getString(R.string.recipes), mRecipes.size());
+        /*String nrecipes = String.format(getResources().getString(R.string.recipes), mRecipes.sizePicture());
         nRecipesInRecipeList.setText(nrecipes);
         //Change the adapter
         RecipeListRecyclerViewAdapter newAdapter = new RecipeListRecyclerViewAdapter(getActivity(), mRecipes);
@@ -593,10 +593,10 @@ public class RecipeListFragment extends Fragment implements
 //        if(mRecipes == null){
 //            return;
 //        }
-//        for(int i = 0; i< mRecipes.size(); i++){
-//            if(mRecipes.get(i).get_id().intValue() == recipe.get_id().intValue()){
-//                mRecipes.remove(i);
-//                mRecipes.add(i, recipe);
+//        for(int i = 0; i< mRecipes.sizePicture(); i++){
+//            if(mRecipes.getPicture(i).get_id().intValue() == recipe.get_id().intValue()){
+//                mRecipes.removePicture(i);
+//                mRecipes.addPicture(i, recipe);
 //                filterRecipes(lastFilter);
 //            }
 //        }
@@ -615,8 +615,8 @@ public class RecipeListFragment extends Fragment implements
 //        name = dbTools.getNormalizedString(name);
 //        List<RecipeItemOld> coincidences = dbTools.searchRecipesInDatabase(getActivity().getApplicationContext(),
 //                RecipesTable.FIELD_NAME_NORMALIZED, dbTools.getNormalizedString(name));
-//        if (coincidences.size() > 0) {
-//            showRecipeDetails(coincidences.get(0));
+//        if (coincidences.sizePicture() > 0) {
+//            showRecipeDetails(coincidences.getPicture(0));
 //        }
     }
 
