@@ -4,6 +4,7 @@ import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.v4.content.LocalBroadcastManager;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -39,6 +40,7 @@ public class AlarmService extends IntentService {
     private static final String EXTRA_SIGNED = "com.rukiasoft.androidapps.cocinaconroll.alarm.extra.EXTRA_SIGNED";
     private ObjectQeue pullPictures;
     private Boolean isDownloadingPics = false;
+    private int contador;
 
     public AlarmService() {
         super("AlarmService");
@@ -143,11 +145,11 @@ public class AlarmService extends IntentService {
             }
         }
         downloadRecipesFromFirebase();
-        mDownloading = false;
     }
 
 
     public void downloadRecipesFromFirebase(){
+        contador = 0;
         //Veo si hay que descargar recetas
         pullPictures = ObjectQeue.create(new ArrayList<String>());
         RecipeController recipeController = new RecipeController();
@@ -201,6 +203,7 @@ public class AlarmService extends IntentService {
     }
 
     private void downloadRecipe(DataSnapshot dataSnapshot){
+
         RecipeController recipeController = new RecipeController();
         RecipeFirebase recipeFromFirebase = dataSnapshot.getValue(RecipeFirebase.class);
         if(recipeFromFirebase == null){
@@ -215,6 +218,8 @@ public class AlarmService extends IntentService {
         if(recipeDb == null){
             return;
         }
+        contador ++;
+        sendSignal(contador);
         if(recipeDb.getDownloadPicture()){
             pullPictures.add(recipeDb.getPicture());
             if(!isDownloadingPics){
@@ -251,6 +256,8 @@ public class AlarmService extends IntentService {
                 pullPictures.remove(name);
                 RecipeController recipeController = new RecipeController();
                 recipeController.updateDownloadRecipeFlag(getApplication(), name, false);
+                contador ++;
+                sendSignal(contador);
                 downloadPictureFromStorage();
             }
         }).addOnFailureListener(new OnFailureListener() {
@@ -266,5 +273,14 @@ public class AlarmService extends IntentService {
             }
         });
 
+    }
+
+    private void sendSignal(int contador){
+        if(contador % 10 != 0){
+            return;
+        }
+        Logger.d("Envio contador " + contador);
+        Intent intent = new Intent(RecetasCookeoConstants.NAME_DOWNLOAD_INTENT);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 }

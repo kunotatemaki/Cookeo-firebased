@@ -43,7 +43,7 @@ public class RecetasCookeoConstants {
     public static final int RESULT_UPDATE_RECIPE = 300;
     public static final int RESULT_DELETE_RECIPE = 301;
 
-    public static final String PROPERTY_INIT_DATABASE_WITH_ORIGINAL_PATH = "initdatabaseoriginal";
+    public static final String PROPERTY_DATABASE_LOADED = "database_loaded";
     public static final String PROPERTY_INIT_DATABASE_WITH_EDITED_PATH = "initdatabaseedited";
     public static final String PROPERTY_RELOAD_NEW_ORIGINALS = "reloadneworiginals";
     public static final String PROPERTY_DAYS_TO_NEXT_UPDATE = "last_updated";
@@ -143,4 +143,6 @@ public class RecetasCookeoConstants {
 
     //Alarm intent
     public static final String NAME_ALARM_PENDING_INTENT = PACKAGE_NAME + ".ALARM_INTENT";
+    public static final String NAME_DOWNLOAD_INTENT = PACKAGE_NAME + ".DOWNLOAD_INTENT";
+
 }

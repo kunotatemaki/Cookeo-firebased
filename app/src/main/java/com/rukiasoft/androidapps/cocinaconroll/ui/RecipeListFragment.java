@@ -10,7 +10,6 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
@@ -39,9 +38,7 @@ import android.widget.TextView;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FirebaseStorage;
+import com.orhanobut.logger.Logger;
 import com.rukiasoft.androidapps.cocinaconroll.BuildConfig;
 import com.rukiasoft.androidapps.cocinaconroll.R;
 import com.rukiasoft.androidapps.cocinaconroll.alarm.AlarmService;
@@ -113,7 +110,6 @@ public class RecipeListFragment extends Fragment implements
     @State
     ObjectQeue pullPictures;
 
-    @State Boolean firstLoad = false;
     @State Boolean needToRefresh = false;
 
     //private SlideInBottomAnimationAdapter slideAdapter;
@@ -121,7 +117,7 @@ public class RecipeListFragment extends Fragment implements
     List<RecipeReduced> mRecipes;
     private int savedScrollPosition = 0;
     private int columnCount = 10;
-    @State private String lastFilter = null;
+    @State String lastFilter = null;
     private InterstitialAd mInterstitialAd;
     private RecipeItemOld recipeToShow;
     private RecipeController recipeController;
@@ -129,6 +125,7 @@ public class RecipeListFragment extends Fragment implements
     private BroadcastReceiver downloadRecipesReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
+            Logger.d("Recibido localbroadcast");
             if(isResumed()){
                 filterRecipes(lastFilter);
             }else{
@@ -232,7 +229,9 @@ public class RecipeListFragment extends Fragment implements
             addRecipeButtonFAB.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if(((RecipeListActivity)getActivity()).isSignedIn){
+                    Tools tools = new Tools();
+                    if(tools.getBooleanFromPreferences(getContext().getApplicationContext(),
+                            RecetasCookeoConstants.PROPERTY_SIGNED_IN)){
                         createRecipe();
                     }else{
                         requestSignInForNewRecipe();
@@ -292,7 +291,7 @@ public class RecipeListFragment extends Fragment implements
         super.onActivityCreated(savedInstanceState);
 
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(downloadRecipesReceiver,
-                new IntentFilter("custom-event-name"));
+                new IntentFilter(RecetasCookeoConstants.NAME_DOWNLOAD_INTENT));
 
         // Initialize a Loader with id '1'. If the Loader with this id already
         // exists, then the LoaderManager will reuse the existing Loader.
@@ -300,7 +299,6 @@ public class RecipeListFragment extends Fragment implements
             lastFilter = RecetasCookeoConstants.FILTER_ALL_RECIPES;
         }
         if(mRecipes == null || mRecipes.size() == 0 || needToRefresh) {
-            firstLoad = true;
             needToRefresh = false;
             filterRecipes(lastFilter);
         }else{
@@ -364,12 +362,13 @@ public class RecipeListFragment extends Fragment implements
                 }
             }
         }
-        if(mRecipes.isEmpty() && firstLoad){
+        Tools tools = new Tools();
+        Boolean databaseLoaded = tools.getBooleanFromPreferences(getContext(),
+                RecetasCookeoConstants.PROPERTY_DATABASE_LOADED);
+        if(!databaseLoaded){
+            tools.savePreferences(getContext(), RecetasCookeoConstants.PROPERTY_DATABASE_LOADED, true);
             checkPersonalRecipesFromFirebase();
         }else {
-            if(needToDownloadRecipes()){
-                checkPersonalRecipesFromFirebase();
-            }
             setData();
         }
     }

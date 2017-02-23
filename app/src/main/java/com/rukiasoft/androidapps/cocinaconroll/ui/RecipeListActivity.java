@@ -89,7 +89,6 @@ public class RecipeListActivity extends ToolbarAndProgressActivity {
     //Firebase
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
-    @State Boolean isSignedIn;
 
     //Permissions
     private RecetasCookeoMultiplePermissionListener recetasCookeoMultiplePermissionListener;
@@ -117,9 +116,7 @@ public class RecipeListActivity extends ToolbarAndProgressActivity {
         setContentView(R.layout.activity_recipe_list);
         mUnbinder = ButterKnife.bind(this);
 
-        if(isSignedIn == null){
-            initAuth();
-        }
+        initAuth();
 
         //Pido los permisos si procede
         if(mAskForPermission) {
@@ -629,7 +626,8 @@ public class RecipeListActivity extends ToolbarAndProgressActivity {
 
     @Override
         public boolean onPrepareOptionsMenu(Menu menu) {
-        if(isSignedIn){
+        Tools tools = new Tools();
+        if(tools.getBooleanFromPreferences(getApplicationContext(), RecetasCookeoConstants.PROPERTY_SIGNED_IN)){
             menu.findItem(R.id.menu_sign_out).setVisible(true);
             menu.findItem(R.id.menu_sign_in).setVisible(false);
         }else{
@@ -653,7 +651,7 @@ public class RecipeListActivity extends ToolbarAndProgressActivity {
                 @Override
                 public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                     FirebaseUser user = firebaseAuth.getCurrentUser();
-                    isSignedIn = (user != null && !user.isAnonymous());
+                    Boolean isSignedIn = (user != null && !user.isAnonymous());
                     Tools tools = new Tools();
                     tools.savePreferences(getApplicationContext(), RecetasCookeoConstants.PROPERTY_SIGNED_IN, isSignedIn);
                     invalidateOptionsMenu();
