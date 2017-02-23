@@ -74,7 +74,7 @@ public class CocinaConRollApplication  extends MultiDexApplication {
         Logger
                 .init(RecetasCookeoConstants.RUKIA_TAG)                // default PRETTYLOGGER or use just init()
                 //.methodCount(3)                 // default 2
-                .hideThreadInfo()               // default shown
+                //.hideThreadInfo()               // default shown
                 //.logLevel(LogLevel.NONE)        // default LogLevel.FULL
                 //.methodOffset(2)                // default 0
                 //.logAdapter(new AndroidLogAdapter()) //default AndroidLogAdapter

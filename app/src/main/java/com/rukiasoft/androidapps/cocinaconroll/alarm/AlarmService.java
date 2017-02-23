@@ -71,6 +71,7 @@ public class AlarmService extends IntentService {
     }
 
     private void handleActionDownloadRecipes(Boolean signed) {
+        Logger.d("estoy en el serviceintent");
         connectToFirebaseForNewRecipes(RecetasCookeoConstants.ALLOWED_RECIPES_NODE);
         connectToFirebaseForNewRecipes(RecetasCookeoConstants.FORBIDDEN_RECIPES_NODE);
         if(signed){
@@ -149,6 +150,7 @@ public class AlarmService extends IntentService {
 
 
     public void downloadRecipesFromFirebase(){
+        Logger.d("mando descargar desde el intent");
         contador = 0;
         //Veo si hay que descargar recetas
         pullPictures = ObjectQeue.create(new ArrayList<String>());
@@ -203,7 +205,7 @@ public class AlarmService extends IntentService {
     }
 
     private void downloadRecipe(DataSnapshot dataSnapshot){
-
+Logger.d("descargando receta");
         RecipeController recipeController = new RecipeController();
         RecipeFirebase recipeFromFirebase = dataSnapshot.getValue(RecipeFirebase.class);
         if(recipeFromFirebase == null){
@@ -231,6 +233,7 @@ public class AlarmService extends IntentService {
     }
 
     private void downloadPictureFromStorage(){
+        Logger.d("descargando imagen");
         if(pullPictures.isEmpty()){
             isDownloadingPics = !isDownloadingPics;
             return;
