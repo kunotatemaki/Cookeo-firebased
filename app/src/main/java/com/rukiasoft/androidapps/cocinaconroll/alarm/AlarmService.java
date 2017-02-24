@@ -41,6 +41,8 @@ import java.util.List;
 public class AlarmService extends IntentService {
     private static final String ACTION_DOWNLOAD_TIMESTAMPS = "com.rukiasoft.androidapps.cocinaconroll.alarm.action.ACTION_DOWNLOAD_TIMESTAMPS";
     private static final String ACTION_DOWNLOAD_RECIPES = "com.rukiasoft.androidapps.cocinaconroll.alarm.action.ACTION_DOWNLOAD_RECIPES";
+    private static final String ACTION_DOWNLOAD_PICTURES = "com.rukiasoft.androidapps.cocinaconroll.alarm.action.ACTION_DOWNLOAD_PICTURES";
+    private static final String ACTION_UPLOAD_OWN_RECIPES = "com.rukiasoft.androidapps.cocinaconroll.alarm.action.ACTION_UPLOAD_OWN_RECIPES";
 
     private static final String EXTRA_SIGNED = "com.rukiasoft.androidapps.cocinaconroll.alarm.extra.EXTRA_SIGNED";
     private static final int MAX_ITEMS_IN_QUEUE = 50;
@@ -71,9 +73,20 @@ public class AlarmService extends IntentService {
     }
 
     public static void startActionDownloadRecipes(Context context) {
-
         Intent intent = new Intent(context, AlarmService.class);
         intent.setAction(ACTION_DOWNLOAD_RECIPES);
+        context.startService(intent);
+    }
+
+    public static void startActionDownloadPictures(Context context) {
+        Intent intent = new Intent(context, AlarmService.class);
+        intent.setAction(ACTION_DOWNLOAD_PICTURES);
+        context.startService(intent);
+    }
+
+    public static void startActionUploadOwnRecipes(Context context) {
+        Intent intent = new Intent(context, AlarmService.class);
+        intent.setAction(ACTION_UPLOAD_OWN_RECIPES);
         context.startService(intent);
     }
 
@@ -90,6 +103,10 @@ public class AlarmService extends IntentService {
                 handleActionDownloadTimestamps(signed);
             }else if (ACTION_DOWNLOAD_RECIPES.equals(action)) {
                 handleActionDownloadRecipes();
+            }else if (ACTION_DOWNLOAD_PICTURES.equals(action)) {
+                handleActionDownloadPictures();
+            }else if (ACTION_UPLOAD_OWN_RECIPES.equals(action)) {
+                handleActionUploadOwnRecipes();
             }
         }
     }
@@ -109,6 +126,14 @@ public class AlarmService extends IntentService {
 
     private void handleActionDownloadRecipes() {
         downloadRecipesFromFirebase();
+    }
+
+    private void handleActionDownloadPictures() {
+        downloadPicturesFromStorage();
+    }
+
+     private void handleActionUploadOwnRecipes{
+        UploadOwnRecipes();
     }
 
     private void connectToFirebaseForNewRecipes(String node){
@@ -201,20 +226,16 @@ public class AlarmService extends IntentService {
 
 
     public void downloadRecipesFromFirebase(){
-        Logger.d("mando descargar desde el intent");
+        Logger.d("mando descargar recipes desde el intent");
         //reseteo los contadores
         contadorRecipesDownloaded = 0;
         numberPendingRecipes = 0;
-        numberPendingPictures = 0;
         //Veo si hay que descargar recetas
         RecipeController recipeController = new RecipeController();
         recipes = recipeController.getListOnlyRecipeToDownload(getApplication());
-        pictures = recipeController.getListOnlyPicturesToDownload(getApplication());
         totalRecipes = recipes.size();
-        totalPictures = pictures.size();
-        if((recipes == null || recipes.isEmpty()) && (pictures == null || pictures.isEmpty())){
-            isDownloadingPics--;
-            isDownloadingRecipes--;
+        if(recipes == null || recipes.isEmpty()){
+            isDownloadingRecipes = 0;
             return;
         }
 
@@ -224,10 +245,34 @@ public class AlarmService extends IntentService {
 
         }*/
         downloadRecipesSequentialy();
-        downloadPictureFromStorageSequentially();
-        Logger.d("PAROOOOOOOOOO");
+        Logger.d("PAROOOOOOOOOO RECETAS");
         Looper.loop();
-        Logger.d("ACABOOOOOOOOOO");
+        Logger.d("ACABOOOOOOOOOO RECETAS");
+    }
+
+    private void downloadPicturesFromStorage(){
+        Logger.d("mando descargar pictures desde el intent");
+        //reseteo los contadores
+        contadorRecipesDownloaded = 0;
+        numberPendingPictures = 0;
+        //Veo si hay que descargar recetas
+        RecipeController recipeController = new RecipeController();
+        pictures = recipeController.getListOnlyPicturesToDownload(getApplication());
+        totalPictures = pictures.size();
+        if(pictures == null || pictures.isEmpty()){
+            isDownloadingPics = 0;
+            return;
+        }
+
+        //List<RecipeDb> onlyRecipes = recipeController.getListOnlyRecipeToDownload(getApplication());
+        /*if(!onlyRecipes.isEmpty()) {
+            // TODO: 22/2/17 mandar un broadcast para sacar un mensaje de leyendo pictures???
+
+        }*/
+        downloadPictureFromStorageSequentially();
+        Logger.d("PAROOOOOOOOOO PICTURES");
+        Looper.loop();
+        Logger.d("ACABOOOOOOOOOO PICTURES");
     }
 
     private void downloadRecipesSequentialy(){
@@ -303,6 +348,7 @@ public class AlarmService extends IntentService {
         protected void onPostExecute(Void param) {
             if(totalRecipes == 0){
                 sendSignal(getApplicationContext());
+                AlarmService.startActionDownloadPictures(getApplicationContext());
             }
         }
     }
@@ -313,6 +359,14 @@ public class AlarmService extends IntentService {
         for(RecipeDb picture : pictures) {
             final String name = picture.getPicture();
             StorageReference storageRef = FirebaseStorage.getInstance().getReference();
+            StorageReference imageRef;
+            if(picture.getOwner().equals(RecetasCookeoConstants.FLAG_PERSONAL_RECIPE)){
+                FirebaseDbMethods fbMethods = new FirebaseDbMethods(new RecipeController());
+                String userName = fbMethods.getCurrentUser();
+                imageRef = storageRef.child("recipes/" + userName + "/" + name);
+            }else{
+                imageRef = storageRef.child("recipes/" + name);
+            }
             StorageReference imageRef = storageRef.child("recipes/" + name);
             while (numberPendingPictures > MAX_ITEMS_IN_QUEUE) {
                 Logger.d("Espero porque la cola de fotos es de: " + numberPendingPictures);
@@ -335,10 +389,8 @@ public class AlarmService extends IntentService {
                     recipeController.updateDownloadRecipeFlag(getApplication(), name, false);
                     contadorRecipesDownloaded++;
                     //sendSignal(getApplicationContext(), contadorRecipesDownloaded);
-                    if(numberPendingPictures == 0){
-                      //  sendSignal(getApplicationContext());
-                    }
                     if(totalPictures == 0){
+                        sendSignal(getApplicationContext());
                         Looper.myLooper().quit();
                     }
                 }

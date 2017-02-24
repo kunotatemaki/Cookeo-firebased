@@ -37,6 +37,10 @@ public class FirebaseDbMethods {
         this.recipeController = recipeController;
     }
 
+    public String getCurrentUser(){
+        return FirebaseAuth.getInstance().getCurrentUser();
+    }
+
     // TODO: 22/2/17 llamar a este método cuando corresponda (antes se llamaba en el timer) 
     public void updateOldRecipesToPersonalStorage(final Context context){
         if(uploading == true){
@@ -46,7 +50,7 @@ public class FirebaseDbMethods {
         uploading = !uploading;
         ReadWriteTools readWriteTools = new ReadWriteTools();
         List<String> recipeItemNameList = readWriteTools.loadOldEditedAndOriginalRecipes(context);
-        //Log.d(TAG, "numero recetas: " + recipeItemNameList.size());
+        //Log.d(TAG, "numero recetas: " + recipeItemNameList.sizePicture());
         if(recipeItemNameList != null) {
             updateRecipesToPersonalStorage(context, recipeItemNameList);
         }
@@ -61,7 +65,7 @@ public class FirebaseDbMethods {
             uploading = false;
             return;
         }
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        FirebaseUser user = getCurrentUser();
         if(user == null || user.isAnonymous()){
             Log.d(TAG, "No puede subir recetas por el user");
             uploading = false;
