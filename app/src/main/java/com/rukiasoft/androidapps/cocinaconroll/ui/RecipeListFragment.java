@@ -107,8 +107,8 @@ public class RecipeListFragment extends Fragment implements
 
 
     //Pull de fotos a descargar
-    @State
-    ObjectQeue pullPictures;
+    //@State
+    //ObjectQeue pullPictures;
 
     @State Boolean needToRefresh = false;
 
@@ -141,7 +141,6 @@ public class RecipeListFragment extends Fragment implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
-        pullPictures = ObjectQeue.create(new ArrayList<String>());
         mInterstitialAd = new InterstitialAd(getActivity());
         mInterstitialAd.setAdUnitId(getResources().getString(R.string.banner_ad_unit_id_intersticial));
 

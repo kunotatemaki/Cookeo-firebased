@@ -1,8 +1,12 @@
 package com.rukiasoft.androidapps.cocinaconroll.alarm;
 
+import android.app.Activity;
+import android.app.Application;
 import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
+import android.os.Looper;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.v4.content.LocalBroadcastManager;
@@ -40,12 +44,13 @@ public class AlarmService extends IntentService {
 
     private static final String EXTRA_SIGNED = "com.rukiasoft.androidapps.cocinaconroll.alarm.extra.EXTRA_SIGNED";
     private static final int MAX_ITEMS_IN_QUEUE = 50;
-    //private ObjectQeue pullObjects;
-    private static Boolean isDownloadingPics = false;
-    private static Boolean isDownloadingRecipes = false;
-    private int contadorRecipesDownloaded;
+    private static int isDownloadingPics;
+    private static int isDownloadingRecipes;
+    private static int contadorRecipesDownloaded;
     private static int numberPendingRecipes;
     private static int numberPendingPictures;
+    private static int totalRecipes;
+    private static int totalPictures;
     private static List<RecipeDb> recipes;
     private static List<RecipeDb> pictures;
 
@@ -73,7 +78,7 @@ public class AlarmService extends IntentService {
     }
 
     private static Boolean isDownloading(){
-        return isDownloadingPics | isDownloadingRecipes;
+        return isDownloadingPics + isDownloadingRecipes > 0;
     }
 
     @Override
@@ -91,9 +96,13 @@ public class AlarmService extends IntentService {
 
     private void handleActionDownloadTimestamps(Boolean signed) {
         Logger.d("estoy en el serviceintent");
+        isDownloadingPics = 2;
+        isDownloadingRecipes = 2;
         connectToFirebaseForNewRecipes(RecetasCookeoConstants.ALLOWED_RECIPES_NODE);
         connectToFirebaseForNewRecipes(RecetasCookeoConstants.FORBIDDEN_RECIPES_NODE);
         if(signed){
+            isDownloadingPics++;
+            isDownloadingRecipes++;
             connectToFirebaseForNewRecipes(RecetasCookeoConstants.FORBIDDEN_RECIPES_NODE);
         }
     }
@@ -127,7 +136,7 @@ public class AlarmService extends IntentService {
     /**
      * Tarea que comprueba los timestamps descargados
      */
-    private class DownloadTimestampsTask extends AsyncTask<DataSnapshot, Integer, Void>{
+    private class DownloadTimestampsTask extends AsyncTask<DataSnapshot, Integer, Void> {
 
         @Override
         protected Void doInBackground(DataSnapshot... dataSnapshots) {
@@ -137,10 +146,10 @@ public class AlarmService extends IntentService {
             for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
                 TimestampFirebase timestampFirebase = postSnapshot.getValue(TimestampFirebase.class);
                 String key = postSnapshot.getKey();
-                if(getContext()==null){
+                if(getApplicationContext()==null){
                     continue;
                 }
-                RecipeDb recipeDbFromDatabase = recipeController.getRecipeByKey((Application)getContext().getApplicationContext(), key);
+                RecipeDb recipeDbFromDatabase = recipeController.getRecipeByKey(getApplication(), key);
                 if(recipeDbFromDatabase == null){
                     //no existía, la creo
                     recipeDbFromDatabase = new RecipeDb();
@@ -176,7 +185,7 @@ public class AlarmService extends IntentService {
                     recipeDbFromDatabase.setTimestamp(System.currentTimeMillis());
                     recipeDbFromDatabase.setDownloadRecipe(true);
                     recipeDbFromDatabase.setOwner(recipeOwner);
-                    recipeController.insertOrReplaceRecipe(getActivity().getApplication(), recipeDbFromDatabase);
+                    recipeController.insertOrReplaceRecipe(getApplication(), recipeDbFromDatabase);
                 }
 
             }
@@ -201,7 +210,11 @@ public class AlarmService extends IntentService {
         RecipeController recipeController = new RecipeController();
         recipes = recipeController.getListOnlyRecipeToDownload(getApplication());
         pictures = recipeController.getListOnlyPicturesToDownload(getApplication());
+        totalRecipes = recipes.size();
+        totalPictures = pictures.size();
         if((recipes == null || recipes.isEmpty()) && (pictures == null || pictures.isEmpty())){
+            isDownloadingPics--;
+            isDownloadingRecipes--;
             return;
         }
 
@@ -210,18 +223,16 @@ public class AlarmService extends IntentService {
             // TODO: 22/2/17 mandar un broadcast para sacar un mensaje de leyendo recetas???
 
         }*/
-        isDownloadingPics = true;
-        isDownloadingRecipes = true;
         downloadRecipesSequentialy();
         downloadPictureFromStorageSequentially();
+        Logger.d("PAROOOOOOOOOO");
+        Looper.loop();
+        Logger.d("ACABOOOOOOOOOO");
     }
 
     private void downloadRecipesSequentialy(){
         //Descargo las recetas de Firebase
-        if(recipes.isEmpty()){
-            isDownloadingRecipes = !isDownloadingRecipes;
-            return;
-        }
+
         for(RecipeDb recipe : recipes) {
 
             String node = FirebaseDbMethods.getNodeNameFromRecipeFlag(recipe.getOwner());
@@ -247,6 +258,7 @@ public class AlarmService extends IntentService {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     numberPendingRecipes--;
+                    totalRecipes--;
                     DownloadRecipeTask downloadTask = new DownloadRecipeTask();
                     downloadTask.execute(dataSnapshot);
                 }
@@ -254,6 +266,10 @@ public class AlarmService extends IntentService {
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
                     numberPendingRecipes--;
+                    totalRecipes--;
+                    if(totalRecipes == 0){
+                        sendSignal(getApplicationContext());
+                    }
                 }
             });
         }
@@ -267,7 +283,6 @@ public class AlarmService extends IntentService {
 
         @Override
         protected Void doInBackground(DataSnapshot... snapshot) {
-            Logger.d("descargando receta");
             RecipeController recipeController = new RecipeController();
             DataSnapshot dataSnapshot = snapshot[0];
             RecipeFirebase recipeFromFirebase = dataSnapshot.getValue(RecipeFirebase.class);
@@ -279,23 +294,22 @@ public class AlarmService extends IntentService {
             RecipeDb recipeDb = recipeController.insertRecipeFromFirebase(getApplication(),
                     dataSnapshot, recipeFromFirebase);
             contadorRecipesDownloaded++;
-            sendSignal(contadorRecipesDownloaded);
+
+            sendSignal(getApplicationContext(), contadorRecipesDownloaded);
             return null;
         }
 
         @Override
-        protected void onPostExecute() {
-
+        protected void onPostExecute(Void param) {
+            if(totalRecipes == 0){
+                sendSignal(getApplicationContext());
+            }
         }
     }
 
 
     private void downloadPictureFromStorageSequentially(){
-        Logger.d("descargando imagen");
-        if(pictures.isEmpty()){
-            isDownloadingPics = !isDownloadingPics;
-            return;
-        }
+        Logger.d("descargando imagenes " + totalPictures);
         for(RecipeDb picture : pictures) {
             final String name = picture.getPicture();
             StorageReference storageRef = FirebaseStorage.getInstance().getReference();
@@ -313,13 +327,20 @@ public class AlarmService extends IntentService {
                 @Override
                 public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
                     // Local temp file has been created
-                    //Log.d(TAG, "Salvado correctamente: " + name);
+                    Logger.d("Salvado correctamente: " + name);
                     //quito del pull y sigo descargando
                     numberPendingPictures--;
+                    totalPictures--;
                     RecipeController recipeController = new RecipeController();
                     recipeController.updateDownloadRecipeFlag(getApplication(), name, false);
                     contadorRecipesDownloaded++;
-                    sendSignal(contadorRecipesDownloaded);
+                    //sendSignal(getApplicationContext(), contadorRecipesDownloaded);
+                    if(numberPendingPictures == 0){
+                      //  sendSignal(getApplicationContext());
+                    }
+                    if(totalPictures == 0){
+                        Looper.myLooper().quit();
+                    }
                 }
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
@@ -330,17 +351,25 @@ public class AlarmService extends IntentService {
                         imageFile.delete();
                     }
                     numberPendingRecipes--;
+                    totalPictures--;
+                    if(totalPictures == 0){
+                        Looper.myLooper().quit();
+                    }
                 }
             });
         }
     }
 
-    private void sendSignal(int contador){
-        if(contador % 10 != 0){
+    private static void sendSignal(Context context, int contador){
+        if(contador % 30 != 0){
             return;
         }
         Logger.d("Envio contadorRecipesDownloaded " + contador);
+        sendSignal(context);
+    }
+
+    private static void sendSignal(Context context){
         Intent intent = new Intent(RecetasCookeoConstants.NAME_DOWNLOAD_INTENT);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 }
