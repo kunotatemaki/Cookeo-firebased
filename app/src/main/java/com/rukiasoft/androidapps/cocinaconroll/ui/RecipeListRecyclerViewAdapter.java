@@ -170,7 +170,7 @@ public class RecipeListRecyclerViewAdapter extends RecyclerView.Adapter<RecipeLi
         if (onCardClickListener != null) {
             new Handler().postDelayed(new Runnable() {
                 @Override public void run() {
-                    onCardClickListener.onCardClick(v, (RecipeItemOld) v.getTag());
+                    onCardClickListener.onCardClick(v, (RecipeReduced) v.getTag());
                 }
             }, 200);
         }
@@ -317,7 +317,7 @@ public class RecipeListRecyclerViewAdapter extends RecyclerView.Adapter<RecipeLi
     }
 
     public interface OnCardClickListener {
-        void onCardClick(View view, RecipeItemOld recipeItemOld);
+        void onCardClick(View view, RecipeReduced recipeItemOld);
     }
 
 

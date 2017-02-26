@@ -1,25 +1,27 @@
-package com.rukiasoft.androidapps.cocinaconroll.persistence.controllers;
 
 
-import android.app.Application;
-import android.database.Cursor;
+        package com.rukiasoft.androidapps.cocinaconroll.persistence.controllers;
 
-import com.google.firebase.database.DataSnapshot;
-import com.rukiasoft.androidapps.cocinaconroll.persistence.daoqueries.RecipeQueries;
-import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.database.methods.FirebaseDbMethods;
-import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.database.model.RecipeFirebase;
-import com.rukiasoft.androidapps.cocinaconroll.persistence.model.DaoSession;
-import com.rukiasoft.androidapps.cocinaconroll.persistence.model.IngredientDb;
-import com.rukiasoft.androidapps.cocinaconroll.persistence.model.RecipeDb;
-import com.rukiasoft.androidapps.cocinaconroll.persistence.model.RecipeDbDao;
-import com.rukiasoft.androidapps.cocinaconroll.persistence.model.StepDb;
-import com.rukiasoft.androidapps.cocinaconroll.ui.model.RecipeReduced;
-import com.rukiasoft.androidapps.cocinaconroll.utilities.LogHelper;
 
-import org.greenrobot.greendao.query.Query;
+        import android.app.Application;
+        import android.database.Cursor;
 
-import java.util.ArrayList;
-import java.util.List;
+        import com.google.firebase.database.DataSnapshot;
+        import com.rukiasoft.androidapps.cocinaconroll.persistence.daoqueries.RecipeQueries;
+        import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.database.methods.FirebaseDbMethods;
+        import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.database.model.RecipeFirebase;
+        import com.rukiasoft.androidapps.cocinaconroll.persistence.model.DaoSession;
+        import com.rukiasoft.androidapps.cocinaconroll.persistence.model.IngredientDb;
+        import com.rukiasoft.androidapps.cocinaconroll.persistence.model.RecipeDb;
+        import com.rukiasoft.androidapps.cocinaconroll.persistence.model.RecipeDbDao;
+        import com.rukiasoft.androidapps.cocinaconroll.persistence.model.StepDb;
+        import com.rukiasoft.androidapps.cocinaconroll.ui.model.RecipeReduced;
+        import com.rukiasoft.androidapps.cocinaconroll.utilities.LogHelper;
+
+        import org.greenrobot.greendao.query.Query;
+
+        import java.util.ArrayList;
+        import java.util.List;
 
 /**
  * Created by iRoll on 9/2/17.
@@ -242,3 +244,5 @@ public class RecipeController {
 
 
 }
+
+

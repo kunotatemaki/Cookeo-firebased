@@ -116,8 +116,6 @@ public class RecipeListActivity extends ToolbarAndProgressActivity {
         setContentView(R.layout.activity_recipe_list);
         mUnbinder = ButterKnife.bind(this);
 
-        initAuth();
-
         //Pido los permisos si procede
         if(mAskForPermission) {
             createPermissionListeners();
@@ -257,9 +255,9 @@ public class RecipeListActivity extends ToolbarAndProgressActivity {
                 }
                 break;*/
             case RecetasCookeoConstants.REQUEST_CODE_SIGNING_FROM_RECIPELIST:
-                initAuth();
                 // TODO: 28/1/17 revisar qué hace aquí cuando le llamo desde esta actividad
                 if(!tools.getBooleanFromPreferences(this, RecetasCookeoConstants.PROPERTY_INIT_DATABASE_WITH_EDITED_PATH)) {
+                    // TODO: 26/2/17 atualizar recetas porque acabo de hacer sign in (o no)
                     //loadEditedRecipes();
                 }
                 break;
@@ -412,6 +410,9 @@ public class RecipeListActivity extends ToolbarAndProgressActivity {
 
     @Override
     public void onBackPressed(){
+        if(mProgressDialog.isShowing()){
+            return;
+        }
         if(drawerLayout.isDrawerOpen(GravityCompat.START)){
             drawerLayout.closeDrawer(GravityCompat.START);
         }else{
@@ -642,24 +643,7 @@ public class RecipeListActivity extends ToolbarAndProgressActivity {
         startActivityForResult(intent, RecetasCookeoConstants.REQUEST_CODE_SIGNING_FROM_RECIPELIST);
     }
 
-    private void initAuth(){
-        if(mAuth == null){
-            mAuth = FirebaseAuth.getInstance();
-        }
-        if(mAuthListener == null) {
-            mAuthListener = new FirebaseAuth.AuthStateListener() {
-                @Override
-                public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                    FirebaseUser user = firebaseAuth.getCurrentUser();
-                    Boolean isSignedIn = (user != null && !user.isAnonymous());
-                    Tools tools = new Tools();
-                    tools.savePreferences(getApplicationContext(), RecetasCookeoConstants.PROPERTY_SIGNED_IN, isSignedIn);
-                    invalidateOptionsMenu();
-                }
-            };
-        }
-        mAuth.addAuthStateListener(mAuthListener);
-    }
+
 
 
 }

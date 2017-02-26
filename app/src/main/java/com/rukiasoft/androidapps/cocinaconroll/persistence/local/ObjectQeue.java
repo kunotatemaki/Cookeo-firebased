@@ -2,6 +2,7 @@ package com.rukiasoft.androidapps.cocinaconroll.persistence.local;
 
 
 import android.os.Parcelable;
+import android.support.annotation.Nullable;
 
 import com.google.auto.value.AutoValue;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.model.RecipeDb;
@@ -15,28 +16,21 @@ import java.util.List;
 
 @AutoValue
 public abstract class ObjectQeue implements Parcelable {
-    public static ObjectQeue create(ArrayList<RecipeDb> pullRecipes, ArrayList<String> pullPictures) {
+    public static ObjectQeue create(ArrayList<RecipeDb> pullRecipes, ArrayList<RecipeDb> pullPictures) {
         return new AutoValue_ObjectQeue(pullRecipes, pullPictures);
     }
 
-    abstract List<RecipeDb> pullRecipes();
-    abstract List<String> pullPictureNames();
+    @Nullable abstract List<RecipeDb> pullRecipes();
+    @Nullable abstract List<RecipeDb> pullPictureNames();
 
-    public void addPicture(String value){
-        pullPictureNames().add(value);
-    }
-
-    public void addRecipe(RecipeDb value){
-        pullRecipes().add(value);
-    }
     public boolean isPictureListEmpty(){
-        return pullPictureNames().isEmpty();
+        return pullPictureNames() == null || pullPictureNames().isEmpty();
     }
     public boolean isRecipeListEmpty(){
-        return pullRecipes().isEmpty();
+        return pullRecipes() == null || pullRecipes().isEmpty();
     }
 
-    public String getPicture(int index){
+    public RecipeDb getPicture(int index){
         if(pullPictureNames().size() > index) {
             return pullPictureNames().get(index);
         }else{
@@ -52,18 +46,15 @@ public abstract class ObjectQeue implements Parcelable {
         }
     }
 
-    public boolean removePicture(String objectName){
-        return pullPictureNames().remove(objectName);
-    }
-
-    public boolean removeRecipe(RecipeDb objectName){
-        return pullRecipes().remove(objectName);
-    }
-
-    public int sizePicture(){
-        return pullPictureNames().size();
-    }
-    public int sizeRecipe(){
+    public int recipeSize(){
         return pullRecipes().size();
     }
+    public RecipeDb removePicture(int index){
+        return pullPictureNames().remove(index);
+    }
+
+    public RecipeDb removeRecipe(int index){
+        return pullRecipes().remove(index);
+    }
+
 }

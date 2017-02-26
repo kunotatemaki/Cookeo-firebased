@@ -37,7 +37,7 @@ public class FirebaseDbMethods {
         this.recipeController = recipeController;
     }
 
-    public String getCurrentUser(){
+    public FirebaseUser getCurrentUser(){
         return FirebaseAuth.getInstance().getCurrentUser();
     }
 

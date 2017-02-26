@@ -40,6 +40,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.orhanobut.logger.Logger;
 import com.rukiasoft.androidapps.cocinaconroll.R;
 import com.rukiasoft.androidapps.cocinaconroll.gcm.QuickstartPreferences;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.LogHelper;
@@ -124,6 +125,7 @@ public class SignInActivity extends ToolbarAndProgressActivity implements
         super.onActivityResult(requestCode, resultCode, data);
 
         // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
+        Tools tools = new Tools();
         if (requestCode == RecetasCookeoConstants.REQUEST_CODE_GOOGLE_SIGN_IN) {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             if (result.isSuccess()) {
@@ -132,26 +134,36 @@ public class SignInActivity extends ToolbarAndProgressActivity implements
                 firebaseAuthWithGoogle(account);
             } else {
                 // Google Sign In failed, update UI appropriately
+                tools.savePreferences(getApplicationContext(), RecetasCookeoConstants.PROPERTY_SIGNED_IN, false);
                 revokeAccess();
+                enableButtons();
             }
         }
     }
 
     // [START signIn]
     protected void signIn() {
+        disableButtons();
+        showProgressDialog(getString(R.string.signing_in));
         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
         startActivityForResult(signInIntent, RecetasCookeoConstants.REQUEST_CODE_GOOGLE_SIGN_IN);
     }
 
     protected void signInAnnonimously(){
         //Quito el acceso por si lo tenía
+        disableButtons();
+        showProgressDialog(getString(R.string.signing_in));
         revokeAccess();
         //Autentico anónimamente
         FirebaseAuth.getInstance().signInAnonymously()
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
-                        Log.d(TAG, "signInWithCredential:onComplete:" + task.isSuccessful());
+                        Logger.d("signInWithCredential:onComplete:" + task.isSuccessful());
+                        //Para bien o para mal, pulsando aquí no está signed in (estará en fallo o anónimo)
+                        Tools tools = new Tools();
+                        tools.savePreferences(getApplicationContext(), RecetasCookeoConstants.PROPERTY_SIGNED_IN, false);
+
                         hideProgressDialog();
                         // If sign in fails, display a message to the user. If sign in succeeds
                         // the auth state listener will be notified and logic to handle the
@@ -161,6 +173,7 @@ public class SignInActivity extends ToolbarAndProgressActivity implements
                             Toast.makeText(SignInActivity.this, getString(R.string.signed_in_err),
                                     Toast.LENGTH_SHORT).show();
                             revokeAccess();
+                            enableButtons();
                         }else{
                             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                             handleSignInResult(user);
@@ -172,26 +185,30 @@ public class SignInActivity extends ToolbarAndProgressActivity implements
 
 
     protected void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
-        Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());
+        Logger.d( "firebaseAuthWithGoogle:" + acct.getId());
         showProgressDialog(getString(R.string.signing_in));
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
         FirebaseAuth.getInstance().signInWithCredential(credential)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
-                        Log.d(TAG, "signInWithCredential:onComplete:" + task.isSuccessful());
+                        Logger.d( "signInWithCredential:onComplete:" + task.isSuccessful());
                         hideProgressDialog();
                         // If sign in fails, display a message to the user. If sign in succeeds
                         // the auth state listener will be notified and logic to handle the
                         // signed in user can be handled in the listener.
+                        Tools tools = new Tools();
                         if (!task.isSuccessful()) {
                             Log.w(TAG, "signInWithCredential", task.getException());
                             Toast.makeText(SignInActivity.this, getString(R.string.signed_in_err),
                                     Toast.LENGTH_SHORT).show();
                             revokeAccess();
+                            tools.savePreferences(getApplicationContext(), RecetasCookeoConstants.PROPERTY_SIGNED_IN, false);
+                            enableButtons();
                         }else{
                             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                             handleSignInResult(user);
+                            tools.savePreferences(getApplicationContext(), RecetasCookeoConstants.PROPERTY_SIGNED_IN, true);
                             finish();
                         }
 
@@ -209,16 +226,14 @@ public class SignInActivity extends ToolbarAndProgressActivity implements
     private void handleSignInResult(FirebaseUser user) {
         Tools mTools = new Tools();
         if (user != null && !user.isAnonymous()) {
-            /*mTools.savePreferences(this, RecetasCookeoConstants.PROPERTY_DEVICE_OWNER_NAME, user.getDisplayName());
+            mTools.savePreferences(this, RecetasCookeoConstants.PROPERTY_DEVICE_OWNER_NAME, user.getDisplayName());
             mTools.savePreferences(this, RecetasCookeoConstants.PROPERTY_DEVICE_OWNER_EMAIL, user.getEmail());
             mTools.savePreferences(this, RecetasCookeoConstants.PROPERTY_FIREBASE_ID, user.getUid());
-
-            mTools.savePreferences(this, QuickstartPreferences.SENT_TOKEN_TO_SERVER, false);*/
-        } /*else {
+        } else {
             mTools.savePreferences(this, RecetasCookeoConstants.PROPERTY_DEVICE_OWNER_NAME, "");
             mTools.savePreferences(this, RecetasCookeoConstants.PROPERTY_DEVICE_OWNER_EMAIL, "");
             mTools.savePreferences(this, RecetasCookeoConstants.PROPERTY_FIREBASE_ID, "");
-        }*/
+        }
     }
 
 
@@ -241,6 +256,22 @@ public class SignInActivity extends ToolbarAndProgressActivity implements
 
     }
 
+    private void disableButtons(){
+        if(signInButton != null){
+            signInButton.setEnabled(false);
+        }
+        if(anonymousButton != null){
+            anonymousButton.setEnabled(false);
+        }
+    }
 
+    private void enableButtons(){
+        if(signInButton != null){
+            signInButton.setEnabled(true);
+        }
+        if(anonymousButton != null){
+            anonymousButton.setEnabled(true);
+        }
+    }
 
 }

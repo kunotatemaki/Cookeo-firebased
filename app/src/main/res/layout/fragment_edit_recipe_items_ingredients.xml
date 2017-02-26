@@ -30,7 +30,7 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Title"
         android:textColor="@color/ColorPrimary"
         android:textStyle="bold"
-        android:text="@string/ingredientDbs"/>
+        android:text="@string/ingredients"/>
 
     <include layout="@layout/fragment_edit_recipe_items" />
 

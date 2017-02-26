@@ -34,7 +34,7 @@
     <string name="search_hint">Buscar recetas</string>
     <string name="search_settings">Ajustes de búsqueda</string>
     <string name="restore_recipe_confirmation">¿Recuperar receta original? Esta operación no puede deshacerse.</string>
-    <string name="ingredientDbs">Ingredientes</string>
+    <string name="ingredients">Ingredientes</string>
     <string name="default_author">Programada en Cookeo</string>
     <string name="exit_application_title">Salir</string>
     <string name="exit_application">¿Desea salir de %1$s</string>
@@ -46,7 +46,7 @@
     <string name="email_alert_title">Enviar receta</string>
     <string name="remove_recipe">Eliminar receta</string>
     <string name="sender">Enviado por %1$s</string>
-    <string name="stepDbs">Pasos</string>
+    <string name="steps">Pasos</string>
     <string name="thanks">Agradecimientos</string>
     <string name="support_recipes">Si tienes un blog de cocina y quieres ver tus recetas en %1$s, manda un email a %2$s!</string>
     <string name="thanks_intro">Esta aplicación es posible gracias a los creadores de los siguientes blogs de cocina, que ceden sus recetas desinteresadamente. ¡No dudes en visitarlos!</string>
@@ -124,5 +124,8 @@
     <string name="write_external_explanation">Se necesita este permiso para cargar recetas creadas en versiones anteriores de la aplicación</string>
     <string name="close">Cerrar</string>
     <string name="sign_in">Iniciar sesión</string>
+    <string name="downloading_recipes">Descargando recetas… Puede tardar unos minutos en el primer arranque.</string>
+    <string name="downloading_pictures">Descargando las fotos de las recetas en segundo plano. Puedes usar la aplicación mientras tanto.</string>
+
 
 </resources>

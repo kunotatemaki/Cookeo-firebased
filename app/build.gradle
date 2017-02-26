@@ -9,7 +9,7 @@ android {
     //useLibrary 'org.apache.http.legacy'
     defaultConfig {
         applicationId "com.rukiasoft.androidapps.cocinaconroll"
-        minSdkVersion 14
+        minSdkVersion 10
         targetSdkVersion 25
         versionCode 321
         versionName "3.2.1"
@@ -123,6 +123,7 @@ dependencies {
     compile 'com.google.code.gson:gson:2.8.0'
     compile 'com.squareup.okhttp:okhttp:2.0.0'
     compile 'org.greenrobot:greendao:3.2.0'
+    compile 'com.orhanobut:logger:1.15'
     compile 'com.google.android.gms:play-services-auth:10.0.1'
     compile 'com.google.firebase:firebase-auth:10.0.1'
     compile 'com.google.firebase:firebase-database:10.0.1'
@@ -138,9 +139,6 @@ dependencies {
     provided 'frankiesardo:icepick-processor:3.2.0'
     provided 'com.google.auto.value:auto-value:1.2'
     releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.4-beta2'
-
-    //Logs
-    compile 'com.orhanobut:logger:1.15'
 }
 
 
