@@ -64,6 +64,7 @@ import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.database.mod
 import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.database.model.TimestampFirebase;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.local.ObjectQeue;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.model.RecipeDb;
+import com.rukiasoft.androidapps.cocinaconroll.ui.model.RecipeComplete;
 import com.rukiasoft.androidapps.cocinaconroll.ui.model.RecipeReduced;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.CommonRecipeOperations;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.LogHelper;
@@ -140,8 +141,8 @@ public class RecipeListFragment extends Fragment implements
     private int columnCount = 10;
     @State String lastFilter = null;
     private InterstitialAd mInterstitialAd;
-    private RecipeItemOld recipeToShow;
-    private RecipeController recipeController;
+    private RecipeComplete recipeToShow;
+    private RecipeController mRecipeController;
     @State int numRecipesDownloaded;
 
     Application application;
@@ -213,8 +214,8 @@ public class RecipeListFragment extends Fragment implements
         View view = inflater.inflate(R.layout.fragment_recipe_list, container, false);
         unbinder = ButterKnife.bind(this, view);
 
-        recipeController = new RecipeController();
-        firebaseDbMethods = new FirebaseDbMethods(recipeController);
+        mRecipeController = new RecipeController();
+        firebaseDbMethods = new FirebaseDbMethods(mRecipeController);
 
         //Set the mToolbarRecipeListFragment
         if(getActivity() instanceof ToolbarAndProgressActivity){
@@ -286,7 +287,7 @@ public class RecipeListFragment extends Fragment implements
         addRecipeButtonFAB.setOnClickListener(null);
 
         unbinder.unbind();
-        recipeController = null;
+        mRecipeController = null;
     }
 
     @Override
@@ -390,7 +391,7 @@ public class RecipeListFragment extends Fragment implements
     }
 
     private Boolean needToDownloadRecipes(){
-        List<RecipeDb> recipes = recipeController.getListBothRecipeAndPicturesToDownload(getActivity().getApplication());
+        List<RecipeDb> recipes = mRecipeController.getListBothRecipeAndPicturesToDownload(getActivity().getApplication());
         return recipes != null && !recipes.isEmpty();
     }
 
@@ -455,23 +456,22 @@ public class RecipeListFragment extends Fragment implements
     }
 
     @Override
-    public void onCardClick(View view, RecipeItemOld recipeItemOld) {
-        showRecipeDetails(recipeItemOld);
+    public void onCardClick(View view, RecipeReduced recipeReduced) {
+        showRecipeDetails(recipeReduced);
     }
 
 
 
-    private void showRecipeDetails(RecipeItemOld recipeItemOld){
+    private void showRecipeDetails(RecipeReduced recipeReduced){
         //interstitial
         Tools tools = new Tools();
         int number = tools.getIntegerFromPreferences(getActivity().getApplicationContext(), RecetasCookeoConstants.PREFERENCE_INTERSTITIAL);
         if(number<0 || number> RecetasCookeoConstants.N_RECIPES_TO_INTERSTICIAL){
             number = 0;
         }
-        CommonRecipeOperations commonRecipeOperations = new CommonRecipeOperations(getActivity(), recipeItemOld);
-        recipeItemOld = commonRecipeOperations.loadRecipeDetailsFromRecipeCard();
+        RecipeDb recipeDb = mRecipeController.getRecipeById(getActivity().getApplication(), recipeReduced.getId());
 
-        recipeToShow = recipeItemOld;
+        recipeToShow = RecipeComplete(recipeDb);
         if(number != RecetasCookeoConstants.N_RECIPES_TO_INTERSTICIAL) {
             launchActivityDetails();
         }else if(mInterstitialAd.isLoaded()) {
@@ -548,37 +548,7 @@ public class RecipeListFragment extends Fragment implements
         typeRecipesInRecipeList.setText(type);
         typeIconInRecipeList.setImageDrawable(ContextCompat.getDrawable(getActivity(), iconResource));
 
-        /*String nrecipes = String.format(getResources().getString(R.string.recipes), mRecipes.sizePicture());
-        nRecipesInRecipeList.setText(nrecipes);
-        //Change the adapter
-        RecipeListRecyclerViewAdapter newAdapter = new RecipeListRecyclerViewAdapter(getActivity(), mRecipes);
-        newAdapter.setHasStableIds(true);
-        newAdapter.setOnCardClickListener(this);
-        mRecyclerView.setHasFixedSize(true);
 
-
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            SlideInBottomAnimationAdapter newSlideAdapter = wrapAdapter(newAdapter);
-            mRecyclerView.swapAdapter(newSlideAdapter, false);
-        }else{
-            mRecyclerView.swapAdapter(newAdapter, false);
-        }
-        //mRecyclerView.setAdapter(adapter);
-        int columnCount = getResources().getInteger(R.integer.list_column_count);
-        StaggeredGridLayoutManager sglm =
-                new StaggeredGridLayoutManager(columnCount, StaggeredGridLayoutManager.VERTICAL);
-
-        //adapter = newAdapter;
-        //if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-        //    slideAdapter = newSlideAdapter;
-        //}
-        mRecyclerView.setLayoutManager(sglm);
-        mRecyclerView.scrollToPosition(0);
-
-        //Set the fast Scroller
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB && fastScroller != null) {
-            fastScroller.setRecyclerView(mRecyclerView);
-        }*/
     }
 
 
