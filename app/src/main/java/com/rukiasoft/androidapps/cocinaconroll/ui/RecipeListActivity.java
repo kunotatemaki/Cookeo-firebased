@@ -44,6 +44,7 @@ import com.rukiasoft.androidapps.cocinaconroll.gcm.RegistrationIntentService;
 import com.rukiasoft.androidapps.cocinaconroll.permissions.ErrorListener;
 import com.rukiasoft.androidapps.cocinaconroll.permissions.RecetasCookeoMultiplePermissionListener;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.controllers.RecipeController;
+import com.rukiasoft.androidapps.cocinaconroll.ui.model.RecipeComplete;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.CommonRecipeOperations;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.LogHelper;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.ReadWriteTools;
@@ -206,6 +207,7 @@ public class RecipeListActivity extends ToolbarAndProgressActivity {
         switch (requestCode) {
             case RecetasCookeoConstants.REQUEST_DETAILS:
                 //return from RecipeDetailsActivity
+                // TODO: 27/02/2017 borrar/actualizar receta (borrar en detail activity y aquí simplemente llamar al loader)
                 if (resultCode == RecetasCookeoConstants.RESULT_DELETE_RECIPE && intentData != null && intentData.hasExtra(RecetasCookeoConstants.KEY_RECIPE)) {
                     RecipeItemOld recipe = intentData.getParcelableExtra(RecetasCookeoConstants.KEY_RECIPE);
                     if (recipe != null) {
@@ -213,52 +215,31 @@ public class RecipeListActivity extends ToolbarAndProgressActivity {
                     }
                 }else if(resultCode == RecetasCookeoConstants.RESULT_UPDATE_RECIPE){
                     if (intentData != null && intentData.hasExtra(RecetasCookeoConstants.KEY_RECIPE)) {
-                        RecipeItemOld recipe = intentData.getParcelableExtra(RecetasCookeoConstants.KEY_RECIPE);
+                        RecipeComplete recipe = intentData.getParcelableExtra(RecetasCookeoConstants.KEY_RECIPE);
                         RecipeListFragment mRecipeListFragment = (RecipeListFragment) getSupportFragmentManager().findFragmentById(R.id.list_recipes_fragment);
                         if (mRecipeListFragment != null) {
-                            mRecipeListFragment.updateRecipe(recipe);
+                            mRecipeListFragment.insertRecipe(recipe);
                         }
                     }
                 }
                 break;
             case RecetasCookeoConstants.REQUEST_EDIT_RECIPE:
                 if(resultCode == RecetasCookeoConstants.RESULT_UPDATE_RECIPE && intentData != null && intentData.hasExtra(RecetasCookeoConstants.KEY_RECIPE)) {
-                    RecipeItemOld recipe = intentData.getParcelableExtra(RecetasCookeoConstants.KEY_RECIPE);
-                    CommonRecipeOperations commonRecipeOperations = new CommonRecipeOperations(this, recipe);
-                    String oldPicture = "";
-                    if (intentData.hasExtra(RecetasCookeoConstants.KEY_DELETE_OLD_PICTURE)) {
-                        oldPicture = intentData.getStringExtra(RecetasCookeoConstants.KEY_DELETE_OLD_PICTURE);
-                    }
-                    commonRecipeOperations.updateRecipe(oldPicture);
+                    RecipeComplete recipe = intentData.getParcelableExtra(RecetasCookeoConstants.KEY_RECIPE);
                     RecipeListFragment mRecipeListFragment = (RecipeListFragment) getSupportFragmentManager().findFragmentById(R.id.list_recipes_fragment);
                     if (mRecipeListFragment != null) {
-                        mRecipeListFragment.updateRecipe(recipe);
+                        mRecipeListFragment.insertRecipe(recipe);
                     }
                 }
                 break;
             case RecetasCookeoConstants.REQUEST_CREATE_RECIPE:
-                if (resultCode == RecetasCookeoConstants.RESULT_UPDATE_RECIPE && intentData != null && intentData.hasExtra(RecetasCookeoConstants.KEY_RECIPE)) {
-                    RecipeItemOld recipe = intentData.getParcelableExtra(RecetasCookeoConstants.KEY_RECIPE);
+                if (resultCode == RecetasCookeoConstants.RESULT_UPDATE_RECIPE && intentData != null &&
+                        intentData.hasExtra(RecetasCookeoConstants.KEY_RECIPE)) {
+                    RecipeComplete recipe = intentData.getParcelableExtra(RecetasCookeoConstants.KEY_RECIPE);
                     RecipeListFragment mRecipeListFragment = (RecipeListFragment) getSupportFragmentManager().findFragmentById(R.id.list_recipes_fragment);
-                    ReadWriteTools readWriteTools = new ReadWriteTools();
-                    String path = readWriteTools.saveRecipeOnEditedPath(getApplicationContext(), recipe);
-                    recipe.setPathRecipe(path);
                     if (mRecipeListFragment != null) {
-                        mRecipeListFragment.createRecipe(recipe);
+                        mRecipeListFragment.insertRecipe(recipe);
                     }
-                }
-                break;
-            /*case REQUEST_CODE_RESOLUTION:
-                // Called after a file is saved to Drive.
-                if (resultCode == RESULT_OK) {
-                    connectToDrive(true);
-                }
-                break;*/
-            case RecetasCookeoConstants.REQUEST_CODE_SIGNING_FROM_RECIPELIST:
-                // TODO: 28/1/17 revisar qué hace aquí cuando le llamo desde esta actividad
-                if(!tools.getBooleanFromPreferences(this, RecetasCookeoConstants.PROPERTY_INIT_DATABASE_WITH_EDITED_PATH)) {
-                    // TODO: 26/2/17 atualizar recetas porque acabo de hacer sign in (o no)
-                    //loadEditedRecipes();
                 }
                 break;
             default:
@@ -267,7 +248,7 @@ public class RecipeListActivity extends ToolbarAndProgressActivity {
     }
 
     private void removeRecipeFromDiskAndDatabase(RecipeItemOld recipe){
-        //// TODO: 21/2/17 hacer con recipeControler
+        //// TODO: 21/2/17 hacer con en el fragment
 //        ReadWriteTools rwTools = new ReadWriteTools();
 //        rwTools.deleteRecipe(recipe);
 //        RecipeController recipeController = new RecipeController();
@@ -644,6 +625,6 @@ public class RecipeListActivity extends ToolbarAndProgressActivity {
     }
 
 
-
+// TODO: 27/02/2017 revisar las búsquedas, que habrá que ajustarlas
 
 }

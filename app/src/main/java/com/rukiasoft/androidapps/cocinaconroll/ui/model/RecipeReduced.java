@@ -3,7 +3,6 @@ package com.rukiasoft.androidapps.cocinaconroll.ui.model;
 import android.os.Parcelable;
 
 import com.google.auto.value.AutoValue;
-import com.orhanobut.logger.Logger;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.model.RecipeDb;
 
 /**

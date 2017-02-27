@@ -143,9 +143,11 @@ public class RecipeListFragment extends Fragment implements
     private int columnCount = 10;
     @State String lastFilter = null;
     private InterstitialAd mInterstitialAd;
-    private RecipeComplete recipeToShow;
+    // TODO: 27/02/2017 revisar si esto no casca cuando es null
+    @State RecipeComplete recipeToShow;
     private RecipeController mRecipeController;
     @State int numRecipesDownloaded;
+    @State int numNodesOnInitDatabase;
 
     Application application;
 
@@ -462,8 +464,7 @@ public class RecipeListFragment extends Fragment implements
             number = 0;
         }
         RecipeDb recipeDb = mRecipeController.getRecipeById(getActivity().getApplication(), recipeReduced.getId());
-// TODO: 27/2/17 cargar la foto mediante constructor o lo qeu sea
-        //recipeToShow = RecipeComplete(recipeDb);
+        recipeToShow = RecipeComplete.getRecipeFromDatabase(recipeDb);
         if(number != RecetasCookeoConstants.N_RECIPES_TO_INTERSTICIAL) {
             launchActivityDetails();
         }else if(mInterstitialAd.isLoaded()) {
@@ -481,15 +482,15 @@ public class RecipeListFragment extends Fragment implements
     private void launchActivityDetails(){
         Intent intent = new Intent(getActivity(), RecipeDetailActivityBase.class);
         Bundle bundle = new Bundle();
-        // TODO: 27/2/17 arreglar lo del parcelable
-        /*bundle.putParcelable(RecetasCookeoConstants.KEY_RECIPE, recipeToShow);
+
+        bundle.putParcelable(RecetasCookeoConstants.KEY_RECIPE, recipeToShow);
         intent.putExtras(bundle);
         ActivityOptionsCompat activityOptions = ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity());
         // Now we can start the Activity, providing the activity options as a bundle
         ActivityCompat.startActivityForResult(getActivity(), intent, RecetasCookeoConstants.REQUEST_DETAILS, activityOptions.toBundle());
 
         recipeToShow = null;
-*/
+
     }
 
 
@@ -566,24 +567,9 @@ public class RecipeListFragment extends Fragment implements
         //else addRecipeButton.show();
     }
 
-    public void updateRecipe(RecipeItemOld recipe) {
-        // TODO: 21/2/17 hacer esto por recipecontroles
-//        if(mRecipes == null){
-//            return;
-//        }
-//        for(int i = 0; i< mRecipes.sizePicture(); i++){
-//            if(mRecipes.getPicture(i).get_id().intValue() == recipe.get_id().intValue()){
-//                mRecipes.removePicture(i);
-//                mRecipes.addPicture(i, recipe);
-//                filterRecipes(lastFilter);
-//            }
-//        }
-    }
-
-    public void createRecipe(RecipeItemOld recipe) {
-        // TODO: 21/2/17 hacer esto por recipecontroler
-//        DatabaseRelatedTools dbTools = new DatabaseRelatedTools();
-//        dbTools.addRecipeToArrayAndDatabase(getActivity().getApplicationContext(), mRecipes, recipe);
+    public void insertRecipe(RecipeComplete recipe) {
+        RecipeDb recipeDb = RecipeDb.fromRecipeComplete(recipe);
+        mRecipeController.insertOrReplaceRecipe(application, recipeDb);
         filterRecipes(lastFilter);
     }
 
@@ -607,10 +593,21 @@ public class RecipeListFragment extends Fragment implements
         if (application == null) {
             return;
         }
-        if(getActivity() != null){
-            ((RecipeListActivity)getActivity()).showProgressDialog(getString(R.string.downloading_recipes_first_load));
+        if (getActivity() != null) {
+            ((RecipeListActivity) getActivity()).showProgressDialog(getString(R.string.downloading_recipes_first_load));
         }
-        //en el primer arranque solo leo las allowed. Las personales y forbidden, ya tocará
+        numNodesOnInitDatabase = 2;
+        downloadRecipesOnFirstLoad(RecetasCookeoConstants.ALLOWED_RECIPES_NODE);
+        downloadRecipesOnFirstLoad(RecetasCookeoConstants.FORBIDDEN_RECIPES_NODE);
+        boolean isSigned = mTools.getBooleanFromPreferences(application.getApplicationContext(),
+                RecetasCookeoConstants.PROPERTY_SIGNED_IN);
+        if(isSigned){
+            numNodesOnInitDatabase++;
+            downloadRecipesOnFirstLoad(RecetasCookeoConstants.PERSONAL_RECIPES_NODE);
+        }
+    }
+    
+    private void downloadRecipesOnFirstLoad(String node){
 
         //descargo las recetas
         DatabaseReference mRecipeRefDetailed = FirebaseDatabase.getInstance()
@@ -625,7 +622,8 @@ public class RecipeListFragment extends Fragment implements
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
+                // TODO: 27/02/2017 ver si cuando no puede acceder al nodo entra aquí (forbidden)
+                numNodesOnInitDatabase--;
             }
         });
 
@@ -637,6 +635,7 @@ public class RecipeListFragment extends Fragment implements
         protected Void doInBackground(DataSnapshot... snapshot) {
             RecipeController recipeController = new RecipeController();
             DataSnapshot dataSnapshot = snapshot[0];
+            int contador = 0;
             for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
                 RecipeFirebase recipeFromFirebase = postSnapshot.getValue(RecipeFirebase.class);
                 if (recipeFromFirebase == null) continue;
@@ -645,18 +644,22 @@ public class RecipeListFragment extends Fragment implements
                     continue;
                 }
                 recipeController.insertRecipeFromFirebase(application, postSnapshot, recipeFromFirebase);
+                contador++;
             }
             return null;
         }
 
         @Override
         protected void onPostExecute(Void param) {
-
-            mTools.savePreferences(application.getApplicationContext(),
-                    RecetasCookeoConstants.PROPERTY_DATABASE_CREATED, true);
-            filterRecipes(lastFilter);
-            if(getActivity() != null){
-                ((RecipeListActivity)getActivity()).hideProgressDialog();
+            numNodesOnInitDatabase--;
+            if(numNodesOnInitDatabase == 0) {
+                mTools.savePreferences(application.getApplicationContext(),
+                        RecetasCookeoConstants.PROPERTY_DATABASE_CREATED, true);
+                filterRecipes(lastFilter);
+                if (getActivity() != null) {
+                    ((RecipeListActivity) getActivity()).hideProgressDialog();
+                }
+                downloadPicturesFromStorage();
             }
         }
     }

@@ -2,6 +2,7 @@ package com.rukiasoft.androidapps.cocinaconroll.persistence.model;
 
 import com.rukiasoft.androidapps.cocinaconroll.R;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.database.model.RecipeFirebase;
+import com.rukiasoft.androidapps.cocinaconroll.ui.model.RecipeComplete;
 import com.rukiasoft.androidapps.cocinaconroll.ui.model.RecipeReduced;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.Tools;
@@ -16,6 +17,8 @@ import org.greenrobot.greendao.annotation.ToMany;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringTokenizer;
+
 import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.DaoException;
 
@@ -72,6 +75,33 @@ public class RecipeDb {
     public RecipeDb() {
     }
 
+    public static RecipeDb fromRecipeComplete(RecipeComplete recipeComplete){
+        RecipeDb recipeDb = new RecipeDb();
+        recipeDb.setId(recipeComplete.getId());
+        recipeDb.setKey(recipeComplete.getKey());
+        recipeDb.setName(recipeComplete.getName());
+        Tools tools = new Tools();
+        recipeDb.setNormalizedName(tools.getNormalizedString(recipeComplete.getName()));
+        recipeDb.setType(recipeComplete.getType());
+        recipeDb.setIcon(recipeComplete.getIcon());
+        recipeDb.setPicture(recipeComplete.getPicture());
+        recipeDb.setFavourite(recipeComplete.getFavourite());
+        recipeDb.setVegetarian(recipeComplete.getVegetarian());
+        recipeDb.setMinutes(recipeComplete.getMinutes());
+        recipeDb.setPortions(recipeComplete.getPortions());
+        recipeDb.setLanguage(recipeComplete.getLanguage());
+        recipeDb.setAuthor(recipeComplete.getAuthor());
+        recipeDb.setLink(recipeComplete.getLink());
+        recipeDb.setTip(recipeComplete.getTip());
+        recipeDb.setOwner(recipeComplete.getOwner());
+        recipeDb.setIngredients(RecipeDb.addIngredients(recipeComplete.getIngredients(), recipeComplete.getKey()));
+        recipeDb.setSteps(RecipeDb.addSteps(recipeComplete.getSteps(), recipeComplete.getKey()));
+        recipeDb.setTimestamp(System.currentTimeMillis());
+        recipeDb.setDownloadRecipe(false);
+        recipeDb.setDownloadPicture(false);
+        return recipeDb;
+    }
+
     public RecipeDb(RecipeFirebase recipe, String key, Integer owner){
         this.key = key;
         this.owner = owner;
@@ -105,22 +135,33 @@ public class RecipeDb {
         this.tip = recipe.getTip();
         this.language = recipe.getLanguage();
         this.link = recipe.getLink();
-        this.ingredients = new ArrayList<>();
-        for(int i=0; i<recipe.getIngredients().size(); i++){
+        this.ingredients = RecipeDb.addIngredients(recipe.getIngredients(), this.key);
+        this.steps = RecipeDb.addSteps(recipe.getSteps(), this.key);
+
+    }
+
+    private static List<IngredientDb> addIngredients(List<String> indredients, String key){
+        List<IngredientDb> mIngredients = new ArrayList<>();
+        for(int i=0; i<indredients.size(); i++){
             IngredientDb ingredientDb = new IngredientDb();
-            ingredientDb.setIngredient(recipe.getIngredients().get(i));
+            ingredientDb.setIngredient(indredients.get(i));
             ingredientDb.setPosition(i);
             ingredientDb.setKey(key);
-            this.ingredients.add(ingredientDb);
+            mIngredients.add(ingredientDb);
         }
-        this.steps = new ArrayList<>();
-        for(int i=0; i<recipe.getSteps().size(); i++){
+        return mIngredients;
+    }
+
+    private static List<StepDb> addSteps(List<String> steps, String key){
+        List<StepDb> mSteps = new ArrayList<>();
+        for(int i=0; i<steps.size(); i++){
             StepDb stepDb = new StepDb();
-            stepDb.setStep(recipe.getSteps().get(i));
+            stepDb.setStep(steps.get(i));
             stepDb.setPosition(i);
             stepDb.setKey(key);
-            this.steps.add(stepDb);
+            mSteps.add(stepDb);
         }
+        return mSteps;
 
     }
 
@@ -296,6 +337,14 @@ public class RecipeDb {
 
     public Boolean getDownloadPicture() {
         return this.downloadPicture;
+    }
+
+    public void setIngredients(List<IngredientDb> ingredients) {
+        this.ingredients = ingredients;
+    }
+
+    public void setSteps(List<StepDb> steps) {
+        this.steps = steps;
     }
 
     public void setDownloadPicture(Boolean downloadPicture) {

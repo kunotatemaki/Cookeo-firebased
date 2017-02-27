@@ -3,195 +3,187 @@ package com.rukiasoft.androidapps.cocinaconroll.ui.model;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.model.IngredientDb;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.model.RecipeDb;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.model.StepDb;
-
-import org.greenrobot.greendao.annotation.Id;
-import org.greenrobot.greendao.annotation.Index;
-import org.greenrobot.greendao.annotation.JoinProperty;
-import org.greenrobot.greendao.annotation.NotNull;
-import org.greenrobot.greendao.annotation.OrderBy;
-import org.greenrobot.greendao.annotation.ToMany;
+import android.os.Parcelable;
+import com.google.auto.value.AutoValue;
 
 import java.util.List;
 
 /**
  * Created by iRoll on 19/2/17.
  */
+@AutoValue
+public class RecipeComplete implements Parcelable{
+    abstract Long id();
+    abstract String key();
+    abstract String name();
+    abstract String type();
+    abstract Integer icon();
+    abstract String picture();
+    abstract Boolean vegetarian();
+    abstract Boolean favourite();
+    abstract Integer minutes();
+    abstract Integer portions();
+    abstract Integer language();
+    abstract String author();
+    abstract String link();
+    @Nullable abstract String tip();
+    abstract Integer owner();
+    abstract Long timestamp();
+    @Nullable abstract List<String> ingredients();
+    @Nullable abstract List<String> steps();
 
-public class RecipeComplete {
-    private Long id;
-    private String key;
-    private String name;
-    private String type;
-    private Integer icon;
-    private String picture;
-    private Boolean vegetarian;
-    private Boolean favourite;
-    private Integer minutes;
-    private Integer portions;
-    private Integer language;
-    private String author;
-    private String link;
-    private String tip;
-    private Integer owner;
-    private List<IngredientDb> ingredients;
-    private List<StepDb> steps;
-
-    public RecipeComplete() {
+    static RecipeComplete.Builder builder() {
+        return new $AutoValue_RecipeComplete.Builder();
     }
 
-    public RecipeComplete(RecipeDb recipeDb) {
-        this.id = recipeDb.getId();
-        this.key = recipeDb.getKey();
-        this.name = recipeDb.getName();
-        this.type = recipeDb.getType();
-        this.icon = recipeDb.getIcon();
-        this.picture = recipeDb.getPicture();
-        this.vegetarian = recipeDb.getVegetarian();
-        this.favourite = recipeDb.getFavourite();
-        this.minutes = recipeDb.getMinutes();
-        this.portions = recipeDb.getPortions();
-        this.language = recipeDb.getLanguage();
-        this.author = recipeDb.getAuthor();
-        this.link = recipeDb.getLink();
-        this.tip = recipeDb.getTip();
-        this.owner = recipeDb.getOwner();
-        this.ingredients = recipeDb.getIngredients();
-        this.steps = recipeDb.getSteps();
+    @AutoValue.Builder
+    abstract static class Builder {
+        abstract RecipeComplete.Builder setId(Long value);
+        abstract RecipeComplete.Builder setKey(String value);
+        abstract RecipeComplete.Builder setName(String value);
+        abstract RecipeComplete.Builder setIcon(Integer value);
+        abstract RecipeComplete.Builder setPicture(String value);
+        abstract RecipeComplete.Builder settimestamp(Long value);
+        abstract RecipeComplete.Builder setVegetarian(Boolean value);
+        abstract RecipeComplete.Builder setFavourite(Boolean value);
+        abstract RecipeComplete.Builder setOwner(Integer value);
+        abstract RecipeComplete.Builder setTimestamp(Long value);
+        abstract RecipeComplete.Builder setType(String value);
+        abstract RecipeComplete.Builder setMinutes(Integer value);
+        abstract RecipeComplete.Builder setPortions(Integer value);
+        abstract RecipeComplete.Builder setAuthor(String value);
+        abstract RecipeComplete.Builder setLink(String value);
+        abstract RecipeComplete.Builder setTip(String value);
+        abstract RecipeComplete.Builder setIngredients(List<String> value);
+        abstract RecipeComplete.Builder setSteps(List<String> value);
+        abstract RecipeReduced build();
+
+    }
+
+    public static RecipeComplete getRecipeFromDatabase(RecipeDb recipeDb) {
+        try {
+            return RecipeComplete.builder()
+                    .setId(recipeDb.getId())
+                    .setKey(recipeDb.getKey())
+                    .setName(recipeDb.getName())
+                    .setIcon(recipeDb.getIcon())
+                    .setPicture(recipeDb.getPicture())
+                    .setTimestamp(recipeDb.getTimestamp())
+                    .setVegetarian(recipeDb.getVegetarian())
+                    .setFavourite(recipeDb.getFavourite())
+                    .setOwner(recipeDb.getOwner())
+                    .setTimestamp(recipeDb.getTimestamp())
+                    .setType(recipeDb.getType())
+                    .setMinutes((recipeDb.getMinutes())
+                    .setPortions((recipeDb.getPortions())
+                    .setAuthor((recipeDb.getAuthor())
+                    .setLink((recipeDb.getLink())
+                    .setTip((recipeDb.getTip())
+                    .setIngredients((recipeDb.getIngredients())
+                    .setSteps((recipeDb.getSteps())
+                    .build();
+        }catch (IllegalStateException e){
+            return null;
+        }
+    }
+
+    public static RecipeComplete getRecipeFromRecipe(RecipeComplete recipe) {
+        try {
+            return RecipeComplete.builder()
+                    .setId(recipe.getId())
+                    .setKey(recipe.getKey())
+                    .setTimestamp(recipe.getTimestamp())
+                    .setName(recipe.getName())
+                    .setIcon(recipe.getIcon())
+                    .setPicture(recipe.getPicture())
+                    .setVegetarian(recipe.getVegetarian())
+                    .setFavourite(recipe.getFavourite())
+                    .setOwner(recipe.getOwner())
+                    .setTimestamp(recipe.getTimestamp())
+                    .setType(recipe.getType())
+                    .setMinutes((recipe.getMinutes())
+                            .setPortions((recipe.getPortions())
+                                    .setAuthor((recipe.getAuthor())
+                                            .setLink((recipe.getLink())
+                                                    .setTip((recipe.getTip())
+                                                            .setIngredients((recipe.getIngredients())
+                                                                    .setSteps((recipe.getSteps())
+                                                                            .build();
+        }catch (IllegalStateException e){
+            return null;
+        }
     }
 
     public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
+        return id();
     }
 
     public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
+        return key();
     }
 
     public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+        return name();
     }
 
     public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
+        return type();
     }
 
     public Integer getIcon() {
-        return icon;
-    }
-
-    public void setIcon(Integer icon) {
-        this.icon = icon;
+        return icon();
     }
 
     public String getPicture() {
-        return picture;
-    }
-
-    public void setPicture(String picture) {
-        this.picture = picture;
+        return picture();
     }
 
     public Boolean getVegetarian() {
-        return vegetarian;
-    }
-
-    public void setVegetarian(Boolean vegetarian) {
-        this.vegetarian = vegetarian;
+        return vegetarian();
     }
 
     public Boolean getFavourite() {
-        return favourite;
-    }
-
-    public void setFavourite(Boolean favourite) {
-        this.favourite = favourite;
+        return favourite();
     }
 
     public Integer getMinutes() {
-        return minutes;
-    }
-
-    public void setMinutes(Integer minutes) {
-        this.minutes = minutes;
+        return minutes();
     }
 
     public Integer getPortions() {
-        return portions;
-    }
-
-    public void setPortions(Integer portions) {
-        this.portions = portions;
+        return portions();
     }
 
     public Integer getLanguage() {
-        return language;
-    }
-
-    public void setLanguage(Integer language) {
-        this.language = language;
+        return language();
     }
 
     public String getAuthor() {
-        return author;
-    }
-
-    public void setAuthor(String author) {
-        this.author = author;
+        return author();
     }
 
     public String getLink() {
-        return link;
-    }
-
-    public void setLink(String link) {
-        this.link = link;
+        return link();
     }
 
     public String getTip() {
-        return tip;
-    }
-
-    public void setTip(String tip) {
-        this.tip = tip;
+        return tip();
     }
 
     public Integer getOwner() {
-        return owner;
+        return owner();
     }
 
-    public void setOwner(Integer owner) {
-        this.owner = owner;
+    public Long getTimestamp(){
+        return timestamp();
     }
 
-    public List<IngredientDb> getIngredients() {
-        return ingredients;
+    public List<String> getIngredients() {
+        return ingredients();
     }
 
-    public void setIngredients(List<IngredientDb> ingredients) {
-        this.ingredients = ingredients;
+    public List<String> getSteps() {
+        return steps();
     }
 
-    public List<StepDb> getSteps() {
-        return steps;
-    }
-
-    public void setSteps(List<StepDb> steps) {
-        this.steps = steps;
-    }
 }
