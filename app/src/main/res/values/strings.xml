@@ -150,7 +150,8 @@
 
     <string name="web_client_id" translatable="false">962580870211-67gs2sopg9l6v1bc36ed19rdc1dlj407.apps.googleusercontent.com</string>
     <string name="sign_in">Sign in</string>
-    <string name="downloading_recipes">Downloading recipes… It can take a couple of minutes on firs load</string>
+    <string name="downloading_recipes">Downloading recipes… </string>
+    <string name="downloading_recipes_first_load">Downloading recipes… It can take a couple of minutes on firs load</string>
     <string name="cancel">Cancel</string>
     <string name="downloading_pictures">Downloading recipe\'s pictures in the background. You can use the app while downloading.</string>
 

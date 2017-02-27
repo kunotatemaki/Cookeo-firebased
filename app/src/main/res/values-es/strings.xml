@@ -124,7 +124,8 @@
     <string name="write_external_explanation">Se necesita este permiso para cargar recetas creadas en versiones anteriores de la aplicación</string>
     <string name="close">Cerrar</string>
     <string name="sign_in">Iniciar sesión</string>
-    <string name="downloading_recipes">Descargando recetas… Puede tardar unos minutos en el primer arranque.</string>
+    <string name="downloading_recipes">Descargando recetas… </string>
+    <string name="downloading_recipes_first_load">Descargando recetas… Puede tardar unos minutos en el primer arranque.</string>
     <string name="downloading_pictures">Descargando las fotos de las recetas en segundo plano. Puedes usar la aplicación mientras tanto.</string>
 
 

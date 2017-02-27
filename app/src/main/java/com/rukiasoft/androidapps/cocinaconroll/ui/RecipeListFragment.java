@@ -126,6 +126,8 @@ public class RecipeListFragment extends Fragment implements
     @State Boolean firstLoad = true;
     @State int isDownloadingTimestamps;
 
+    Tools mTools;
+
 
 
     //Pull de fotos a descargar
@@ -169,7 +171,7 @@ public class RecipeListFragment extends Fragment implements
             }
         });
         requestNewInterstitial();
-
+        mTools = new Tools();
 
     }
 
@@ -244,8 +246,7 @@ public class RecipeListFragment extends Fragment implements
             addRecipeButtonFAB.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Tools tools = new Tools();
-                    if(tools.getBooleanFromPreferences(getContext().getApplicationContext(),
+                    if(mTools.getBooleanFromPreferences(getContext().getApplicationContext(),
                             RecetasCookeoConstants.PROPERTY_SIGNED_IN)){
                         createRecipe();
                     }else{
@@ -257,18 +258,6 @@ public class RecipeListFragment extends Fragment implements
             });
         }
         return view;
-    }
-
-    public void checkNewRecipesFromFirebase(){
-        Tools tools = new Tools();
-        Boolean isSignedIn = tools.getBooleanFromPreferences(getContext(), RecetasCookeoConstants.PROPERTY_SIGNED_IN);
-        isDownloadingTimestamps = 2;
-        connectToFirebaseForNewRecipes(RecetasCookeoConstants.ALLOWED_RECIPES_NODE);
-        connectToFirebaseForNewRecipes(RecetasCookeoConstants.FORBIDDEN_RECIPES_NODE);
-        if(isSignedIn){
-            isDownloadingTimestamps++;
-            connectToFirebaseForNewRecipes(RecetasCookeoConstants.PERSONAL_RECIPES_NODE);
-        }
     }
 
     public void createRecipe(){
@@ -314,20 +303,27 @@ public class RecipeListFragment extends Fragment implements
 
         // Initialize a Loader with id '1'. If the Loader with this id already
         // exists, then the LoaderManager will reuse the existing Loader.
+
+
+        boolean isDatabaseCreated = mTools.getBooleanFromPreferences(getContext(), RecetasCookeoConstants.PROPERTY_DATABASE_CREATED);
+
         if(lastFilter == null){
             lastFilter = RecetasCookeoConstants.FILTER_ALL_RECIPES;
         }
-        if(mRecipes == null || mRecipes.size() == 0 || needToRefresh) {
+
+        if(!isDatabaseCreated){
+            downloadRecipesOnFirstLoad();
+        }else if(firstLoad){
+            firstLoad = false;
+            checkNewRecipesFromFirebase();
+        }else if(mRecipes == null || mRecipes.size() == 0 || needToRefresh) {
             needToRefresh = false;
             filterRecipes(lastFilter);
         }else{
             setData();
         }
 
-        if(firstLoad){
-            firstLoad = false;
-            checkNewRecipesFromFirebase();
-        }
+
     }
 
     @Override
@@ -356,7 +352,6 @@ public class RecipeListFragment extends Fragment implements
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         if(getActivity() instanceof ToolbarAndProgressActivity){
             if(isResumed()){
-                Tools tools = new Tools();
                 //tools.showRefreshLayout(getActivity());
             }else {
                 //((ToolbarAndProgressActivity) getActivity()).needToShowRefresh = true;
@@ -399,7 +394,6 @@ public class RecipeListFragment extends Fragment implements
     public void onLoaderReset(Loader<Cursor> loader) {
         if(mRecyclerView != null) {
             mRecyclerView.setAdapter(null);
-            Tools tools = new Tools();
             //tools.hideRefreshLayout(getActivity());
         }
     }
@@ -413,7 +407,6 @@ public class RecipeListFragment extends Fragment implements
         //orderRecipesByName();
         //((ToolbarAndProgressActivity) getActivity()).needToShowRefresh = false;
         if(isResumed()) {
-            Tools tools = new Tools();
             //tools.hideRefreshLayout(getActivity());
         }
 
@@ -464,14 +457,13 @@ public class RecipeListFragment extends Fragment implements
 
     private void showRecipeDetails(RecipeReduced recipeReduced){
         //interstitial
-        Tools tools = new Tools();
-        int number = tools.getIntegerFromPreferences(getActivity().getApplicationContext(), RecetasCookeoConstants.PREFERENCE_INTERSTITIAL);
+        int number = mTools.getIntegerFromPreferences(getActivity().getApplicationContext(), RecetasCookeoConstants.PREFERENCE_INTERSTITIAL);
         if(number<0 || number> RecetasCookeoConstants.N_RECIPES_TO_INTERSTICIAL){
             number = 0;
         }
         RecipeDb recipeDb = mRecipeController.getRecipeById(getActivity().getApplication(), recipeReduced.getId());
-
-        recipeToShow = RecipeComplete(recipeDb);
+// TODO: 27/2/17 cargar la foto mediante constructor o lo qeu sea
+        //recipeToShow = RecipeComplete(recipeDb);
         if(number != RecetasCookeoConstants.N_RECIPES_TO_INTERSTICIAL) {
             launchActivityDetails();
         }else if(mInterstitialAd.isLoaded()) {
@@ -482,21 +474,22 @@ public class RecipeListFragment extends Fragment implements
             requestNewInterstitial();
             return;
         }
-        tools.savePreferences(getActivity(), RecetasCookeoConstants.PREFERENCE_INTERSTITIAL, ++number);
+        mTools.savePreferences(getActivity(), RecetasCookeoConstants.PREFERENCE_INTERSTITIAL, ++number);
 
     }
 
     private void launchActivityDetails(){
         Intent intent = new Intent(getActivity(), RecipeDetailActivityBase.class);
         Bundle bundle = new Bundle();
-        bundle.putParcelable(RecetasCookeoConstants.KEY_RECIPE, recipeToShow);
+        // TODO: 27/2/17 arreglar lo del parcelable
+        /*bundle.putParcelable(RecetasCookeoConstants.KEY_RECIPE, recipeToShow);
         intent.putExtras(bundle);
         ActivityOptionsCompat activityOptions = ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity());
         // Now we can start the Activity, providing the activity options as a bundle
         ActivityCompat.startActivityForResult(getActivity(), intent, RecetasCookeoConstants.REQUEST_DETAILS, activityOptions.toBundle());
 
         recipeToShow = null;
-
+*/
     }
 
 
@@ -536,7 +529,6 @@ public class RecipeListFragment extends Fragment implements
         }else if(filter.compareTo(RecetasCookeoConstants.FILTER_LATEST_RECIPES) == 0){
             type = getResources().getString(R.string.last_downloaded);
             bundle.putString(RecetasCookeoConstants.SEARCH_FIELD, RecetasCookeoConstants.SEARCH_LATEST);
-            Tools mTools = new Tools();
             //mRecipes = dbTools.searchRecipesInDatabase(getActivity().getApplicationContext(),
               //      RecipesTable.FIELD_DATE, mTools.getTimeframe());
             iconResource = R.drawable.ic_latest_24;
@@ -604,6 +596,83 @@ public class RecipeListFragment extends Fragment implements
 //        if (coincidences.sizePicture() > 0) {
 //            showRecipeDetails(coincidences.getPicture(0));
 //        }
+    }
+
+    ///////////// PARTE DE DESCARGA DE LAS RECETAS ///////////////
+
+    private void downloadRecipesOnFirstLoad() {
+        if (isDownloadingRecipes) {
+            return;
+        }
+        if (application == null) {
+            return;
+        }
+        if(getActivity() != null){
+            ((RecipeListActivity)getActivity()).showProgressDialog(getString(R.string.downloading_recipes_first_load));
+        }
+        //en el primer arranque solo leo las allowed. Las personales y forbidden, ya tocará
+
+        //descargo las recetas
+        DatabaseReference mRecipeRefDetailed = FirebaseDatabase.getInstance()
+                .getReference(RecetasCookeoConstants.ALLOWED_RECIPES_NODE +
+                        "/" + RecetasCookeoConstants.DETAILED_RECIPES_NODE );
+        mRecipeRefDetailed.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                DownloadRecipesOnFirsLoadTask downloadTask = new DownloadRecipesOnFirsLoadTask();
+                downloadTask.execute(dataSnapshot);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+    }
+
+    private class DownloadRecipesOnFirsLoadTask extends AsyncTask<DataSnapshot, Integer, Void> {
+
+        @Override
+        protected Void doInBackground(DataSnapshot... snapshot) {
+            RecipeController recipeController = new RecipeController();
+            DataSnapshot dataSnapshot = snapshot[0];
+            for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
+                RecipeFirebase recipeFromFirebase = postSnapshot.getValue(RecipeFirebase.class);
+                if (recipeFromFirebase == null) continue;
+                //String key = dataSnapshot.getRef().getParent().getParent().getKey();
+                if (application == null) {
+                    continue;
+                }
+                recipeController.insertRecipeFromFirebase(application, postSnapshot, recipeFromFirebase);
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void param) {
+
+            mTools.savePreferences(application.getApplicationContext(),
+                    RecetasCookeoConstants.PROPERTY_DATABASE_CREATED, true);
+            filterRecipes(lastFilter);
+            if(getActivity() != null){
+                ((RecipeListActivity)getActivity()).hideProgressDialog();
+            }
+        }
+    }
+
+    private void checkNewRecipesFromFirebase(){
+        if(isDownloadingTimestamps != 0){
+            return;
+        }
+        Boolean isSignedIn = mTools.getBooleanFromPreferences(getContext(), RecetasCookeoConstants.PROPERTY_SIGNED_IN);
+        isDownloadingTimestamps = 2;
+        connectToFirebaseForNewRecipes(RecetasCookeoConstants.ALLOWED_RECIPES_NODE);
+        connectToFirebaseForNewRecipes(RecetasCookeoConstants.FORBIDDEN_RECIPES_NODE);
+        if(isSignedIn){
+            isDownloadingTimestamps++;
+            connectToFirebaseForNewRecipes(RecetasCookeoConstants.PERSONAL_RECIPES_NODE);
+        }
     }
 
     private void connectToFirebaseForNewRecipes(String node){
