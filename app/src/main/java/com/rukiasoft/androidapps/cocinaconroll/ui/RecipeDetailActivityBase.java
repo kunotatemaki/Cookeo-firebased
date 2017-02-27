@@ -9,8 +9,10 @@ import android.view.MenuItem;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
+import com.rukiasoft.androidapps.cocinaconroll.BuildConfig;
 import com.rukiasoft.androidapps.cocinaconroll.R;
 import com.rukiasoft.androidapps.cocinaconroll.classes.RecipeItemOld;
+import com.rukiasoft.androidapps.cocinaconroll.ui.model.RecipeComplete;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.CommonRecipeOperations;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.Tools;
@@ -32,28 +34,26 @@ public class RecipeDetailActivityBase extends ToolbarAndProgressActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recipe_detail);
         unbinder = ButterKnife.bind(this);
-        RecipeItemOld recipeItemOld = new RecipeItemOld();
         Intent intent = getIntent();
-        if(intent != null && intent.hasExtra(RecetasCookeoConstants.KEY_RECIPE))
-            recipeItemOld = getIntent().getExtras().getParcelable(RecetasCookeoConstants.KEY_RECIPE);
-        else{
+        if(intent == null || !intent.hasExtra(RecetasCookeoConstants.KEY_RECIPE)){
             finish();
         }
+        RecipeComplete recipeComplete = getIntent().getExtras().getParcelable(RecetasCookeoConstants.KEY_RECIPE);
+
         RecipeDetailsFragment recipeDetailsFragment = (RecipeDetailsFragment) getSupportFragmentManager().findFragmentById(R.id.details_recipes_fragment);
         if(recipeDetailsFragment != null){
-            recipeDetailsFragment.setRecipe(recipeItemOld);
+            recipeDetailsFragment.setRecipe(recipeComplete);
         }else{
             finish();
         }
         //set up advertises
         AdRequest adRequest = new AdRequest.Builder()
                 .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)        // All emulators
-                .addTestDevice("B29C1F71528C79C864D503360C5225C0")  // My Xperia Z3 test device
+                .addTestDevice(BuildConfig.Z3_DEVICE_ID)  // My Xperia Z3 test device
                 .setGender(AdRequest.GENDER_FEMALE)
                 .build();
 
         mAdViewDetails.loadAd(adRequest);
-
 
     }
 
@@ -101,7 +101,8 @@ public class RecipeDetailActivityBase extends ToolbarAndProgressActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent intentData) {
         if(requestCode == RecetasCookeoConstants.REQUEST_EDIT_RECIPE){
             if(resultCode == RecetasCookeoConstants.RESULT_UPDATE_RECIPE && intentData != null && intentData.hasExtra(RecetasCookeoConstants.KEY_RECIPE)){
-                RecipeItemOld recipe = intentData.getParcelableExtra(RecetasCookeoConstants.KEY_RECIPE);
+                // TODO: 27/2/17 salvar la receta
+                /*RecipeComplete recipe = intentData.getParcelableExtra(RecetasCookeoConstants.KEY_RECIPE);
                 RecipeDetailsFragment recipeDetailsFragment = (RecipeDetailsFragment) getSupportFragmentManager().findFragmentById(R.id.details_recipes_fragment);
                 if(recipeDetailsFragment != null)
                     recipeDetailsFragment.updateRecipe(recipe);
@@ -117,7 +118,7 @@ public class RecipeDetailActivityBase extends ToolbarAndProgressActivity {
                 Bundle bundle = new Bundle();
                 bundle.putParcelable(RecetasCookeoConstants.KEY_RECIPE, recipe);
                 returnIntent.putExtras(bundle);
-                setResult(RecetasCookeoConstants.RESULT_UPDATE_RECIPE, returnIntent);
+                setResult(RecetasCookeoConstants.RESULT_UPDATE_RECIPE, returnIntent);*/
             }
         }
     }

@@ -18,6 +18,7 @@ import org.greenrobot.greendao.annotation.ToMany;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.util.zip.Inflater;
 
 import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.DaoException;
@@ -140,11 +141,11 @@ public class RecipeDb {
 
     }
 
-    private static List<IngredientDb> addIngredients(List<String> indredients, String key){
+    private static List<IngredientDb> addIngredients(List<String> ingredients, String key){
         List<IngredientDb> mIngredients = new ArrayList<>();
-        for(int i=0; i<indredients.size(); i++){
+        for(int i=0; i<ingredients.size(); i++){
             IngredientDb ingredientDb = new IngredientDb();
-            ingredientDb.setIngredient(indredients.get(i));
+            ingredientDb.setIngredient(ingredients.get(i));
             ingredientDb.setPosition(i);
             ingredientDb.setKey(key);
             mIngredients.add(ingredientDb);
@@ -163,6 +164,22 @@ public class RecipeDb {
         }
         return mSteps;
 
+    }
+
+    public List<String> getStepsAsStringList(){
+        List<String> list = new ArrayList<>();
+        for(StepDb stepDb : steps){
+            list.add(stepDb.getStep());
+        }
+        return list;
+    }
+
+    public List<String> getIngredientsAsStringList(){
+        List<String> list = new ArrayList<>();
+        for(IngredientDb ingredientDb : ingredients){
+            list.add(ingredientDb.getIngredient());
+        }
+        return list;
     }
 
     @Generated(hash = 256029834)

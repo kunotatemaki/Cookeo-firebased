@@ -19,6 +19,7 @@ import com.orhanobut.logger.Logger;
 import com.rukiasoft.androidapps.cocinaconroll.R;
 import com.rukiasoft.androidapps.cocinaconroll.classes.PreinstalledRecipeNamesList;
 import com.rukiasoft.androidapps.cocinaconroll.classes.RecipeItemOld;
+import com.rukiasoft.androidapps.cocinaconroll.ui.model.RecipeComplete;
 
 import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.core.Persister;
@@ -423,8 +424,10 @@ public class ReadWriteTools {
     }
 
     public void loadImageFromPathInCircle(Context mContext, ImageView imageView, String path, int defaultImage, int version) {
-       Glide.with(mContext)
-               .load(Uri.parse(path))
+        String fullPath = getOriginalStorageDir(mContext);
+        File file = new File(fullPath + path);
+        Glide.with(mContext)
+               .load(Uri.fromFile(file))
                .centerCrop()
                .signature(new MediaStoreSignature(RecetasCookeoConstants.MIME_TYPE_PICTURE, version, 0))
                .transform(new GlideCircleTransform(mContext))
@@ -432,9 +435,11 @@ public class ReadWriteTools {
                .into(imageView);
     }
 
-    public void loadImageFromPath(Context mContext, BitmapImageViewTarget bitmapImageViewTarget, String path, int defaultImage, int version) {
+    public void loadImageFromPath(Context mContext, BitmapImageViewTarget bitmapImageViewTarget, String path, int defaultImage, long version) {
+        String fullPath = getOriginalStorageDir(mContext);
+        File file = new File(fullPath + path);
         Glide.with(mContext)
-                .load(Uri.parse(path))
+                .load(Uri.fromFile(file))
                 .asBitmap()
                 .signature(new MediaStoreSignature(RecetasCookeoConstants.MIME_TYPE_PICTURE, version, 0))
                 .centerCrop()
@@ -442,9 +447,10 @@ public class ReadWriteTools {
                 .into(bitmapImageViewTarget);
     }
 
-    public void share(final Activity activity, RecipeItemOld recipe)
+    public void share(final Activity activity, RecipeComplete recipe)
     {
-        //need to "send multiple" to get more than one attachment
+        //// TODO: 27/2/17 a ver cómo cambio esto
+        /*//need to "send multiple" to get more than one attachment
         Tools tools = new Tools();
         Boolean installed = tools.isPackageInstalled("com.google.android.gm", activity);
         final Intent emailIntent = new Intent(Intent.ACTION_SEND_MULTIPLE);
@@ -491,21 +497,8 @@ public class ReadWriteTools {
 
             builder.show();
         }else
-            activity.startActivity(emailIntent);
+            activity.startActivity(emailIntent);*/
     }
-
-    public String getZipsStorageDir(Context mContext){
-        //create the dir if dont exist
-        String path = mContext.getExternalFilesDir(null) + String.valueOf(File.separatorChar)
-                + RecetasCookeoConstants.ZIPS_DIR + String.valueOf(File.separatorChar);
-        File f = new File(path);
-        if(!f.exists()){
-            f.mkdirs();
-        }
-        return path;
-    }
-
-
 
 
     public RecipeItemOld readRecipeInfo(Context mContext, String pathRecipe) {

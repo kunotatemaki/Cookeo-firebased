@@ -23,7 +23,6 @@ public class RecipeQueries {
     private static Query queryRecipeByKey;
     private static Query queryRecipeById;
     private static Query queryRecipesByName;
-    private static CursorQuery cursorRecipesByType;
     private static CursorQuery cursorFavouriteRecipes;
     private static CursorQuery cursorVegetarianRecipes;
     private static CursorQuery cursorOwnRecipes;
@@ -94,8 +93,14 @@ public class RecipeQueries {
         return queryRecipesByName.forCurrentThread();
     }
 
+    public static Cursor getCursorRecipesByName(DaoSession session, String name) {
+        CursorQuery cursor = initializeCursorRecipesByName(session, name);
+
+        return cursor.forCurrentThread().query();
+    }
+
     public static Cursor getCursorRecipesByType(DaoSession session, String type) {
-        initializeCursorRecipesByType(session, type);
+        CursorQuery cursorRecipesByType = initializeCursorRecipesByType(session, type);
         return cursorRecipesByType.forCurrentThread().query();
     }
 
@@ -220,11 +225,19 @@ public class RecipeQueries {
 //        ).build();
     }
 
-    private static void initializeCursorRecipesByType(DaoSession session, String type){
+    private static CursorQuery initializeCursorRecipesByType(DaoSession session, String type){
         RecipeDbDao recipeDbDao = session.getRecipeDbDao();
         recipeDbDao.detachAll();
-        cursorRecipesByType = recipeDbDao.queryBuilder().where(
+        return recipeDbDao.queryBuilder().where(
                 RecipeDbDao.Properties.Type.like(type)
+        ).buildCursor();
+    }
+
+    private static CursorQuery initializeCursorRecipesByName(DaoSession session, String name){
+        RecipeDbDao recipeDbDao = session.getRecipeDbDao();
+        recipeDbDao.detachAll();
+        return recipeDbDao.queryBuilder().where(
+                RecipeDbDao.Properties.NormalizedName.like("%" + name + "%")
         ).buildCursor();
     }
 

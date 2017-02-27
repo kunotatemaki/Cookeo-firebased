@@ -23,9 +23,8 @@ public class CocinaConRollContentProvider extends ContentProvider {
     private RecipesDB mRecipesDB = null;
     private RecipeController recipeController = null;
 
-    private static final int SUGGESTIONS_RECIPE = 1;
-    private static final int SEARCH_SUGGESTION = 2;
-    private static final int GET_SUGGESTION = 3;
+    private static final int COINCIDENCES = 1;
+    private static final int GET_SEARCHED_RECIPE = 3;
     private static final int GET_ALL_RECIPES = 4;
     private static final int GET_RECIPE = 5;
     private static final int GET_MAINS = 6;
@@ -46,13 +45,13 @@ public class CocinaConRollContentProvider extends ContentProvider {
         UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
         // Suggestion items of Search Dialog is provided by this uri
-        uriMatcher.addURI(AUTHORITY, SearchManager.SUGGEST_URI_PATH_QUERY, SUGGESTIONS_RECIPE);
+        uriMatcher.addURI(AUTHORITY, SearchManager.SUGGEST_URI_PATH_QUERY, COINCIDENCES);
 
         // This URI is invoked, when user presses "Go" in the Keyboard of Search Dialog
         // Listview items of SearchableActivity is provided by this uri
-        uriMatcher.addURI(AUTHORITY, "suggestions", SEARCH_SUGGESTION);
+        uriMatcher.addURI(AUTHORITY, "suggestions", COINCIDENCES);
         // This URI is invoked, when user selects a suggestion from search dialog or an item from the listview
-        uriMatcher.addURI(AUTHORITY, "suggestions/#", GET_SUGGESTION);
+        uriMatcher.addURI(AUTHORITY, "suggestions/#", GET_SEARCHED_RECIPE);
 
         uriMatcher.addURI(AUTHORITY, RecetasCookeoConstants.SEARCH_ALL, GET_ALL_RECIPES);
         uriMatcher.addURI(AUTHORITY, RecetasCookeoConstants.SEARCH_MAIN, GET_MAINS);
@@ -83,13 +82,10 @@ public class CocinaConRollContentProvider extends ContentProvider {
         Cursor c = null;
         String id_recipe;
         switch(mUriMatcher.match(uri)){
-            case SUGGESTIONS_RECIPE:
-                c = mRecipesDB.getSuggestions(selectionArgs);
+            case COINCIDENCES:
+                c = recipeController.getRecipesByName((Application)getContext().getApplicationContext(), selectionArgs[0]);
                 break;
-            case SEARCH_SUGGESTION:
-                c = mRecipesDB.getSuggestions(projection, selection, selectionArgs, sortOrder);
-                break;
-            case GET_SUGGESTION:
+            case GET_SEARCHED_RECIPE:
                 id_recipe = uri.getLastPathSegment();
                 c = mRecipesDB.getSuggestion(id_recipe);
                 break;

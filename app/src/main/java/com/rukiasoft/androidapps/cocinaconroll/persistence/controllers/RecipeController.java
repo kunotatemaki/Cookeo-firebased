@@ -166,9 +166,12 @@ public class RecipeController {
         return recipeDb;
     }
 
-    public List<RecipeDb> getRecipesByName(Application application, String name) {
+    public Cursor getRecipesByName(Application application, String name) {
+
         DaoSession session = CommonController.getDaosessionFromApplication(application, "RecipeDb");
-        Query queryRecipe = RecipeQueries.getQueryRecipesByName(session);
+        return RecipeQueries.getCursorRecipesByName(session, name);
+
+        /*Query queryRecipe = RecipeQueries.getQueryRecipesByName(session);
         StringBuilder stringBuilder = new StringBuilder(name);
         stringBuilder.insert(0, "%");
         stringBuilder.append("%");
@@ -182,7 +185,7 @@ public class RecipeController {
             recipeDb.getIngredients();
             recipeDb.getSteps();
         }
-        return recipeDbList;
+        return recipeDbList;*/
     }
 
 

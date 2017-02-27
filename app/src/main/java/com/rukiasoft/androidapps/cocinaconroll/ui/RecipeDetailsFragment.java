@@ -31,6 +31,7 @@ import android.support.v7.graphics.Palette;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
+import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -53,6 +54,9 @@ import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.rukiasoft.androidapps.cocinaconroll.CocinaConRollApplication;
 import com.rukiasoft.androidapps.cocinaconroll.R;
 import com.rukiasoft.androidapps.cocinaconroll.classes.RecipeItemOld;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.model.IngredientDb;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.model.StepDb;
+import com.rukiasoft.androidapps.cocinaconroll.ui.model.RecipeComplete;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.CommonRecipeOperations;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.ReadWriteTools;
@@ -62,6 +66,7 @@ import com.squareup.leakcanary.RefWatcher;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import icepick.State;
 
 
 public class RecipeDetailsFragment extends Fragment implements
@@ -95,7 +100,8 @@ public class RecipeDetailsFragment extends Fragment implements
     @BindView(R.id.listview_steps_cardview)
     LinearLayout stepsList;
     private Unbinder unbinder;
-    private RecipeItemOld recipe;
+    @State
+    RecipeComplete recipe;
     private boolean recipeLoaded = false;
     private ActionBar actionBar;
     @BindView(R.id.cardview_link_textview) TextView author;
@@ -128,7 +134,6 @@ public class RecipeDetailsFragment extends Fragment implements
             getActivity().supportPostponeEnterTransition();
         }
         setHasOptionsMenu(true);
-        Tools mTools = new Tools();
         rwTools = new ReadWriteTools();
 
     }
@@ -184,9 +189,7 @@ public class RecipeDetailsFragment extends Fragment implements
             case R.id.menu_item_remove:
                 AlertDialog.Builder removeBuilder = new AlertDialog.Builder(getActivity());
                 String message;
-                if((recipe.getState() & (RecetasCookeoConstants.FLAG_EDITED| RecetasCookeoConstants.FLAG_EDITED_PICTURE))!=0){
-                    message = getActivity().getResources().getString(R.string.restore_recipe_confirmation);
-                }else if((recipe.getState() & RecetasCookeoConstants.FLAG_OWN)!=0){
+                if(recipe.getOwner() == RecetasCookeoConstants.FLAG_PERSONAL_RECIPE){
                     message = getActivity().getResources().getString(R.string.delete_recipe_confirmation);
                 }else{
                     return false;
@@ -211,7 +214,8 @@ public class RecipeDetailsFragment extends Fragment implements
     }
 
     public void editRecipe(){
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
+        // TODO: 27/2/17  ver esto
+        /*if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
                 ContextCompat.checkSelfPermission(getActivity(),
                         Manifest.permission.WRITE_EXTERNAL_STORAGE)
                         != PackageManager.PERMISSION_GRANTED) {
@@ -240,7 +244,7 @@ public class RecipeDetailsFragment extends Fragment implements
         }else{
             CommonRecipeOperations commonRecipeOperations = new CommonRecipeOperations(getActivity(), recipe);
             commonRecipeOperations.editRecipe();
-        }
+        }*/
     }
 
     private final Runnable scaleIn = new Runnable() {
@@ -412,7 +416,7 @@ public class RecipeDetailsFragment extends Fragment implements
         }
     }
 
-    public void setRecipe(RecipeItemOld recipe) {
+    public void setRecipe(RecipeComplete recipe) {
         this.recipe = recipe;
         loadRecipe();
     }
@@ -425,7 +429,6 @@ public class RecipeDetailsFragment extends Fragment implements
 
     private void loadRecipe(){
         if(recipeLoaded) return;
-        own = (recipe.getState() & (RecetasCookeoConstants.FLAG_OWN| RecetasCookeoConstants.FLAG_EDITED)) != 0;
 
         if(recipeName != null){
             recipeName.setText(recipe.getName());
@@ -473,8 +476,8 @@ public class RecipeDetailsFragment extends Fragment implements
                 }
             };
             rwTools.loadImageFromPath(getActivity().getApplicationContext(),
-                    bitmapImageViewTarget, recipe.getPathPicture(),
-                    R.drawable.default_dish, recipe.getVersion());
+                    bitmapImageViewTarget, recipe.getPicture(),
+                    R.drawable.default_dish, recipe.getTimestamp());
         }
 
         //Set the author
@@ -483,7 +486,13 @@ public class RecipeDetailsFragment extends Fragment implements
             author.setText(sAuthor);
         else {
             String link = getResources().getString(R.string.original_link).concat(" ").concat(recipe.getAuthor());
-            author.setText(Html.fromHtml(link));
+            Spanned linkFormatted;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                linkFormatted = Html.fromHtml(link, Html.FROM_HTML_MODE_LEGACY);
+            } else {
+                linkFormatted = Html.fromHtml(link);
+            }
+            author.setText(linkFormatted);
             author.setMovementMethod(LinkMovementMethod.getInstance());
         }
 
@@ -562,7 +571,7 @@ public class RecipeDetailsFragment extends Fragment implements
 
 
     @SuppressLint("NewApi")
-    public void updateRecipe(RecipeItemOld recipe) {
+    public void updateRecipe(RecipeComplete recipe) {
         this.recipe = recipe;
         loadRecipe();
         Boolean compatRequired = Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB;

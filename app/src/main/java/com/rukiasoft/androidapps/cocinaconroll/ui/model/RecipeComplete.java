@@ -1,10 +1,13 @@
 package com.rukiasoft.androidapps.cocinaconroll.ui.model;
 
+import android.os.Parcelable;
+import android.support.annotation.Nullable;
+
+import com.google.auto.value.AutoValue;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.daoqueries.StepQueries;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.model.IngredientDb;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.model.RecipeDb;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.model.StepDb;
-import android.os.Parcelable;
-import com.google.auto.value.AutoValue;
 
 import java.util.List;
 
@@ -12,7 +15,7 @@ import java.util.List;
  * Created by iRoll on 19/2/17.
  */
 @AutoValue
-public class RecipeComplete implements Parcelable{
+public abstract class RecipeComplete implements Parcelable{
     abstract Long id();
     abstract String key();
     abstract String name();
@@ -26,7 +29,8 @@ public class RecipeComplete implements Parcelable{
     abstract Integer language();
     abstract String author();
     abstract String link();
-    @Nullable abstract String tip();
+    @Nullable
+    abstract String tip();
     abstract Integer owner();
     abstract Long timestamp();
     @Nullable abstract List<String> ingredients();
@@ -43,20 +47,20 @@ public class RecipeComplete implements Parcelable{
         abstract RecipeComplete.Builder setName(String value);
         abstract RecipeComplete.Builder setIcon(Integer value);
         abstract RecipeComplete.Builder setPicture(String value);
-        abstract RecipeComplete.Builder settimestamp(Long value);
+        abstract RecipeComplete.Builder setTimestamp(Long value);
         abstract RecipeComplete.Builder setVegetarian(Boolean value);
         abstract RecipeComplete.Builder setFavourite(Boolean value);
         abstract RecipeComplete.Builder setOwner(Integer value);
-        abstract RecipeComplete.Builder setTimestamp(Long value);
         abstract RecipeComplete.Builder setType(String value);
         abstract RecipeComplete.Builder setMinutes(Integer value);
         abstract RecipeComplete.Builder setPortions(Integer value);
         abstract RecipeComplete.Builder setAuthor(String value);
         abstract RecipeComplete.Builder setLink(String value);
         abstract RecipeComplete.Builder setTip(String value);
+        abstract RecipeComplete.Builder setLanguage(Integer value);
         abstract RecipeComplete.Builder setIngredients(List<String> value);
         abstract RecipeComplete.Builder setSteps(List<String> value);
-        abstract RecipeReduced build();
+        abstract RecipeComplete build();
 
     }
 
@@ -74,15 +78,17 @@ public class RecipeComplete implements Parcelable{
                     .setOwner(recipeDb.getOwner())
                     .setTimestamp(recipeDb.getTimestamp())
                     .setType(recipeDb.getType())
-                    .setMinutes((recipeDb.getMinutes())
-                    .setPortions((recipeDb.getPortions())
-                    .setAuthor((recipeDb.getAuthor())
-                    .setLink((recipeDb.getLink())
-                    .setTip((recipeDb.getTip())
-                    .setIngredients((recipeDb.getIngredients())
-                    .setSteps((recipeDb.getSteps())
+                    .setMinutes(recipeDb.getMinutes())
+                    .setPortions(recipeDb.getPortions())
+                    .setAuthor(recipeDb.getAuthor())
+                    .setLink(recipeDb.getLink())
+                    .setTip(recipeDb.getTip())
+                    .setLanguage(recipeDb.getLanguage())
+                    .setIngredients(recipeDb.getIngredientsAsStringList())
+                    .setSteps(recipeDb.getStepsAsStringList())
                     .build();
         }catch (IllegalStateException e){
+            e.printStackTrace();
             return null;
         }
     }
@@ -101,14 +107,14 @@ public class RecipeComplete implements Parcelable{
                     .setOwner(recipe.getOwner())
                     .setTimestamp(recipe.getTimestamp())
                     .setType(recipe.getType())
-                    .setMinutes((recipe.getMinutes())
-                            .setPortions((recipe.getPortions())
-                                    .setAuthor((recipe.getAuthor())
-                                            .setLink((recipe.getLink())
-                                                    .setTip((recipe.getTip())
-                                                            .setIngredients((recipe.getIngredients())
-                                                                    .setSteps((recipe.getSteps())
-                                                                            .build();
+                    .setMinutes(recipe.getMinutes())
+                    .setPortions(recipe.getPortions())
+                    .setAuthor(recipe.getAuthor())
+                    .setLink(recipe.getLink())
+                    .setTip(recipe.getTip())
+                    .setIngredients(recipe.getIngredients())
+                    .setSteps(recipe.getSteps())
+                    .build();
         }catch (IllegalStateException e){
             return null;
         }
