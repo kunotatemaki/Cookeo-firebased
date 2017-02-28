@@ -87,9 +87,6 @@ public class RecipeListActivity extends ToolbarAndProgressActivity {
     @State String mLastFilter;
     @State boolean mAskForPermission = true;
 
-    //Firebase
-    private FirebaseAuth mAuth;
-    private FirebaseAuth.AuthStateListener mAuthListener;
 
     //Permissions
     private RecetasCookeoMultiplePermissionListener recetasCookeoMultiplePermissionListener;
@@ -206,55 +203,27 @@ public class RecipeListActivity extends ToolbarAndProgressActivity {
         Tools tools = new Tools();
         switch (requestCode) {
             case RecetasCookeoConstants.REQUEST_DETAILS:
+            case RecetasCookeoConstants.REQUEST_CREATE_RECIPE:
                 //return from RecipeDetailsActivity
-                // TODO: 27/02/2017 borrar/actualizar receta (borrar en detail activity y aquí simplemente llamar al loader)
-                if (resultCode == RecetasCookeoConstants.RESULT_DELETE_RECIPE && intentData != null && intentData.hasExtra(RecetasCookeoConstants.KEY_RECIPE)) {
-                    RecipeItemOld recipe = intentData.getParcelableExtra(RecetasCookeoConstants.KEY_RECIPE);
-                    if (recipe != null) {
-                        removeRecipeFromDiskAndDatabase(recipe);
-                    }
-                }else if(resultCode == RecetasCookeoConstants.RESULT_UPDATE_RECIPE){
-                    if (intentData != null && intentData.hasExtra(RecetasCookeoConstants.KEY_RECIPE)) {
-                        RecipeComplete recipe = intentData.getParcelableExtra(RecetasCookeoConstants.KEY_RECIPE);
-                        RecipeListFragment mRecipeListFragment = (RecipeListFragment) getSupportFragmentManager().findFragmentById(R.id.list_recipes_fragment);
-                        if (mRecipeListFragment != null) {
-                            mRecipeListFragment.insertRecipe(recipe);
-                        }
-                    }
+                RecipeListFragment mRecipeListFragment = (RecipeListFragment) getSupportFragmentManager().findFragmentById(R.id.list_recipes_fragment);
+                if (mRecipeListFragment != null) {
+                    mRecipeListFragment.filterRecipes(null);
                 }
                 break;
             case RecetasCookeoConstants.REQUEST_EDIT_RECIPE:
-                if(resultCode == RecetasCookeoConstants.RESULT_UPDATE_RECIPE && intentData != null && intentData.hasExtra(RecetasCookeoConstants.KEY_RECIPE)) {
+                /*if(resultCode == RecetasCookeoConstants.RESULT_UPDATE_RECIPE && intentData != null && intentData.hasExtra(RecetasCookeoConstants.KEY_RECIPE)) {
                     RecipeComplete recipe = intentData.getParcelableExtra(RecetasCookeoConstants.KEY_RECIPE);
                     RecipeListFragment mRecipeListFragment = (RecipeListFragment) getSupportFragmentManager().findFragmentById(R.id.list_recipes_fragment);
                     if (mRecipeListFragment != null) {
                         mRecipeListFragment.insertRecipe(recipe);
                     }
-                }
-                break;
-            case RecetasCookeoConstants.REQUEST_CREATE_RECIPE:
-                if (resultCode == RecetasCookeoConstants.RESULT_UPDATE_RECIPE && intentData != null &&
-                        intentData.hasExtra(RecetasCookeoConstants.KEY_RECIPE)) {
-                    RecipeComplete recipe = intentData.getParcelableExtra(RecetasCookeoConstants.KEY_RECIPE);
-                    RecipeListFragment mRecipeListFragment = (RecipeListFragment) getSupportFragmentManager().findFragmentById(R.id.list_recipes_fragment);
-                    if (mRecipeListFragment != null) {
-                        mRecipeListFragment.insertRecipe(recipe);
-                    }
-                }
+                }*/
                 break;
             default:
                 super.onActivityResult(requestCode, resultCode, intentData);
         }
     }
 
-    private void removeRecipeFromDiskAndDatabase(RecipeItemOld recipe){
-        //// TODO: 21/2/17 hacer con en el fragment
-//        ReadWriteTools rwTools = new ReadWriteTools();
-//        rwTools.deleteRecipe(recipe);
-//        RecipeController recipeController = new RecipeController();
-//        recipeController.removeRecipe(getApplicationContext(), recipe.get_id());
-//        restartLoader();
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -534,9 +503,6 @@ public class RecipeListActivity extends ToolbarAndProgressActivity {
     @Override
     public void onStop() {
         super.onStop();
-        if (mAuthListener != null && mAuth != null) {
-            mAuth.removeAuthStateListener(mAuthListener);
-        }
     }
 
 

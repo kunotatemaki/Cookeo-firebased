@@ -495,7 +495,9 @@ public class RecipeListFragment extends Fragment implements
 
 
     public void filterRecipes(String filter) {
-        lastFilter = filter;
+        if(filter != null && !filter.isEmpty()) {
+            lastFilter = filter;
+        }
         String type = "";
         int iconResource = 0;
         Bundle bundle = new Bundle();

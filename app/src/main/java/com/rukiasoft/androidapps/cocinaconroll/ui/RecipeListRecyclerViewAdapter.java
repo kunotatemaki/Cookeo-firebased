@@ -30,28 +30,24 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewParent;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.rukiasoft.androidapps.cocinaconroll.classes.LikeButtonView;
-import com.rukiasoft.androidapps.cocinaconroll.classes.RecipeItemOld;
-import com.rukiasoft.androidapps.cocinaconroll.ui.model.RecipeReduced;
-import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 import com.rukiasoft.androidapps.cocinaconroll.R;
+import com.rukiasoft.androidapps.cocinaconroll.classes.LikeButtonView;
+import com.rukiasoft.androidapps.cocinaconroll.ui.model.RecipeReduced;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.ReadWriteTools;
-
+import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.Unbinder;
 
-public class RecipeListRecyclerViewAdapter extends RecyclerView.Adapter<RecipeListRecyclerViewAdapter.RecipeViewHolder>
+class RecipeListRecyclerViewAdapter extends RecyclerView.Adapter<RecipeListRecyclerViewAdapter.RecipeViewHolder>
         implements View.OnClickListener, View.OnLongClickListener {
 
     private final List<RecipeReduced> mItems;
@@ -61,12 +57,12 @@ public class RecipeListRecyclerViewAdapter extends RecyclerView.Adapter<RecipeLi
     private View backCard = null;
 
 
-    public RecipeListRecyclerViewAdapter(Context context, List<RecipeReduced> items) {
+    RecipeListRecyclerViewAdapter(Context context, List<RecipeReduced> items) {
         this.mItems = new ArrayList<>(items);
         this.mContext = context;
     }
 
-    public void setOnCardClickListener(OnCardClickListener onCardClickListener) {
+    void setOnCardClickListener(OnCardClickListener onCardClickListener) {
         this.onCardClickListener = onCardClickListener;
     }
 
@@ -82,52 +78,11 @@ public class RecipeListRecyclerViewAdapter extends RecyclerView.Adapter<RecipeLi
                 recipeViewHolder.backCardView.setRotationY(180);
             }
         }
-        /*recipeViewHolder.favoriteButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (onBackFavoriteClickListener != null) {
-                    final RecipeItemOld recipe = getRecipeFromParent(v);
-                    if (v instanceof ImageView) {
-                        ((ImageView) v).setImageDrawable(
-                                (!recipe.getFavourite()) ? ContextCompat.getDrawable(mContext, R.drawable.ic_favorite_white_48dp) :
-                                        ContextCompat.getDrawable(mContext, R.drawable.ic_favorite_outline_white_48dp)
-                        );
-                    }
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            onBackFavoriteClickListener.onBackFavoriteClick(recipe);
-                        }
-                    }, 200);
-                }
-            }
-        });*/
-
 
         return recipeViewHolder;
-        /*v.setOnClickListener(this);
-        return new RecipeViewHolder(v);*/
     }
 
-    private RecipeReduced getRecipeFromParent(View v){
-        RecipeReduced recipe = null;
-        View aux = v;
-        ViewParent parent;
-        while((parent = aux.getParent()) != null){
-            if(parent instanceof CardView){
-                recipe = (RecipeReduced) ((View)parent).getTag();
-                break;
-            }else{
-                aux = (View) parent;
-            }
-        }
-        if(recipe != null){
-            //// TODO: 20/2/17 descomentar estas dos lineas y ver si son necesarias
-            /*CommonRecipeOperations commonRecipeOperations = new CommonRecipeOperations(mContext, recipe);
-            recipe = commonRecipeOperations.loadRecipeDetailsFromRecipeCard();*/
-        }
-        return recipe;
-    }
+
 
     @Override
     public void onBindViewHolder(RecipeViewHolder holder, int position) {
@@ -140,11 +95,6 @@ public class RecipeListRecyclerViewAdapter extends RecyclerView.Adapter<RecipeLi
                 flipCard(holder.cardView);
             }
         }
-
-        /*holder.favoriteButton.setImageDrawable(
-                (item.getFavourite())? ContextCompat.getDrawable(mContext, R.drawable.ic_favorite_white_48dp) :
-                        ContextCompat.getDrawable(mContext, R.drawable.ic_favorite_outline_white_48dp)
-        );*/
 
     }
 
@@ -256,32 +206,31 @@ public class RecipeListRecyclerViewAdapter extends RecyclerView.Adapter<RecipeLi
         flipCard.start();
     }
 
-    protected static class RecipeViewHolder extends RecyclerView.ViewHolder {
-        public @BindView(R.id.recipe_pic_cardview) ImageView recipeThumbnail;
-        public @BindView(R.id.recipe_title_cardview) TextView recipeTitle;
-        public @BindView(R.id.recipe_pic_protection_cardview) ImageView backgroundProtection;
-        public @BindView(R.id.recipe_item_favorite_icon) ImageView favoriteIcon;
-        public @BindView(R.id.recipe_item_own_recipe_icon) ImageView ownRecipeIcon;
-        public @BindView(R.id.recipe_item_type_icon) ImageView typeIcon;
-        public @BindView(R.id.recipe_item_vegetarian_recipe_icon) ImageView vegetarianIcon;
-        public @BindView(R.id.cardview_recipe_item)
+    static class RecipeViewHolder extends RecyclerView.ViewHolder {
+        @BindView(R.id.recipe_pic_cardview) ImageView recipeThumbnail;
+        @BindView(R.id.recipe_title_cardview) TextView recipeTitle;
+        @BindView(R.id.recipe_pic_protection_cardview) ImageView backgroundProtection;
+        @BindView(R.id.recipe_item_favorite_icon) ImageView favoriteIcon;
+        @BindView(R.id.recipe_item_own_recipe_icon) ImageView ownRecipeIcon;
+        @BindView(R.id.recipe_item_type_icon) ImageView typeIcon;
+        @BindView(R.id.recipe_item_vegetarian_recipe_icon) ImageView vegetarianIcon;
+        @BindView(R.id.cardview_recipe_item)
         CardView cardView;
-        public @BindView(R.id.front_cardview_recipe_item)
+        @BindView(R.id.front_cardview_recipe_item)
         LinearLayout frontCardView;
-        public @Nullable @BindView(R.id.back_cardview_recipe_item)
+        @Nullable @BindView(R.id.back_cardview_recipe_item)
         RelativeLayout backCardView;
-        public @Nullable @BindView(R.id.recipe_item_favorite_button)
+        @Nullable @BindView(R.id.recipe_item_favorite_button)
         LikeButtonView favoriteButton;
         ReadWriteTools rwTools;
-        private Unbinder unbinder;
 
-        public RecipeViewHolder(View itemView) {
+        RecipeViewHolder(View itemView) {
             super(itemView);
-            unbinder = ButterKnife.bind(this, itemView);
+            ButterKnife.bind(this, itemView);
 
         }
 
-        public void bindRecipe(Context context, RecipeReduced item) {
+        void bindRecipe(Context context, RecipeReduced item) {
             if(rwTools == null) rwTools = new ReadWriteTools();
             recipeTitle.setText(item.getName());
             int visibilityProtection = View.GONE;
@@ -316,7 +265,7 @@ public class RecipeListRecyclerViewAdapter extends RecyclerView.Adapter<RecipeLi
 
     }
 
-    public interface OnCardClickListener {
+    interface OnCardClickListener {
         void onCardClick(View view, RecipeReduced recipeItemOld);
     }
 

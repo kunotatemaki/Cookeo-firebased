@@ -54,6 +54,7 @@ import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.rukiasoft.androidapps.cocinaconroll.CocinaConRollApplication;
 import com.rukiasoft.androidapps.cocinaconroll.R;
 import com.rukiasoft.androidapps.cocinaconroll.classes.RecipeItemOld;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.controllers.RecipeController;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.model.IngredientDb;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.model.StepDb;
 import com.rukiasoft.androidapps.cocinaconroll.ui.model.RecipeComplete;
@@ -110,6 +111,7 @@ public class RecipeDetailsFragment extends Fragment implements
     private boolean animated;
     private View viewToReveal;
     private ReadWriteTools rwTools;
+    RecipeController mRecipeController;
 
 
     private final DialogInterface.OnClickListener editDialogClickListener = new DialogInterface.OnClickListener() {
@@ -135,6 +137,7 @@ public class RecipeDetailsFragment extends Fragment implements
         }
         setHasOptionsMenu(true);
         rwTools = new ReadWriteTools();
+        mRecipeController = new RecipeController();
 
     }
 
@@ -369,24 +372,19 @@ public class RecipeDetailsFragment extends Fragment implements
 
     private void clickOnHeartButton(){
         // TODO: 21/2/17 cambiar a lo que ya está hecho
-//        if (recipe.getFavourite()) {
-//            recipeDescriptionFAB.setImageDrawable(ContextCompat.getDrawable(getActivity(),
-//                    R.drawable.ic_favorite_outline_white_24dp));
-//        } else {
-//            recipeDescriptionFAB.setImageDrawable(ContextCompat.getDrawable(getActivity(),
-//                    R.drawable.ic_favorite_white_24dp));
-//        }
-//        //lo almaceno en la base de datos
-//        recipe.setFavourite(!recipe.getFavourite());
-//        dbTools.updateFavoriteById(getActivity().getApplicationContext(), recipe.get_id(), recipe.getFavourite());
-//        Intent returnIntent = new Intent();
-//        Bundle bundle = new Bundle();
-//        bundle.putParcelable(RecetasCookeoConstants.KEY_RECIPE, recipe);
-//        returnIntent.putExtras(bundle);
-//        getActivity().setResult(RecetasCookeoConstants.RESULT_UPDATE_RECIPE, returnIntent);
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-//            scaleIn.run();
-//        }
+        recipe = RecipeComplete.getRecipeFromDatabase(mRecipeController.switchFavourite(getActivity().getApplication(),
+                recipe.getId()));
+        if (recipe.getFavourite()) {
+            recipeDescriptionFAB.setImageDrawable(ContextCompat.getDrawable(getActivity(),
+                    R.drawable.ic_favorite_outline_white_24dp));
+        } else {
+            recipeDescriptionFAB.setImageDrawable(ContextCompat.getDrawable(getActivity(),
+                    R.drawable.ic_favorite_white_24dp));
+        }
+        getActivity().setResult(RecetasCookeoConstants.RESULT_UPDATE_RECIPE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            scaleIn.run();
+        }
     }
 
 
