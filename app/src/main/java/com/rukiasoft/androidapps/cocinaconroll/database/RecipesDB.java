@@ -9,6 +9,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 
+import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
+import com.rukiasoft.androidapps.cocinaconroll.utilities.Tools;
+
 import java.util.HashMap;
 
 public class RecipesDB {
@@ -42,15 +45,15 @@ public class RecipesDB {
     public Cursor getSuggestions(String[] selectionArgs){
         //call from search widget
     	String selection =  RecipesTable.FIELD_NAME_NORMALIZED + " like ? ";
-        // TODO: 21/2/17 revisar con la nueva configuracion
-        /*if(selectionArgs!=null){
-    		selectionArgs[0] = "%" + dbTools.getNormalizedString(selectionArgs[0]) + "%";
-    	} */
+        Tools tools = new Tools();
+        if(selectionArgs!=null){
+    		selectionArgs[0] = "%" + tools.getNormalizedString(selectionArgs[0]) + "%";
+    	}
     	
     	SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
     	queryBuilder.setProjectionMap(mAliasMap);
     	
-    	queryBuilder.setTables(RecipesTable.TABLE_NAME);
+    	queryBuilder.setTables(RecetasCookeoConstants.RECIPES_TABLE_NAME);
 
 		return queryBuilder.query(mCocinaConRollDatabaseHelper.getReadableDatabase(),
                 new String[]{"_ID",
@@ -70,16 +73,15 @@ public class RecipesDB {
                              String[] selectionArgs, String sortOrder){
 
         SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
-        queryBuilder.setTables(RecipesTable.TABLE_NAME);
+        queryBuilder.setTables(RecipesTable.RECIPES_TABLE_NAME);
 
-
+        Tools tools = new Tools();
         if(selection == null){
         //call from search widget when pressed, when user presses "Go" in the Keyboard of Search Dialog
             selection =  RecipesTable.FIELD_NAME_NORMALIZED + " like ? ";
             if(selectionArgs!=null){
                 for(int i=0; i<selectionArgs.length; i++){
-                    // TODO: 21/2/17 descomentar
-                    selectionArgs[i] = "%"+/*dbTools.getNormalizedString(selectionArgs[i]) + */"%";
+                    selectionArgs[i] = "%"+ tools.getNormalizedString(selectionArgs[i]) + "%";
                 }
             }
         }
@@ -109,64 +111,12 @@ public class RecipesDB {
     /** Return Suggestion corresponding to the id */
     public Cursor getSuggestion(String id){
         SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
-        queryBuilder.setTables( RecipesTable.TABLE_NAME);
+        queryBuilder.setTables( RecipesTable.RECIPES_TABLE_NAME);
         return queryBuilder.query(mCocinaConRollDatabaseHelper.getReadableDatabase(),
                 new String[]{RecipesTable.FIELD_ID, RecipesTable.FIELD_NAME, RecipesTable.FIELD_NAME_NORMALIZED, RecipesTable.FIELD_ICON},
                 RecipesTable.FIELD_ID + " = ?", new String[]{id}, null, null, null, "1"
         );
     }
 
-    /** Returns Recipes  */
-    public Cursor getRecipes(String[] projection, String selection,
-                             String[] selectionArgs, String sortOrder){
 
-        SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
-        queryBuilder.setTables(RecipesTable.TABLE_NAME);
-
-        return queryBuilder.query(mCocinaConRollDatabaseHelper.getReadableDatabase(),
-                projection,
-                selection,
-                selectionArgs,
-                null,
-                null,
-                sortOrder
-        );
-    }
-
-
-    /** Return RecipeDb corresponding to the id */
-    public Cursor getRecipe(String id){
-    	SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
-    	queryBuilder.setTables( RecipesTable.TABLE_NAME);
-		return queryBuilder.query(mCocinaConRollDatabaseHelper.getReadableDatabase(),
-                RecipesTable.ALL_COLUMNS,
-                RecipesTable.FIELD_ID + " = ?", new String[]{id}, null, null, null, "1"
-        );
-    }
-
-	public Uri insert(ContentValues values){
-        //first, check if exist
-        SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
-        queryBuilder.setTables(RecipesTable.TABLE_NAME);
-        Cursor c = queryBuilder.query(mCocinaConRollDatabaseHelper.getReadableDatabase(),
-                RecipesTable.ALL_COLUMNS,
-                RecipesTable.FIELD_NAME_NORMALIZED+ " = ?", new String[]{values.get(RecipesTable.FIELD_NAME_NORMALIZED).toString()}, null, null, null, null
-        );
-        if(c.getCount()>0)
-            return null;
-		long regId;
-		SQLiteDatabase db = mCocinaConRollDatabaseHelper.getWritableDatabase();
-		regId = db.insert(RecipesTable.TABLE_NAME, null, values);
-        return ContentUris.withAppendedId(CocinaConRollContentProvider.getUri(""), regId);
-	}
-
-    public int updateFavorite(ContentValues values, String selection, String[] selectionArgs) {
-        SQLiteDatabase db = mCocinaConRollDatabaseHelper.getWritableDatabase();
-        return db.update(RecipesTable.TABLE_NAME, values, selection, selectionArgs);
-    }
-
-    public int delete(String selection, String[] selectionArgs){
-        SQLiteDatabase db = mCocinaConRollDatabaseHelper.getWritableDatabase();
-        return db.delete(RecipesTable.TABLE_NAME, selection, selectionArgs);
-    }
 }

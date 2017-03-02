@@ -198,11 +198,17 @@ public class RecipeController {
         recipeDao.insertOrReplace(recipeDb);
 
         //Guardo los ingredientes si los hay
+        boolean reloadRecipe = false;
         if(recipeDb.getIngredients() != null){
             insertOrReplaceRecipeIngredients(application, recipeDb);
+            reloadRecipe = true;
         }
         if(recipeDb.getSteps() != null){
             insertOrReplaceRecipeSteps(application, recipeDb);
+            reloadRecipe = true;
+        }
+        if(reloadRecipe){
+            recipeDb = getRecipeById(application, recipeDb.getId());
         }
 
     }

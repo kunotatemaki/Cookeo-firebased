@@ -10,11 +10,12 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class CocinaConRollDatabaseHelper extends SQLiteOpenHelper {
 
 
-    private static final String DB_NAME = "cocinaconroll.db";
+    private static final String DB_NAME = "lepetitcuquichef.db";
+    private static final String DB_NAME_OLD = "cocinaconroll.db";
     public static final String OLD_DB_NAME = "cukio";
 
 
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 1;
     private Context myContext;
 
     public CocinaConRollDatabaseHelper(Context context) {
@@ -27,9 +28,8 @@ public class CocinaConRollDatabaseHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase database) {
         //delete database from previous version
         myContext.deleteDatabase(OLD_DB_NAME);
+        myContext.deleteDatabase(DB_NAME_OLD);
 
-        //create tables
-        RecipesTable.onCreate(database);
 
     }
 
@@ -39,7 +39,7 @@ public class CocinaConRollDatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase database, int oldVersion,
                           int newVersion) {
-        RecipesTable.onUpgrade(database, oldVersion, newVersion);
+
     }
 
 }

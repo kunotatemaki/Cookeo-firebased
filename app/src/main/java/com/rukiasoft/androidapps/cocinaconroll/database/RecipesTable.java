@@ -13,7 +13,7 @@ public class RecipesTable {
     public static final String FIELD_ID = "_id";
     public static final String FIELD_NAME = "name";
     public static final String FIELD_ICON = "icon";
-    public static final String FIELD_NAME_NORMALIZED = "normalized";
+    public static final String FIELD_NAME_NORMALIZED = "NORMALIZED_NAME";
     public static final String FIELD_TYPE = "type";
     public static final String FIELD_FAVORITE = "favorite";
     public static final String FIELD_STATE = "state";
@@ -26,14 +26,14 @@ public class RecipesTable {
     public static final String FIELD_DATE_OLD = "path_date";
     public static final String FIELD_VERSION = "version";
 
-    public static final String TABLE_NAME = "recipes";
+    public static final String RECIPES_TABLE_NAME = "recipes";
 
     final public static String[] ALL_COLUMNS = {FIELD_ID, FIELD_NAME, FIELD_NAME_NORMALIZED, FIELD_TYPE,
             FIELD_ICON, FIELD_FAVORITE, FIELD_STATE, FIELD_VEGETARIAN, FIELD_PATH_RECIPE, FIELD_PATH_PICTURE,
             FIELD_PATH_RECIPE_EDITED, FIELD_PATH_PICTURE_EDITED, FIELD_DATE, FIELD_VERSION};
 
     // Database creation SQL statement
-    private static final String DATABASE_CREATE = " create table " + TABLE_NAME + "" +
+    private static final String DATABASE_CREATE = " create table " + RECIPES_TABLE_NAME + "" +
             " ( " +
             FIELD_ID + " integer primary key autoincrement, " +
             FIELD_NAME + " TEXT NOT NULL, " +
@@ -61,10 +61,10 @@ public class RecipesTable {
                 + oldVersion + " to " + newVersion
                 + ", which will destroy all old data");
         //database.execSQL("PRAGMA writable_schema = 1;");
-        String sql = "ALTER TABLE " + TABLE_NAME + " RENAME TO tmp_table;";
+        String sql = "ALTER TABLE " + RECIPES_TABLE_NAME + " RENAME TO tmp_table;";
         database.execSQL(sql);
         database.execSQL(DATABASE_CREATE);
-        sql = "INSERT INTO "+ TABLE_NAME + "(" +
+        sql = "INSERT INTO "+ RECIPES_TABLE_NAME + "(" +
                 FIELD_ID + ", " +
                 FIELD_NAME + ", " +
                 FIELD_NAME_NORMALIZED + ", " +

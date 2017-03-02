@@ -9,8 +9,11 @@ import android.support.multidex.MultiDexApplication;
 
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
+import com.orhanobut.logger.LogLevel;
+import com.orhanobut.logger.Logger;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.model.DaoMaster;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.model.DaoSession;
+import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 import com.squareup.leakcanary.LeakCanary;
 import com.squareup.leakcanary.RefWatcher;
 
@@ -66,7 +69,6 @@ public class CocinaConRollApplication  extends MultiDexApplication {
     public void onCreate() {
         super.onCreate();
         analytics = GoogleAnalytics.getInstance(this);
-        //ACRA.init(this);
         refWatcher = LeakCanary.install(this);
 
         //analytics.getLogger().setLogLevel(Logger.LogLevel.VERBOSE);
@@ -104,9 +106,18 @@ public class CocinaConRollApplication  extends MultiDexApplication {
             QueryBuilder.LOG_SQL = true;
             QueryBuilder.LOG_VALUES = true;
         }*/
-
-
+        Logger
+                .init(RecetasCookeoConstants.RUKIA_TAG)                 // default PRETTYLOGGER or use just init()
+                //.methodCount(3)                 // default 2
+                .hideThreadInfo()               // default shown
+                //.logLevel(LogLevel.NONE)        // default LogLevel.FULL
+                //.methodOffset(2)                // default 0
+                //.logAdapter(new AndroidLogAdapter()) //default AndroidLogAdapter
+        ;
     }
+
+
+
 
     @Override
     protected void attachBaseContext(Context base) {

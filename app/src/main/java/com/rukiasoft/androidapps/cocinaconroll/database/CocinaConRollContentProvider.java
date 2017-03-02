@@ -6,7 +6,6 @@ import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
-import android.database.SQLException;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 
@@ -18,13 +17,13 @@ public class CocinaConRollContentProvider extends ContentProvider {
 
 	public static final String AUTHORITY = "com.rukiasoft.androidapps.cocinaconroll.database.cocinaconrollcontentprovider";
 	public static final Uri CONTENT_URI_SUGGESTIONS_WHEN_KEYBOARD_GO = Uri.parse("content://" + AUTHORITY + "/suggestions");
-	//public static final Uri CONTENT_URI_RECIPES = Uri.parse("content://" + AUTHORITY + "/" + RecipesTable.TABLE_NAME);
 
     private RecipesDB mRecipesDB = null;
     private RecipeController recipeController = null;
 
-    private static final int COINCIDENCES = 1;
-    private static final int GET_SEARCHED_RECIPE = 3;
+    private static final int SUGGESTIONS_RECIPE = 1;
+    private static final int SEARCH_SUGGESTION = 2;
+    private static final int GET_SUGGESTION = 3;
     private static final int GET_ALL_RECIPES = 4;
     private static final int GET_RECIPE = 5;
     private static final int GET_MAINS = 6;
@@ -45,13 +44,13 @@ public class CocinaConRollContentProvider extends ContentProvider {
         UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
         // Suggestion items of Search Dialog is provided by this uri
-        uriMatcher.addURI(AUTHORITY, SearchManager.SUGGEST_URI_PATH_QUERY, COINCIDENCES);
+        uriMatcher.addURI(AUTHORITY, SearchManager.SUGGEST_URI_PATH_QUERY, SUGGESTIONS_RECIPE);
 
         // This URI is invoked, when user presses "Go" in the Keyboard of Search Dialog
         // Listview items of SearchableActivity is provided by this uri
-        uriMatcher.addURI(AUTHORITY, "suggestions", COINCIDENCES);
+        uriMatcher.addURI(AUTHORITY, "suggestions", SEARCH_SUGGESTION);
         // This URI is invoked, when user selects a suggestion from search dialog or an item from the listview
-        uriMatcher.addURI(AUTHORITY, "suggestions/#", GET_SEARCHED_RECIPE);
+        uriMatcher.addURI(AUTHORITY, "suggestions/#", GET_SUGGESTION);
 
         uriMatcher.addURI(AUTHORITY, RecetasCookeoConstants.SEARCH_ALL, GET_ALL_RECIPES);
         uriMatcher.addURI(AUTHORITY, RecetasCookeoConstants.SEARCH_MAIN, GET_MAINS);
@@ -63,7 +62,7 @@ public class CocinaConRollContentProvider extends ContentProvider {
         uriMatcher.addURI(AUTHORITY, RecetasCookeoConstants.SEARCH_LATEST, GET_LATEST);
 
         // This URI is invoked, when user selects a suggestion from search dialog or an item from the listview
-        uriMatcher.addURI(AUTHORITY, RecipesTable.TABLE_NAME + "/#", GET_RECIPE);
+        uriMatcher.addURI(AUTHORITY, RecipesTable.RECIPES_TABLE_NAME + "/#", GET_RECIPE);
 
         return uriMatcher;
     }
@@ -80,18 +79,23 @@ public class CocinaConRollContentProvider extends ContentProvider {
                         String[] selectionArgs, String sortOrder) {
 
         Cursor c = null;
+        if(getContext() == null){
+            return null;
+        }
         String id_recipe;
         switch(mUriMatcher.match(uri)){
-            case COINCIDENCES:
-                c = recipeController.getRecipesByName((Application)getContext().getApplicationContext(), selectionArgs[0]);
+            case SUGGESTIONS_RECIPE:
+                c = mRecipesDB.getSuggestions(selectionArgs);
                 break;
-            case GET_SEARCHED_RECIPE:
+            case SEARCH_SUGGESTION:
+                c = mRecipesDB.getSuggestions(projection, selection, selectionArgs, sortOrder);
+                break;
+            case GET_SUGGESTION:
                 id_recipe = uri.getLastPathSegment();
                 c = mRecipesDB.getSuggestion(id_recipe);
                 break;
             case GET_ALL_RECIPES:
                 c = recipeController.getRecipesInCursorFormat((Application)getContext().getApplicationContext());
-                //c = mRecipesDB.getRecipes(projection, selection, selectionArgs, sortOrder);
                 break;
             case GET_STARTERS:
                 c = recipeController.getRecipesByTypeInCursorFormat((Application)getContext().getApplicationContext(),
@@ -117,21 +121,13 @@ public class CocinaConRollContentProvider extends ContentProvider {
             case GET_LATEST:
                 c = recipeController.getLatestRecipesInCursorFormat((Application)getContext().getApplicationContext());
                 break;
-            case GET_RECIPE:
-                id_recipe = uri.getLastPathSegment();
-                c = mRecipesDB.getRecipe(id_recipe);
-                break;
         }
         return c;
     }
 
     @Override
     public int delete(@NonNull Uri uri, String selection, String[] selectionArgs) {
-        switch (mUriMatcher.match(uri)){
-            case GET_ALL_RECIPES:
-                return mRecipesDB.delete(selection, selectionArgs);
-            default: throw new SQLException("Failed to delete row " + uri);
-        }
+        return -1;
     }
 
     @Override
@@ -141,28 +137,16 @@ public class CocinaConRollContentProvider extends ContentProvider {
 
     @Override
     public Uri insert(@NonNull Uri uri, ContentValues values) {
-        Uri returnUri;
-        switch (mUriMatcher.match(uri)){
-            case GET_ALL_RECIPES:
-                returnUri = mRecipesDB.insert(values);
-                break;
-            default: throw new SQLException("Failed to insert row into " + uri);
-        }
-        return returnUri;
+
+        return uri;
     }
 
 
     @Override
     public int update(@NonNull Uri uri, ContentValues values, String selection,
                       String[] selectionArgs) {
-        int index;
-        switch (mUriMatcher.match(uri)){
-            case GET_ALL_RECIPES:
-                index = mRecipesDB.updateFavorite(values, selection, selectionArgs);
-                break;
-            default: throw new SQLException("Failed to insert row into " + uri);
-        }
-        return index;
+
+        return -1;
 
     }
 }

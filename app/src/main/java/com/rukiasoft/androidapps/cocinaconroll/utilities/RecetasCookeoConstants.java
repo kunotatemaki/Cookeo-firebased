@@ -122,7 +122,9 @@ public class RecetasCookeoConstants {
     public static final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 13;
 
 
-    public static final String SHORT_RECIPE_TABLE_NAME = "SHORT_RECIPES";
+    public static final String RECIPES_TABLE_NAME = "RECIPES";
+    public static final String FIELD_NAME_NORMALIZED = "NORMALIZED_NAME";
+
     public static final String STORAGE_URL = "gs://hardy-binder-89508.appspot.com";
     public static final String STORAGE_NODE = "recipes";
     public static final String RUKIA_TAG = "RUKIA";
@@ -141,8 +143,5 @@ public class RecetasCookeoConstants {
     public static final int FLAG_PERSONAL_RECIPE = 4;
 
 
-    //Alarm intent
-    public static final String NAME_ALARM_PENDING_INTENT = PACKAGE_NAME + ".ALARM_INTENT";
-    public static final String NAME_DOWNLOAD_INTENT = PACKAGE_NAME + ".DOWNLOAD_INTENT";
 
 }

@@ -3,12 +3,15 @@ package com.rukiasoft.androidapps.cocinaconroll.persistence.daoqueries;
 import android.database.Cursor;
 
 import com.rukiasoft.androidapps.cocinaconroll.persistence.model.DaoSession;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.model.RecipeDb;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.model.RecipeDbDao;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 
 import org.greenrobot.greendao.query.CursorQuery;
 import org.greenrobot.greendao.query.Query;
 import org.greenrobot.greendao.query.QueryBuilder;
+
+import java.util.List;
 
 /**
  * Created by iRoll on 27/1/17.O
@@ -236,6 +239,7 @@ public class RecipeQueries {
     private static CursorQuery initializeCursorRecipesByName(DaoSession session, String name){
         RecipeDbDao recipeDbDao = session.getRecipeDbDao();
         recipeDbDao.detachAll();
+        Query<RecipeDb> query = recipeDbDao.queryRawCreate("select name as suggest_text_1, icon as suggest_icon_1, normalized_name as suggest_intent_data_id where normalized_name like ?", "%" + name + "%");
         return recipeDbDao.queryBuilder().where(
                 RecipeDbDao.Properties.NormalizedName.like("%" + name + "%")
         ).buildCursor();

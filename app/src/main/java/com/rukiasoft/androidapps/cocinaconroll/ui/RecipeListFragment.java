@@ -495,9 +495,10 @@ public class RecipeListFragment extends Fragment implements
 
 
     public void filterRecipes(String filter) {
-        if(filter != null && !filter.isEmpty()) {
-            lastFilter = filter;
+        if(filter == null || filter.isEmpty()) {
+            filter = RecetasCookeoConstants.FILTER_ALL_RECIPES;
         }
+        lastFilter = filter;
         String type = "";
         int iconResource = 0;
         Bundle bundle = new Bundle();
