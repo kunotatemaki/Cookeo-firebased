@@ -9,7 +9,6 @@ public class RecetasCookeoConstants {
     public static final String RECIPES_DIR = "recipes";
     public static final String BASE_DIR = "CookingWihCookeo";
     public static final String OLD_BASE_DIR = "CocinandoconmiCookeo";
-    public static final String ZIPS_DIR = "zips";
 
     public static final Integer FLAG_ASSETS = 1;
     public static final Integer FLAG_ORIGINAL = 2;
@@ -70,8 +69,6 @@ public class RecetasCookeoConstants {
     public static final String ACTION_DELETE_RECIPE = PACKAGE_NAME + ".action.DELETE_RECIPE";
     public static final String ACTION_BROADCAST_UPLOADED_RECIPE = PACKAGE_NAME + ".action.ACTION_BROADCAST_UPLOADED_RECIPE";
     public static final String ACTION_BROADCAST_DELETED_RECIPE = PACKAGE_NAME + ".action.ACTION_BROADCAST_DELETED_RECIPE";
-    public static final String ACTION_GET_RECIPES_FROM_DRIVE = PACKAGE_NAME + ".action.GET_RECIPES_IN_DRIVE";
-    public static final String ACTION_BROADCAST_GET_RECIPES_FROM_DRIVE = PACKAGE_NAME + ".action.ACTION_BROADCAST_GET_RECIPES_FROM_DRIVE";
 
     public static final String MIME_TYPE_RECIPE = "application/xml";
     public static final String MIME_TYPE_PICTURE = "image/jpeg";
@@ -123,7 +120,9 @@ public class RecetasCookeoConstants {
 
 
     public static final String RECIPES_TABLE_NAME = "RECIPES";
-    public static final String FIELD_NAME_NORMALIZED = "NORMALIZED_NAME";
+    public static final String FIELD_ID = "_id";
+    public static final String FIELD_NAME = "name";
+    public static final String FIELD_ICON = "icon";
 
     public static final String STORAGE_URL = "gs://hardy-binder-89508.appspot.com";
     public static final String STORAGE_NODE = "recipes";

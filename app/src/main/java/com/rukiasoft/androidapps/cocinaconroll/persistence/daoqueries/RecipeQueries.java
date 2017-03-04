@@ -1,6 +1,7 @@
 package com.rukiasoft.androidapps.cocinaconroll.persistence.daoqueries;
 
 import android.database.Cursor;
+import android.os.SystemClock;
 
 import com.rukiasoft.androidapps.cocinaconroll.persistence.model.DaoSession;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.model.RecipeDb;
@@ -223,9 +224,11 @@ public class RecipeQueries {
     private static void initializeCursorLatestRecipes(DaoSession session){
         RecipeDbDao recipeDbDao = session.getRecipeDbDao();
         recipeDbDao.detachAll();
-//        queryRecipesByName = recipeDbDao.queryBuilder().where(
-//                RecipeDbDao.Properties.Favourite.eq(1)
-//        ).build();
+        long timestamp = System.currentTimeMillis() -
+                RecetasCookeoConstants.TIMEFRAME_NEW_RECIPE_DAYS * RecetasCookeoConstants.TIMEFRAME_MILI_SECONDS_DAY;
+        cursorLatestRecipes = recipeDbDao.queryBuilder().where(
+                RecipeDbDao.Properties.Timestamp.ge(timestamp)
+        ).buildCursor();
     }
 
     private static CursorQuery initializeCursorRecipesByType(DaoSession session, String type){

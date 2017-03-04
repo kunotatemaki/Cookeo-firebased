@@ -4,33 +4,38 @@
     android:id="@+id/recipe_description_item_ingredients_layout"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal">
+    android:orientation="horizontal"
+
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?selectableItemBackground">
 
     <ImageView
-        android:id="@+id/recipe_description_item_icon"
+        android:id="@+id/search_recipe_icon"
         android:adjustViewBounds="true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="top"
-        android:layout_marginTop="12dp"
+        android:layout_gravity="center_vertical"
         android:layout_marginRight="5dip"
         android:layout_marginEnd="5dip"
         android:layout_marginLeft="@dimen/margin_text_cardview"
         android:layout_marginStart="@dimen/margin_text_cardview"
-        android:tint="@color/ColorDescriptions"
+        android:src="@drawable/ic_all_18"
+        android:tint="@color/ColorPrimary"
         android:scaleType="fitXY"
-        android:contentDescription="@string/null_content_description"/>
+        android:contentDescription="@string/type_dish"/>
 
     <TextView
-        android:id="@+id/recipe_description_item_description"
+        android:id="@+id/search_recipe_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
-        android:gravity="center_vertical"
+        android:gravity="clip_vertical"
         android:paddingRight="10dp"
         android:paddingEnd="10dp"
         android:paddingBottom="5dp"
         android:paddingTop="5dp"
+        android:text="prueba de búsquda"
         style="@style/TextAppearance.AppCompat.Subhead"
         tools:ignore="RtlSymmetry" />
 

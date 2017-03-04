@@ -27,23 +27,17 @@ public class PermissionMethods {
     public void showPermissionRationale(final PermissionToken token, @StringRes int description) {
         new AlertDialog.Builder(activity).setTitle(R.string.permissions_title)
                 .setMessage(description)
-                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                    @Override public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                        token.cancelPermissionRequest();
-                    }
-                })
                 .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     @Override public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
                         token.continuePermissionRequest();
                     }
                 })
-                .setOnDismissListener(new DialogInterface.OnDismissListener() {
+                /*.setOnDismissListener(new DialogInterface.OnDismissListener() {
                     @Override public void onDismiss(DialogInterface dialog) {
-                        token.cancelPermissionRequest();
+                        token.continuePermissionRequest();
                     }
-                })
+                })*/
                 .show();
     }
 

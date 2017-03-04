@@ -55,7 +55,6 @@ import com.google.firebase.storage.StorageReference;
 import com.orhanobut.logger.Logger;
 import com.rukiasoft.androidapps.cocinaconroll.BuildConfig;
 import com.rukiasoft.androidapps.cocinaconroll.R;
-import com.rukiasoft.androidapps.cocinaconroll.classes.RecipeItemOld;
 import com.rukiasoft.androidapps.cocinaconroll.database.CocinaConRollContentProvider;
 import com.rukiasoft.androidapps.cocinaconroll.fastscroller.FastScroller;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.controllers.RecipeController;
@@ -66,8 +65,6 @@ import com.rukiasoft.androidapps.cocinaconroll.persistence.local.ObjectQeue;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.model.RecipeDb;
 import com.rukiasoft.androidapps.cocinaconroll.ui.model.RecipeComplete;
 import com.rukiasoft.androidapps.cocinaconroll.ui.model.RecipeReduced;
-import com.rukiasoft.androidapps.cocinaconroll.utilities.CommonRecipeOperations;
-import com.rukiasoft.androidapps.cocinaconroll.utilities.LogHelper;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.ReadWriteTools;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.Tools;
@@ -82,6 +79,8 @@ import butterknife.Unbinder;
 import icepick.State;
 import jp.wasabeef.recyclerview.adapters.SlideInBottomAnimationAdapter;
 
+import static android.support.v4.app.ActivityOptionsCompat.makeSceneTransitionAnimation;
+
 
 /**
  * A placeholder fragment containing a simple view.
@@ -90,7 +89,6 @@ public class RecipeListFragment extends Fragment implements
         LoaderManager.LoaderCallbacks<Cursor>, RecipeListRecyclerViewAdapter.OnCardClickListener,
         AppBarLayout.OnOffsetChangedListener{
 
-    private static final String TAG = LogHelper.makeLogTag(RecipeListFragment.class);
     private static final String KEY_SCROLL_POSITION = RecetasCookeoConstants.PACKAGE_NAME + ".scrollposition";
     private static final String KEY_RECIPE_LIST = RecetasCookeoConstants.PACKAGE_NAME + ".recipelist";
 
@@ -352,13 +350,6 @@ public class RecipeListFragment extends Fragment implements
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        if(getActivity() instanceof ToolbarAndProgressActivity){
-            if(isResumed()){
-                //tools.showRefreshLayout(getActivity());
-            }else {
-                //((ToolbarAndProgressActivity) getActivity()).needToShowRefresh = true;
-            }
-        }
         String endPath = args.getString(RecetasCookeoConstants.SEARCH_FIELD);
         Uri CONTENT_URI = CocinaConRollContentProvider.getUri(endPath);
         return new CursorLoader(getActivity(), CONTENT_URI, null, null, null, null);
@@ -387,11 +378,6 @@ public class RecipeListFragment extends Fragment implements
 
     }
 
-    private Boolean needToDownloadRecipes(){
-        List<RecipeDb> recipes = mRecipeController.getListBothRecipeAndPicturesToDownload(getActivity().getApplication());
-        return recipes != null && !recipes.isEmpty();
-    }
-
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         if(mRecyclerView != null) {
@@ -406,11 +392,6 @@ public class RecipeListFragment extends Fragment implements
 
     private void setData(){
         initDatabaseText.setVisibility(View.GONE);
-        //orderRecipesByName();
-        //((ToolbarAndProgressActivity) getActivity()).needToShowRefresh = false;
-        if(isResumed()) {
-            //tools.hideRefreshLayout(getActivity());
-        }
 
         RecipeListRecyclerViewAdapter adapter = new RecipeListRecyclerViewAdapter(getActivity(), mRecipes);
         adapter.setHasStableIds(true);
@@ -485,7 +466,7 @@ public class RecipeListFragment extends Fragment implements
 
         bundle.putParcelable(RecetasCookeoConstants.KEY_RECIPE, recipeToShow);
         intent.putExtras(bundle);
-        ActivityOptionsCompat activityOptions = ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity());
+        ActivityOptionsCompat activityOptions = makeSceneTransitionAnimation(getActivity());
         // Now we can start the Activity, providing the activity options as a bundle
         ActivityCompat.startActivityForResult(getActivity(), intent, RecetasCookeoConstants.REQUEST_DETAILS, activityOptions.toBundle());
 
@@ -576,15 +557,18 @@ public class RecipeListFragment extends Fragment implements
         filterRecipes(lastFilter);
     }
 
-    public void searchAndShow(String name) {
-        //// TODO: 21/2/17 hacer con recipecontroler
-//        DatabaseRelatedTools dbTools = new DatabaseRelatedTools();
-//        name = dbTools.getNormalizedString(name);
-//        List<RecipeItemOld> coincidences = dbTools.searchRecipesInDatabase(getActivity().getApplicationContext(),
-//                RecipesTable.FIELD_NAME_NORMALIZED, dbTools.getNormalizedString(name));
-//        if (coincidences.sizePicture() > 0) {
-//            showRecipeDetails(coincidences.getPicture(0));
-//        }
+    public void searchAndShow(long id) {
+        if(application == null){
+            return;
+        }
+        if(id < 0){
+            filterRecipes(null);
+        }
+        RecipeController recipeController = new RecipeController();
+        RecipeDb recipe = recipeController.getRecipeById(application, id);
+        if(recipe != null){
+            showRecipeDetails(RecipeReduced.getRecipeFromDatabase(recipe));
+        }
     }
 
     ///////////// PARTE DE DESCARGA DE LAS RECETAS ///////////////
@@ -682,9 +666,6 @@ public class RecipeListFragment extends Fragment implements
     }
 
     private void connectToFirebaseForNewRecipes(String node){
-        if(getActivity() != null) {
-            ((RecipeListActivity) getActivity()).showProgressDialog(getString(R.string.downloading_recipes));
-        }
         if(node.equals(RecetasCookeoConstants.PERSONAL_RECIPES_NODE)){
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             node += "/" + user.getUid();
@@ -779,8 +760,6 @@ public class RecipeListFragment extends Fragment implements
     }
 
     public void downloadRecipesFromFirebase(){
-        //reseteo los contadores
-        //Veo si hay que descargar recetas
 
         isDownloadingRecipes = true;
         if(application == null){
@@ -790,6 +769,9 @@ public class RecipeListFragment extends Fragment implements
         if(pullItems == null || pullItems.isRecipeListEmpty()) {
             List<RecipeDb> list = recipeController.getListOnlyRecipeToDownload(application);
             pullItems = ObjectQeue.create((ArrayList<RecipeDb>) list, null);
+            if(list.size() > 0 && getActivity() != null) {
+                ((RecipeListActivity) getActivity()).showProgressDialog(getString(R.string.downloading_recipes));
+            }
         }
 
         if(pullItems.isRecipeListEmpty()){
@@ -877,11 +859,10 @@ public class RecipeListFragment extends Fragment implements
         if(pullItems == null || pullItems.isPictureListEmpty()) {
             List<RecipeDb> list = recipeController.getListOnlyPicturesToDownload(application);
             pullItems = ObjectQeue.create(null, (ArrayList<RecipeDb>) list);
-            if(getContext() != null) {
+            if(getContext() != null && isResumed()) {
                 Toast.makeText(getContext(), getString(R.string.downloading_pictures),
                         Toast.LENGTH_LONG).show();
             }
-            // TODO: 26/2/17 mostrar toast
         }
         if(pullItems.isPictureListEmpty()){
             //veo si hay que descargar fotos
@@ -893,6 +874,7 @@ public class RecipeListFragment extends Fragment implements
 
         RecipeDb picture = pullItems.getPicture(0);
         final String name = picture.getPicture();
+        final long id =  picture.getId();
         StorageReference storageRef = FirebaseStorage.getInstance().getReference();
         StorageReference imageRef;
         if(picture.getOwner().equals(RecetasCookeoConstants.FLAG_PERSONAL_RECIPE)){
@@ -912,10 +894,7 @@ public class RecipeListFragment extends Fragment implements
             public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
                 // Local temp file has been created
                 Logger.d("Salvado correctamente: " + name);
-                if(application != null){
-                    RecipeController recipeController = new RecipeController();
-                    recipeController.updateDownloadRecipeFlag(application, name, false);
-                }
+
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
@@ -930,6 +909,10 @@ public class RecipeListFragment extends Fragment implements
             public void onComplete(@NonNull Task<FileDownloadTask.TaskSnapshot> task) {
                 pullItems.removePicture(0);
                 downloadPicturesFromStorage();
+                if(application != null){
+                    RecipeController recipeController = new RecipeController();
+                    recipeController.updateDownloadPictureFlag(application, id, false);
+                }
             }
         });
 

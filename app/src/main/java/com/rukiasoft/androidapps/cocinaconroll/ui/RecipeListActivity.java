@@ -12,7 +12,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.MenuItemCompat;
@@ -33,19 +32,13 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.karumi.dexter.Dexter;
 import com.rukiasoft.androidapps.cocinaconroll.BuildConfig;
 import com.rukiasoft.androidapps.cocinaconroll.R;
-import com.rukiasoft.androidapps.cocinaconroll.classes.RecipeItemOld;
 import com.rukiasoft.androidapps.cocinaconroll.gcm.QuickstartPreferences;
 import com.rukiasoft.androidapps.cocinaconroll.gcm.RegistrationIntentService;
 import com.rukiasoft.androidapps.cocinaconroll.permissions.ErrorListener;
 import com.rukiasoft.androidapps.cocinaconroll.permissions.RecetasCookeoMultiplePermissionListener;
-import com.rukiasoft.androidapps.cocinaconroll.persistence.controllers.RecipeController;
-import com.rukiasoft.androidapps.cocinaconroll.ui.model.RecipeComplete;
-import com.rukiasoft.androidapps.cocinaconroll.utilities.CommonRecipeOperations;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.LogHelper;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.ReadWriteTools;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
@@ -117,19 +110,17 @@ public class RecipeListActivity extends ToolbarAndProgressActivity {
         //Pido los permisos si procede
         if(mAskForPermission) {
             createPermissionListeners();
-            Dexter.withActivity(this).continueRequestingPendingPermissions(recetasCookeoMultiplePermissionListener);
+            //Dexter.withActivity(this).continueRequestingPendingPermissions(recetasCookeoMultiplePermissionListener);
             askForAllPermissions();
             mAskForPermission = false;
+        }else{
+            Dexter.withActivity(this).continueRequestingPendingPermissions(recetasCookeoMultiplePermissionListener);
+
         }
 
         // [END auth_state_listener]
         final Tools mTools = new Tools();
-        if(mTools.getAppVersion(getApplication()) > mTools.getIntegerFromPreferences(this, RecetasCookeoConstants.PROPERTY_APP_VERSION_STORED)){
-            //first installation, or recently updated app
-            mTools.savePreferences(this, QuickstartPreferences.SENT_TOKEN_TO_SERVER, false);
-            mTools.savePreferences(this, RecetasCookeoConstants.PROPERTY_APP_VERSION_STORED, mTools.getAppVersion(getApplication()));
-            // TODO: 15/1/17 Esto posiblemente ya no haga falta
-        }
+
 
         mLastFilter = RecetasCookeoConstants.FILTER_ALL_RECIPES;
         if(getIntent() != null && getIntent().hasExtra(RecetasCookeoConstants.KEY_TYPE)){
@@ -167,9 +158,6 @@ public class RecipeListActivity extends ToolbarAndProgressActivity {
         mStatusIntentFilter.addAction(RecetasCookeoConstants.ACTION_BROADCAST_DELETED_RECIPE);
 
 
-        /*ReadWriteTools readWriteTools = new ReadWriteTools();
-        readWriteTools.loadOldEditedAndOriginalRecipes(getApplicationContext());*/
-
         if(savedInstanceState == null) {
             clearGarbage();
         }
@@ -188,8 +176,8 @@ public class RecipeListActivity extends ToolbarAndProgressActivity {
         RecipeListFragment mRecipeListFragment = (RecipeListFragment) getSupportFragmentManager().findFragmentById(R.id.list_recipes_fragment);
         if(mRecipeListFragment != null){
             if(intent != null && intent.hasExtra(RecetasCookeoConstants.KEY_RECIPE)) {
-                String name = intent.getStringExtra(RecetasCookeoConstants.KEY_RECIPE);
-                mRecipeListFragment.searchAndShow(name);
+                long id = intent.getLongExtra(RecetasCookeoConstants.KEY_RECIPE, -1);
+                mRecipeListFragment.searchAndShow(id);
             }
             if(intent != null && intent.hasExtra(RecetasCookeoConstants.KEY_TYPE)){
                 mLastFilter = intent.getStringExtra(RecetasCookeoConstants.KEY_TYPE);

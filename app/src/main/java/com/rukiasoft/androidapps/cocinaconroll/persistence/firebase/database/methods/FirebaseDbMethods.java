@@ -30,7 +30,7 @@ import java.util.Map;
 
 public class FirebaseDbMethods {
     private final String TAG = LogHelper.makeLogTag(FirebaseDbMethods.class);
-    static boolean uploading = false;
+    private static boolean uploading = false;
     private RecipeController recipeController;
 
     public FirebaseDbMethods(RecipeController recipeController) {
@@ -43,21 +43,20 @@ public class FirebaseDbMethods {
 
     // TODO: 22/2/17 llamar a este método cuando corresponda (antes se llamaba en el timer) 
     public void updateOldRecipesToPersonalStorage(final Context context){
-        if(uploading == true){
+        if(uploading){
             Log.d(TAG, "Estaba descargando");
             return;
         }
-        uploading = !uploading;
+        uploading = true;
         ReadWriteTools readWriteTools = new ReadWriteTools();
         List<String> recipeItemNameList = readWriteTools.loadOldEditedAndOriginalRecipes(context);
-        //Log.d(TAG, "numero recetas: " + recipeItemNameList.sizePicture());
         if(recipeItemNameList != null) {
             updateRecipesToPersonalStorage(context, recipeItemNameList);
         }
 
     }
 
-    public void updateRecipesToPersonalStorage(final Context context, final List<String> recipeList){
+    private void updateRecipesToPersonalStorage(final Context context, final List<String> recipeList){
 
         Tools tools = new Tools();
         if(!tools.getBooleanFromPreferences(context, RecetasCookeoConstants.PROPERTY_CAN_UPLOAD_OWN_RECIPES)){
@@ -125,10 +124,9 @@ public class FirebaseDbMethods {
                     uploadNextRecipe(context, recipeList);
                     return;
                 }
-                StringBuilder sbPath = new StringBuilder(100);
-                sbPath.append(readWriteTools.getEditedStorageDir());
-                sbPath.append(recipeList.get(0));
-                readWriteTools.deleteFile(sbPath.toString());
+                String sbPath = readWriteTools.getEditedStorageDir() +
+                        recipeList.get(0);
+                readWriteTools.deleteFile(sbPath);
                 if(recipeOld.getPicture() != null && !recipeOld.getPicture().isEmpty()
                         && !recipeOld.getPicture().equals(RecetasCookeoConstants.DEFAULT_PICTURE_NAME)) {
                     StorageMethods storageMethods = new StorageMethods();

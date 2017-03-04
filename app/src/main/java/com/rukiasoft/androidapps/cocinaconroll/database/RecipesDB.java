@@ -37,7 +37,7 @@ public class RecipesDB {
     	mAliasMap.put(SearchManager.SUGGEST_COLUMN_ICON_1, RecipesTable.FIELD_ICON + " as " + SearchManager.SUGGEST_COLUMN_ICON_1);
     	
     	// This value will be appended to the Intent data on selecting an item from Search result or Suggestions ( Optional )
-    	mAliasMap.put(SearchManager.SUGGEST_COLUMN_INTENT_DATA_ID, RecipesTable.FIELD_NAME_NORMALIZED + " as " + SearchManager.SUGGEST_COLUMN_INTENT_DATA_ID);
+    	mAliasMap.put(SearchManager.SUGGEST_COLUMN_INTENT_DATA_ID, RecipesTable.FIELD_ID + " as " + SearchManager.SUGGEST_COLUMN_INTENT_DATA_ID);
 	}
 		
 

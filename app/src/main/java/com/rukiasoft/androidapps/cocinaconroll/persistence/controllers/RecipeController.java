@@ -16,7 +16,6 @@
         import com.rukiasoft.androidapps.cocinaconroll.persistence.model.RecipeDbDao;
         import com.rukiasoft.androidapps.cocinaconroll.persistence.model.StepDb;
         import com.rukiasoft.androidapps.cocinaconroll.ui.model.RecipeReduced;
-        import com.rukiasoft.androidapps.cocinaconroll.utilities.LogHelper;
 
         import org.greenrobot.greendao.query.Query;
 
@@ -28,8 +27,6 @@
  */
 
 public class RecipeController {
-
-    private String TAG = LogHelper.makeLogTag(this.getClass());
 
     public RecipeController(){
 
@@ -140,13 +137,13 @@ public class RecipeController {
         return RecipeQueries.getQueryOnlyPicturesToDownload(session).list();
     }
 
-    public void updateDownloadRecipeFlag(Application application, String name, boolean state) {
+    public void updateDownloadPictureFlag(Application application, long id, boolean state) {
         DaoSession session = CommonController.getDaosessionFromApplication(application, "RecipeDb");
-        Query query = RecipeQueries.getQueryRecipesByName(session);
-        query.setParameter(0, name);
+        Query query = RecipeQueries.getQueryRecipeById(session);
+        query.setParameter(0, id);
         RecipeDb recipeDbFromDatabase = (RecipeDb) query.unique();
         if(recipeDbFromDatabase != null) {
-            recipeDbFromDatabase.setDownloadPicture(false);
+            recipeDbFromDatabase.setDownloadPicture(state);
             recipeDbFromDatabase.update();
         }
     }
@@ -171,21 +168,7 @@ public class RecipeController {
         DaoSession session = CommonController.getDaosessionFromApplication(application, "RecipeDb");
         return RecipeQueries.getCursorRecipesByName(session, name);
 
-        /*Query queryRecipe = RecipeQueries.getQueryRecipesByName(session);
-        StringBuilder stringBuilder = new StringBuilder(name);
-        stringBuilder.insert(0, "%");
-        stringBuilder.append("%");
-        name = stringBuilder.toString();
-        queryRecipe.setParameter(0, name);
-        List<RecipeDb> recipeDbList = queryRecipe.list();
-        if(recipeDbList == null){
-            return new ArrayList<>();
-        }
-        for(RecipeDb recipeDb : recipeDbList){
-            recipeDb.getIngredients();
-            recipeDb.getSteps();
-        }
-        return recipeDbList;*/
+
     }
 
 
