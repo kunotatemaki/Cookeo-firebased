@@ -374,7 +374,7 @@ public class RecipeDetailsFragment extends Fragment implements
         // TODO: 21/2/17 cambiar a lo que ya está hecho
         recipe = RecipeComplete.getRecipeFromDatabase(mRecipeController.switchFavourite(getActivity().getApplication(),
                 recipe.getId()));
-        if (recipe.getFavourite()) {
+        if (!recipe.getFavourite()) {
             recipeDescriptionFAB.setImageDrawable(ContextCompat.getDrawable(getActivity(),
                     R.drawable.ic_favorite_outline_white_24dp));
         } else {

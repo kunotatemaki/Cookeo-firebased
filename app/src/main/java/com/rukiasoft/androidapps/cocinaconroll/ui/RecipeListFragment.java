@@ -96,8 +96,6 @@ public class RecipeListFragment extends Fragment implements
     @Nullable
     @BindView(R.id.toolbar_recipe_list_fragment) Toolbar mToolbarRecipeListFragment;
     @BindView(R.id.recycler_view) RecyclerView mRecyclerView;
-    @BindView(R.id.swipe_refresh_layout)
-    protected SwipeRefreshLayout refreshLayout;
     @Nullable @BindView((R.id.fastscroller))
     FastScroller fastScroller;
     @BindView(R.id.appbar_layout)
@@ -412,6 +410,15 @@ public class RecipeListFragment extends Fragment implements
 
         mRecyclerView.setLayoutManager(sglm);
         mRecyclerView.scrollToPosition(savedScrollPosition);
+        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener(){
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy){
+                if (dy > 0)
+                    addRecipeButtonFAB.hide();
+                else if (dy < 0)
+                    addRecipeButtonFAB.show();
+            }
+        });
         //Set the fast Scroller
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
             if(fastScroller != null) {

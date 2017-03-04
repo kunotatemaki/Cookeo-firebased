@@ -6,12 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".ui.RecipeListActivity">
 
-    <android.support.v4.widget.SwipeRefreshLayout
-        android:id="@+id/swipe_refresh_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        >
+
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
@@ -46,7 +41,6 @@
     </RelativeLayout>
 
 
-    </android.support.v4.widget.SwipeRefreshLayout>
 
 
     <android.support.design.widget.AppBarLayout
@@ -115,7 +109,6 @@
         android:src="@drawable/ic_add_white_24dp"
         android:layout_gravity="bottom|end"
         android:id="@+id/add_recipe_fab"
-        app:layout_behavior="com.rukiasoft.androidapps.cocinaconroll.FAB_Hide_on_Scroll"
         />
 
 </android.support.design.widget.CoordinatorLayout>
