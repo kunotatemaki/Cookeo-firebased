@@ -188,7 +188,6 @@ public class RecipeListActivity extends ToolbarAndProgressActivity {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent intentData) {
-        Tools tools = new Tools();
         switch (requestCode) {
             case RecetasCookeoConstants.REQUEST_DETAILS:
             case RecetasCookeoConstants.REQUEST_CREATE_RECIPE:

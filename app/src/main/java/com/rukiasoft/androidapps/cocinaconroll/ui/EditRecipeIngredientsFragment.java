@@ -1,6 +1,7 @@
 package com.rukiasoft.androidapps.cocinaconroll.ui;
 
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -35,8 +36,6 @@ import butterknife.Unbinder;
 
 public class EditRecipeIngredientsFragment extends Fragment implements OnStartDragListener {
 
-    private static final String KEY_ITEM_TO_ADD = RecetasCookeoConstants.PACKAGE_NAME + ".itemtoadd";
-    //private static final String TAG = "EditRecipeIngredientsFragment";
     private Boolean showSwipe = true;
     @BindView(R.id.edit_recipe_add_item)EditText addItem;
     @BindView(R.id.edit_recipe_add_fab)FloatingActionButton fab;
@@ -76,11 +75,6 @@ public class EditRecipeIngredientsFragment extends Fragment implements OnStartDr
             }
         });
 
-
-
-        if(savedInstanceState != null && savedInstanceState.containsKey(KEY_ITEM_TO_ADD))
-            addItem.setText(savedInstanceState.getString(KEY_ITEM_TO_ADD));
-
         return view;
     }
 
@@ -99,6 +93,7 @@ public class EditRecipeIngredientsFragment extends Fragment implements OnStartDr
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
         if(mAdapter == null) {
             RecipeComplete recipe = ((EditRecipeActivity) getActivity()).getRecipe();
             List<String> ingredients = new ArrayList<>();

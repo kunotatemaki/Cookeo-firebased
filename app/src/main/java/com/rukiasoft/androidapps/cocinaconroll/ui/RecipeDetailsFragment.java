@@ -425,39 +425,39 @@ public class RecipeDetailsFragment extends Fragment implements
         unbinder.unbind();
     }
 
-    private void loadRecipe(){
-        if(recipeLoaded) return;
+    private void loadRecipe() {
+        if (recipeLoaded) return;
 
-        if(recipeName != null){
+        if (recipeName != null) {
             recipeName.setText(recipe.getName());
         }
-        if(recipe.getMinutes()>0){
+        if (recipe.getMinutes() > 0) {
             textMinutes.setText(String.valueOf(recipe.getMinutes()));
             textMinutes.setVisibility(View.VISIBLE);
             iconMinutes.setVisibility(View.VISIBLE);
-        }else{
+        } else {
             textMinutes.setVisibility(View.GONE);
             iconMinutes.setVisibility(View.GONE);
         }
-        if(recipe.getPortions()>0){
+        if (recipe.getPortions() > 0) {
             textPortions.setText(String.valueOf(recipe.getPortions()));
             textPortions.setVisibility(View.VISIBLE);
             iconPortions.setVisibility(View.VISIBLE);
-        }else{
+        } else {
             textPortions.setVisibility(View.GONE);
             iconPortions.setVisibility(View.GONE);
         }
-        if(actionBar != null){
+        if (actionBar != null) {
             actionBar.setTitle(recipe.getName());
         }
-        if(recipeDescriptionFAB != null){
+        if (recipeDescriptionFAB != null) {
             if (recipe.getFavourite()) {
                 recipeDescriptionFAB.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.ic_favorite_white_24dp));
             } else {
                 recipeDescriptionFAB.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.ic_favorite_outline_white_24dp));
             }
         }
-        if(mPhotoView != null){
+        if (mPhotoView != null) {
             BitmapImageViewTarget bitmapImageViewTarget = new BitmapImageViewTarget(mPhotoView) {
                 @Override
                 public void onResourceReady(Bitmap bitmap, GlideAnimation anim) {
@@ -480,10 +480,15 @@ public class RecipeDetailsFragment extends Fragment implements
 
         //Set the author
         String sAuthor = getResources().getString(R.string.default_author);
-        if(recipe.getAuthor().equals(sAuthor))
-            author.setText(sAuthor);
-        else {
-            String link = getResources().getString(R.string.original_link).concat(" ").concat(recipe.getAuthor());
+        if (recipe.getAuthor().equals(sAuthor) || recipe.getLink() == null || recipe.getLink().isEmpty()){
+            author.setText(getString(R.string.author).concat(" ").concat(sAuthor));
+        }else {
+            String link = getString(R.string.original_link)
+                    .concat(" <a href=\"")
+                    .concat(recipe.getLink())
+                    .concat("\">")
+                    .concat(recipe.getAuthor())
+                    .concat("</a> ");
             Spanned linkFormatted;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 linkFormatted = Html.fromHtml(link, Html.FROM_HTML_MODE_LEGACY);

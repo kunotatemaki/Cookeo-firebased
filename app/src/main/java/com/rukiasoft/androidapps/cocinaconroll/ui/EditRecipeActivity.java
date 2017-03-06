@@ -15,6 +15,8 @@ import android.view.MenuItem;
 import android.widget.TextView;
 
 import com.rukiasoft.androidapps.cocinaconroll.R;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.controllers.RecipeController;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.model.RecipeDb;
 import com.rukiasoft.androidapps.cocinaconroll.ui.model.RecipeComplete;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.ReadWriteTools;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
@@ -33,7 +35,7 @@ public class EditRecipeActivity extends AppCompatActivity {
     private EditRecipePhotoFragment editRecipePhotoFragment;
     private EditRecipeIngredientsFragment editRecipeIngredientsFragment;
     private EditRecipeStepsFragment editRecipeStepsFragment;
-    @State RecipeComplete recipe;
+    RecipeComplete recipe;
     @State String title;
     @BindView(R.id.standard_toolbar) Toolbar mToolbar;
     @State String oldPicture;
@@ -138,7 +140,7 @@ public class EditRecipeActivity extends AppCompatActivity {
                     getSupportFragmentManager().executePendingTransactions();
                 } else if (f instanceof EditRecipeIngredientsFragment) {
                     //editRecipeStepsFragment = (EditRecipeStepsFragment) getSupportFragmentManager().findFragmentByTag(EditRecipeStepsFragment.class.getSimpleName());
-                    editRecipeIngredientsFragment.saveData();
+                    setRecipe(editRecipeIngredientsFragment.saveData());
                     editRecipeIngredientsFragment = null;
                     if(editRecipeStepsFragment == null) {
                         editRecipeStepsFragment = new EditRecipeStepsFragment();
@@ -149,7 +151,7 @@ public class EditRecipeActivity extends AppCompatActivity {
                             .commit();
                     getSupportFragmentManager().executePendingTransactions();
                 } else if (f instanceof EditRecipeStepsFragment) {
-                    recipe = editRecipeStepsFragment.saveData();
+                    setRecipe(editRecipeStepsFragment.saveData());
                     setResultData();
                 }
                 invalidateOptionsMenu();// creates call to onPrepareOptionsMenu()
@@ -207,12 +209,9 @@ public class EditRecipeActivity extends AppCompatActivity {
         builder.show();
     }
     private void setResultData(){
-        Intent resultIntent = new Intent();
-        resultIntent.putExtra(RecetasCookeoConstants.KEY_RECIPE, recipe);
-        if(oldPicture != null && !oldPicture.isEmpty() && !oldPicture.equals(recipe.getPicture())){
-            resultIntent.putExtra(RecetasCookeoConstants.KEY_DELETE_OLD_PICTURE, oldPicture);
-        }
-        setResult(RecetasCookeoConstants.RESULT_UPDATE_RECIPE, resultIntent);
+        RecipeController recipeController = new RecipeController();
+        RecipeDb recipeDb = RecipeDb.fromRecipeComplete(recipe);
+        recipeController.insertOrReplaceRecipe(getApplication(), recipeDb);
         finish();
     }
 
@@ -274,12 +273,18 @@ public class EditRecipeActivity extends AppCompatActivity {
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
+        if(recipe != null){
+            outState.putParcelable(RecetasCookeoConstants.KEY_RECIPE, recipe);
+        }
         super.onSaveInstanceState(outState);
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
+        if(savedInstanceState.containsKey(RecetasCookeoConstants.KEY_RECIPE)){
+            recipe = savedInstanceState.getParcelable(RecetasCookeoConstants.KEY_RECIPE);
+        }
     }
 }
 

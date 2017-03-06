@@ -43,6 +43,7 @@
     <string name="null_content_description" translatable="false"> </string>
     <string name="default_author">Preinstalled in Cookeo</string>
     <string name="original_link" translatable="false">Link:</string>
+    <string name="author" translatable="false">Author:</string>
     <string name="edit_recipe">Edit recipe</string>
     <string name="remove_recipe">Remove recipe</string>
     <string name="Yes">Yes</string>

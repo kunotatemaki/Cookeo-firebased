@@ -27,7 +27,7 @@ public abstract class RecipeComplete implements Parcelable{
     abstract Integer portions();
     abstract Integer language();
     abstract String author();
-    abstract String link();
+    @Nullable abstract String link();
     @Nullable
     abstract String tip();
     abstract Integer owner();

@@ -1,6 +1,7 @@
 package com.rukiasoft.androidapps.cocinaconroll.ui;
 
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -22,6 +23,9 @@ import com.rukiasoft.androidapps.cocinaconroll.dragandswipehelper.SimpleItemTouc
 import com.rukiasoft.androidapps.cocinaconroll.utilities.Tools;
 import com.squareup.leakcanary.RefWatcher;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
@@ -30,7 +34,6 @@ import butterknife.Unbinder;
 public class EditRecipeStepsFragment extends Fragment implements OnStartDragListener {
 
     private static final String KEY_ITEM_TO_ADD = RecetasCookeoConstants.PACKAGE_NAME + ".itemtoadd";
-    private RecipeComplete recipe;
     @BindView(R.id.edit_recipe_add_item)EditText addItem;
     @BindView(R.id.edit_recipe_add_fab)FloatingActionButton fab;
     @BindView(R.id.edit_recipe_recycler_view) RecyclerView recyclerView;
@@ -70,10 +73,6 @@ public class EditRecipeStepsFragment extends Fragment implements OnStartDragList
             }
         });
 
-        setRecipe();
-
-        if(savedInstanceState != null && savedInstanceState.containsKey(KEY_ITEM_TO_ADD))
-            addItem.setText(savedInstanceState.getString(KEY_ITEM_TO_ADD));
 
         return view;
     }
@@ -95,12 +94,11 @@ public class EditRecipeStepsFragment extends Fragment implements OnStartDragList
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        tip.setText(recipe.getTip());
+        RecipeComplete recipe = ((EditRecipeActivity)getActivity()).getRecipe();
+        if(tip.getText().toString().isEmpty() && recipe != null) {
+            tip.setText(recipe.getTip());
+        }
 
-        mAdapter = new EditRecipeRecyclerViewAdapter(recipe.getSteps(), this);
-
-        //recyclerView.setHasFixedSize(true);
-        recyclerView.setAdapter(mAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(mAdapter);
@@ -109,18 +107,30 @@ public class EditRecipeStepsFragment extends Fragment implements OnStartDragList
     }
 
     @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        if(mAdapter == null) {
+            RecipeComplete recipe = ((EditRecipeActivity) getActivity()).getRecipe();
+            List<String> steps = new ArrayList<>();
+            if (recipe.getSteps() != null) {
+                steps = recipe.getSteps();
+            }
+            mAdapter = new EditRecipeRecyclerViewAdapter(steps, this);
+        }
+        recyclerView.setAdapter(mAdapter);
+    }
+
+    @Override
     public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
         mItemTouchHelper.startDrag(viewHolder);
     }
 
-    private void setRecipe(){
-        if(getActivity() instanceof EditRecipeActivity){
-            recipe = ((EditRecipeActivity) getActivity()).getRecipe();
-        }
-    }
+
 
     public RecipeComplete saveData(){
-        return RecipeComplete.getRecipeFrom3Screen(recipe, mAdapter.getItems(), tip.getText().toString());
+        RecipeComplete recipe = ((EditRecipeActivity)getActivity()).getRecipe();
+        String sTip = tip.getText() != null? tip.getText().toString() : "";
+        return RecipeComplete.getRecipeFrom3Screen(recipe, mAdapter.getItems(), sTip);
     }
 
 }

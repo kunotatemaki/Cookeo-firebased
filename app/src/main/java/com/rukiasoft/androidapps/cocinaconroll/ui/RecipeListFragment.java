@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -21,7 +20,6 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -389,17 +387,14 @@ public class RecipeListFragment extends Fragment implements
     private void setData(){
         initDatabaseText.setVisibility(View.GONE);
 
-        RecipeListRecyclerViewAdapter adapter = new RecipeListRecyclerViewAdapter(getActivity(), mRecipes);
+        RecipeListRecyclerViewAdapter adapter = new RecipeListRecyclerViewAdapter(mRecipes);
         adapter.setHasStableIds(true);
         adapter.setOnCardClickListener(this);
         mRecyclerView.setHasFixedSize(true);
 
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            SlideInBottomAnimationAdapter slideAdapter = wrapAdapter(adapter);
-            mRecyclerView.setAdapter(slideAdapter);
-        }else{
-            mRecyclerView.setAdapter(adapter);
-        }
+        SlideInBottomAnimationAdapter slideAdapter = wrapAdapter(adapter);
+        mRecyclerView.setAdapter(slideAdapter);
+
         //mRecyclerView.setAdapter(adapter);
         columnCount = getResources().getInteger(R.integer.list_column_count);
         StaggeredGridLayoutManager sglm =
@@ -418,11 +413,10 @@ public class RecipeListFragment extends Fragment implements
             }
         });
         //Set the fast Scroller
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            if(fastScroller != null) {
-                fastScroller.setRecyclerView(mRecyclerView);
-            }
+        if(fastScroller != null) {
+            fastScroller.setRecyclerView(mRecyclerView);
         }
+
 
         //set the number of recipes
         String nRecipes = String.format(getResources().getString(R.string.recipes), mRecipes.size());
@@ -554,12 +548,6 @@ public class RecipeListFragment extends Fragment implements
         numberAndTypeBar.setVisibility(visibility);
         if(visibility == View.GONE) addRecipeButtonFAB.hide();
         else addRecipeButtonFAB.show();
-    }
-
-    public void insertRecipe(RecipeComplete recipe) {
-        RecipeDb recipeDb = RecipeDb.fromRecipeComplete(recipe);
-        mRecipeController.insertOrReplaceRecipe(application, recipeDb);
-        filterRecipes(lastFilter);
     }
 
     public void searchAndShow(long id) {

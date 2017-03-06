@@ -20,7 +20,6 @@ import android.animation.Animator;
 import android.animation.AnimatorInflater;
 import android.animation.AnimatorSet;
 import android.annotation.TargetApi;
-import android.content.Context;
 import android.os.Build;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -52,14 +51,12 @@ class RecipeListRecyclerViewAdapter extends RecyclerView.Adapter<RecipeListRecyc
 
     private final List<RecipeReduced> mItems;
     private OnCardClickListener onCardClickListener;
-    private final Context mContext;
     private View frontCard = null;
     private View backCard = null;
 
 
-    RecipeListRecyclerViewAdapter(Context context, List<RecipeReduced> items) {
+    RecipeListRecyclerViewAdapter(List<RecipeReduced> items) {
         this.mItems = new ArrayList<>(items);
-        this.mContext = context;
     }
 
     void setOnCardClickListener(OnCardClickListener onCardClickListener) {
@@ -87,7 +84,7 @@ class RecipeListRecyclerViewAdapter extends RecyclerView.Adapter<RecipeListRecyc
     @Override
     public void onBindViewHolder(RecipeViewHolder holder, int position) {
         RecipeReduced item = mItems.get(position);
-        holder.bindRecipe(mContext, item);
+        holder.bindRecipe(item);
         holder.itemView.setTag(item);
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
             if (holder.cardView.getRotationY() != 0) {
@@ -168,11 +165,11 @@ class RecipeListRecyclerViewAdapter extends RecyclerView.Adapter<RecipeListRecyc
         final View front = frontCard;
         final View back = backCard;
         final AnimatorSet flipCard = (card.getRotationY() == 0)?
-                (AnimatorSet) AnimatorInflater.loadAnimator(mContext, R.animator.card_flip_rotate_half) :
-                (AnimatorSet) AnimatorInflater.loadAnimator(mContext, R.animator.card_flip_rotate_full);
-        final AnimatorSet disappear = (AnimatorSet) AnimatorInflater.loadAnimator(mContext, R.animator.view_disappear);
+                (AnimatorSet) AnimatorInflater.loadAnimator(card.getContext(), R.animator.card_flip_rotate_half) :
+                (AnimatorSet) AnimatorInflater.loadAnimator(card.getContext(), R.animator.card_flip_rotate_full);
+        final AnimatorSet disappear = (AnimatorSet) AnimatorInflater.loadAnimator(card.getContext(), R.animator.view_disappear);
         //final AnimatorSet flipPositive = (AnimatorSet) AnimatorInflater.loadAnimator(mContext, R.animator.card_flip_rotate_full);
-        final AnimatorSet appear = (AnimatorSet) AnimatorInflater.loadAnimator(mContext, R.animator.view_appear);
+        final AnimatorSet appear = (AnimatorSet) AnimatorInflater.loadAnimator(card.getContext(), R.animator.view_appear);
         flipCard.setTarget(card);
         disappear.setTarget(front);
         //flipPositive.setTarget(card);
@@ -230,7 +227,7 @@ class RecipeListRecyclerViewAdapter extends RecyclerView.Adapter<RecipeListRecyc
 
         }
 
-        void bindRecipe(Context context, RecipeReduced item) {
+        void bindRecipe(RecipeReduced item) {
             if(rwTools == null) rwTools = new ReadWriteTools();
             recipeTitle.setText(item.getName());
             int visibilityProtection = View.GONE;
@@ -257,9 +254,9 @@ class RecipeListRecyclerViewAdapter extends RecyclerView.Adapter<RecipeListRecyc
             }
             backgroundProtection.setVisibility(visibilityProtection);
 
-            typeIcon.setImageDrawable(ContextCompat.getDrawable(context, (item.getIcon())));
+            typeIcon.setImageDrawable(ContextCompat.getDrawable(typeIcon.getContext(), (item.getIcon())));
 
-            rwTools.loadImageFromPath(context, recipeThumbnail, item.getPicture(),
+            rwTools.loadImageFromPath(recipeThumbnail.getContext(), recipeThumbnail, item.getPicture(),
                     R.drawable.default_dish_thumb, item.getTimestamp());
         }
 
