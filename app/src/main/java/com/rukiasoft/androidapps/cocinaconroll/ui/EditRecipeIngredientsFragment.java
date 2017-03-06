@@ -18,12 +18,15 @@ import android.widget.EditText;
 
 import com.rukiasoft.androidapps.cocinaconroll.CocinaConRollApplication;
 import com.rukiasoft.androidapps.cocinaconroll.R;
-import com.rukiasoft.androidapps.cocinaconroll.classes.RecipeItemOld;
 import com.rukiasoft.androidapps.cocinaconroll.dragandswipehelper.OnStartDragListener;
 import com.rukiasoft.androidapps.cocinaconroll.dragandswipehelper.SimpleItemTouchHelperCallback;
+import com.rukiasoft.androidapps.cocinaconroll.ui.model.RecipeComplete;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.Tools;
 import com.squareup.leakcanary.RefWatcher;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -33,7 +36,6 @@ import butterknife.Unbinder;
 public class EditRecipeIngredientsFragment extends Fragment implements OnStartDragListener {
 
     private static final String KEY_ITEM_TO_ADD = RecetasCookeoConstants.PACKAGE_NAME + ".itemtoadd";
-    private RecipeItemOld recipeItemOld;
     //private static final String TAG = "EditRecipeIngredientsFragment";
     private Boolean showSwipe = true;
     @BindView(R.id.edit_recipe_add_item)EditText addItem;
@@ -54,7 +56,7 @@ public class EditRecipeIngredientsFragment extends Fragment implements OnStartDr
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mTools = new Tools();
-        //setRetainInstance(true);
+        setRetainInstance(true);
         showSwipe = showSwipeDialog();
     }
 
@@ -74,7 +76,7 @@ public class EditRecipeIngredientsFragment extends Fragment implements OnStartDr
             }
         });
 
-        setRecipe();
+
 
         if(savedInstanceState != null && savedInstanceState.containsKey(KEY_ITEM_TO_ADD))
             addItem.setText(savedInstanceState.getString(KEY_ITEM_TO_ADD));
@@ -86,10 +88,7 @@ public class EditRecipeIngredientsFragment extends Fragment implements OnStartDr
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mAdapter = new EditRecipeRecyclerViewAdapter(recipeItemOld.getIngredients(), this);
 
-        //recyclerView.setHasFixedSize(true);
-        recyclerView.setAdapter(mAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(mAdapter);
@@ -98,18 +97,32 @@ public class EditRecipeIngredientsFragment extends Fragment implements OnStartDr
     }
 
     @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        if(mAdapter == null) {
+            RecipeComplete recipe = ((EditRecipeActivity) getActivity()).getRecipe();
+            List<String> ingredients = new ArrayList<>();
+            if (recipe.getIngredients() != null) {
+                ingredients = recipe.getIngredients();
+            }
+            mAdapter = new EditRecipeRecyclerViewAdapter(ingredients, this);
+
+            //recyclerView.setHasFixedSize(true);
+
+        }
+        recyclerView.setAdapter(mAdapter);
+    }
+
+    @Override
     public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
         mItemTouchHelper.startDrag(viewHolder);
     }
 
-    private void setRecipe(){
-        if(getActivity() instanceof EditRecipeActivity){
-            recipeItemOld = ((EditRecipeActivity) getActivity()).getRecipe();
-        }
-    }
 
-    public void saveData(){
-        recipeItemOld.setIngredients(mAdapter.getItems());
+
+    public RecipeComplete saveData(){
+        RecipeComplete recipe = ((EditRecipeActivity)getActivity()).getRecipe();
+        return RecipeComplete.getRecipeFrom2Screen(recipe, mAdapter.getItems());
     }
 
 

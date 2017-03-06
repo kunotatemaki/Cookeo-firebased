@@ -15,10 +15,9 @@ import android.view.MenuItem;
 import android.widget.TextView;
 
 import com.rukiasoft.androidapps.cocinaconroll.R;
-import com.rukiasoft.androidapps.cocinaconroll.classes.RecipeItemOld;
-import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
-import com.rukiasoft.androidapps.cocinaconroll.utilities.LogHelper;
+import com.rukiasoft.androidapps.cocinaconroll.ui.model.RecipeComplete;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.ReadWriteTools;
+import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.Tools;
 
 import java.lang.reflect.Field;
@@ -26,6 +25,7 @@ import java.lang.reflect.Field;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import icepick.State;
 
 
 public class EditRecipeActivity extends AppCompatActivity {
@@ -33,14 +33,10 @@ public class EditRecipeActivity extends AppCompatActivity {
     private EditRecipePhotoFragment editRecipePhotoFragment;
     private EditRecipeIngredientsFragment editRecipeIngredientsFragment;
     private EditRecipeStepsFragment editRecipeStepsFragment;
-    private RecipeItemOld recipe;
-    private final static String TAG = LogHelper.makeLogTag(EditRecipeActivity.class);
-    private final static String KEY_FRAGMENT = RecetasCookeoConstants.PACKAGE_NAME + ".fragment";
-    private final static String KEY_TITLE = RecetasCookeoConstants.PACKAGE_NAME + ".title";
-    private String title;
-    private Tools mTools;
+    @State RecipeComplete recipe;
+    @State String title;
     @BindView(R.id.standard_toolbar) Toolbar mToolbar;
-    private String oldPicture;
+    @State String oldPicture;
     private Unbinder unbinder;
 
 
@@ -48,37 +44,24 @@ public class EditRecipeActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         //Log.d(TAG, "onCreate");
-        mTools = new Tools();
-        if(savedInstanceState != null){
-            if(savedInstanceState.containsKey(RecetasCookeoConstants.KEY_RECIPE)) {
-                recipe = savedInstanceState.getParcelable(RecetasCookeoConstants.KEY_RECIPE);
-            }
-            if(savedInstanceState.containsKey(KEY_TITLE)) {
-                title = savedInstanceState.getString(KEY_TITLE);
-            }
-            oldPicture = savedInstanceState.getString(RecetasCookeoConstants.KEY_DELETE_OLD_PICTURE);
-        }else if(getIntent() != null && getIntent().hasExtra(RecetasCookeoConstants.KEY_RECIPE)) {
+        if(recipe == null && getIntent() != null && getIntent().hasExtra(RecetasCookeoConstants.KEY_RECIPE)) {
             recipe = getIntent().getExtras().getParcelable(RecetasCookeoConstants.KEY_RECIPE);
             //check if the picture is previosly edited, to delete the old picture
             if(recipe == null){
-                recipe = new RecipeItemOld();
                 setResult(RESULT_CANCELED);
                 finish();
             }
-            if((recipe.getState()& RecetasCookeoConstants.FLAG_EDITED_PICTURE)!=0){
-                oldPicture = recipe.getPathPicture();
+            if(recipe.getOwner().equals(RecetasCookeoConstants.FLAG_PERSONAL_RECIPE)){
+                oldPicture = recipe.getPicture();
             }
             title = getResources().getString(R.string.edit_recipe);
-            recipe.setState(RecetasCookeoConstants.FLAG_EDITED);
         }else{
             title = getResources().getString(R.string.create_recipe);
-            recipe = new RecipeItemOld();
-            recipe.setState(RecetasCookeoConstants.FLAG_OWN);
         }
 
         super.onCreate(savedInstanceState);
 
-        if(savedInstanceState != null/* && !CocinaConRollTools.isForTablet(this)*/) {
+        if(savedInstanceState != null) {
             editRecipeIngredientsFragment = (EditRecipeIngredientsFragment) getSupportFragmentManager().findFragmentByTag(EditRecipeIngredientsFragment.class.getSimpleName());
             editRecipeStepsFragment = (EditRecipeStepsFragment) getSupportFragmentManager().findFragmentByTag(EditRecipeStepsFragment.class.getSimpleName());
             editRecipePhotoFragment = (EditRecipePhotoFragment) getSupportFragmentManager().findFragmentByTag(EditRecipePhotoFragment.class.getSimpleName());
@@ -130,18 +113,6 @@ public class EditRecipeActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
-        if(recipe != null) {
-            outState.putParcelable(RecetasCookeoConstants.KEY_RECIPE, recipe);
-        }
-        outState.putString(KEY_TITLE, title);
-        outState.putString(RecetasCookeoConstants.KEY_DELETE_OLD_PICTURE, oldPicture);
-        super.onSaveInstanceState(outState);
-    }
-
-
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         Tools tools = new Tools();
         tools.hideSoftKeyboard(this);
@@ -178,15 +149,10 @@ public class EditRecipeActivity extends AppCompatActivity {
                             .commit();
                     getSupportFragmentManager().executePendingTransactions();
                 } else if (f instanceof EditRecipeStepsFragment) {
-                    editRecipeStepsFragment.saveData();
+                    recipe = editRecipeStepsFragment.saveData();
                     setResultData();
                 }
-                Boolean compatRequired = Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB;
-                if(!compatRequired) {
-                    invalidateOptionsMenu();// creates call to onPrepareOptionsMenu()
-                }else {
-                    supportInvalidateOptionsMenu();
-                }
+                invalidateOptionsMenu();// creates call to onPrepareOptionsMenu()
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -197,7 +163,6 @@ public class EditRecipeActivity extends AppCompatActivity {
     public boolean onPrepareOptionsMenu(Menu menu) {
         MenuItem icon = menu.findItem(R.id.menu_edit_recipe);
         Fragment f = getSupportFragmentManager().findFragmentById(R.id.edit_recipe_container);
-        //Log.d(TAG, f.getClass().toString());
         if(f instanceof EditRecipeStepsFragment) {
             icon.setTitle(getResources().getString(R.string.menu_save_text));
         }else {
@@ -210,10 +175,7 @@ public class EditRecipeActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.edit_recipe_menu, menu);
-        Boolean ret = super.onCreateOptionsMenu(menu);
-        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB)
-            onPrepareOptionsMenu(menu);
-        return ret;
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
@@ -247,7 +209,7 @@ public class EditRecipeActivity extends AppCompatActivity {
     private void setResultData(){
         Intent resultIntent = new Intent();
         resultIntent.putExtra(RecetasCookeoConstants.KEY_RECIPE, recipe);
-        if(oldPicture != null && !oldPicture.isEmpty() && !oldPicture.equals(recipe.getPathPicture())){
+        if(oldPicture != null && !oldPicture.isEmpty() && !oldPicture.equals(recipe.getPicture())){
             resultIntent.putExtra(RecetasCookeoConstants.KEY_DELETE_OLD_PICTURE, oldPicture);
         }
         setResult(RecetasCookeoConstants.RESULT_UPDATE_RECIPE, resultIntent);
@@ -267,8 +229,12 @@ public class EditRecipeActivity extends AppCompatActivity {
         }
     };
 
-    public RecipeItemOld getRecipe() {
+    public RecipeComplete getRecipe() {
         return recipe;
+    }
+
+    public void setRecipe(RecipeComplete recipe) {
+        this.recipe = recipe;
     }
 
     private void performPressBack(){
@@ -276,11 +242,8 @@ public class EditRecipeActivity extends AppCompatActivity {
         if(f instanceof EditRecipePhotoFragment){
             finishWithoutSave();
         }else{
-            Boolean compatRequired = Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB;
-            if(!compatRequired)
-                invalidateOptionsMenu();
-            else
-                supportInvalidateOptionsMenu();
+            invalidateOptionsMenu();
+
             if(f instanceof EditRecipeIngredientsFragment)
                 editRecipeIngredientsFragment = null;
             else if(f instanceof EditRecipeStepsFragment)
@@ -307,6 +270,16 @@ public class EditRecipeActivity extends AppCompatActivity {
                 }
             }
         }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
     }
 }
 

@@ -15,6 +15,7 @@ import android.view.inputmethod.InputMethodManager;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.rukiasoft.androidapps.cocinaconroll.R;
 import com.rukiasoft.androidapps.cocinaconroll.wifi.WifiHandler;
 
 
@@ -213,5 +214,23 @@ public class Tools {
         return input.toLowerCase();
     }
 
+    public static int getIconFromType(String type){
+        int icon;
+        switch (type) {
+            case RecetasCookeoConstants.TYPE_DESSERTS:
+                icon = R.drawable.ic_dessert_18;
+                break;
+            case RecetasCookeoConstants.TYPE_STARTERS:
+                icon = R.drawable.ic_starters_18;
+                break;
+            case RecetasCookeoConstants.TYPE_MAIN:
+                icon = R.drawable.ic_main_18;
+                break;
+            default:
+                icon = R.drawable.ic_all_18;
+                break;
+        }
+        return icon;
+    }
 
 }

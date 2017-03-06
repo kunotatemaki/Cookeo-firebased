@@ -14,7 +14,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 
 import com.rukiasoft.androidapps.cocinaconroll.CocinaConRollApplication;
-import com.rukiasoft.androidapps.cocinaconroll.classes.RecipeItemOld;
+import com.rukiasoft.androidapps.cocinaconroll.ui.model.RecipeComplete;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 import com.rukiasoft.androidapps.cocinaconroll.R;
 import com.rukiasoft.androidapps.cocinaconroll.dragandswipehelper.OnStartDragListener;
@@ -30,8 +30,7 @@ import butterknife.Unbinder;
 public class EditRecipeStepsFragment extends Fragment implements OnStartDragListener {
 
     private static final String KEY_ITEM_TO_ADD = RecetasCookeoConstants.PACKAGE_NAME + ".itemtoadd";
-    private RecipeItemOld recipeItemOld;
-    //private static final String TAG = "EditRecipeIngredientsFragment";
+    private RecipeComplete recipe;
     @BindView(R.id.edit_recipe_add_item)EditText addItem;
     @BindView(R.id.edit_recipe_add_fab)FloatingActionButton fab;
     @BindView(R.id.edit_recipe_recycler_view) RecyclerView recyclerView;
@@ -52,7 +51,7 @@ public class EditRecipeStepsFragment extends Fragment implements OnStartDragList
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mTools = new Tools();
-        //setRetainInstance(true);
+        setRetainInstance(true);
     }
 
     @Override
@@ -96,9 +95,9 @@ public class EditRecipeStepsFragment extends Fragment implements OnStartDragList
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        tip.setText(recipeItemOld.getTip());
+        tip.setText(recipe.getTip());
 
-        mAdapter = new EditRecipeRecyclerViewAdapter(recipeItemOld.getSteps(), this);
+        mAdapter = new EditRecipeRecyclerViewAdapter(recipe.getSteps(), this);
 
         //recyclerView.setHasFixedSize(true);
         recyclerView.setAdapter(mAdapter);
@@ -116,16 +115,12 @@ public class EditRecipeStepsFragment extends Fragment implements OnStartDragList
 
     private void setRecipe(){
         if(getActivity() instanceof EditRecipeActivity){
-            recipeItemOld = ((EditRecipeActivity) getActivity()).getRecipe();
+            recipe = ((EditRecipeActivity) getActivity()).getRecipe();
         }
     }
 
-    public void saveData(){
-        recipeItemOld.setTip(tip.getText().toString());
-        recipeItemOld.setSteps(mAdapter.getItems());
+    public RecipeComplete saveData(){
+        return RecipeComplete.getRecipeFrom3Screen(recipe, mAdapter.getItems(), tip.getText().toString());
     }
 
 }
-
-///https://github.com/iPaulPro/Android-ItemTouchHelper-Demo/blob/master/app/src/main/java/co/paulburke/android/itemtouchhelperdemo/RecyclerListFragment.java
-//https://github.com/iPaulPro/Android-ItemTouchHelper-Demo

@@ -3,11 +3,12 @@ package com.rukiasoft.androidapps.cocinaconroll.persistence.model;
 import com.rukiasoft.androidapps.cocinaconroll.R;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.database.model.RecipeFirebase;
 import com.rukiasoft.androidapps.cocinaconroll.ui.model.RecipeComplete;
-import com.rukiasoft.androidapps.cocinaconroll.ui.model.RecipeReduced;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.Tools;
 
+import org.greenrobot.greendao.DaoException;
 import org.greenrobot.greendao.annotation.Entity;
+import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Index;
 import org.greenrobot.greendao.annotation.JoinProperty;
@@ -17,11 +18,6 @@ import org.greenrobot.greendao.annotation.ToMany;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.StringTokenizer;
-import java.util.zip.Inflater;
-
-import org.greenrobot.greendao.annotation.Generated;
-import org.greenrobot.greendao.DaoException;
 
 
 @Entity(
@@ -110,20 +106,7 @@ public class RecipeDb {
         Tools tools = new Tools();
         this.normalizedName = tools.getNormalizedString(recipe.getName());
         this.type = recipe.getType();
-        switch (recipe.getType()) {
-            case RecetasCookeoConstants.TYPE_DESSERTS:
-                this.icon = R.drawable.ic_dessert_18;
-                break;
-            case RecetasCookeoConstants.TYPE_STARTERS:
-                this.icon = R.drawable.ic_starters_18;
-                break;
-            case RecetasCookeoConstants.TYPE_MAIN:
-                this.icon = R.drawable.ic_main_18;
-                break;
-            default:
-                this.icon = R.drawable.ic_all_18;
-                break;
-        }
+        this.icon = Tools.getIconFromType(recipe.getType());
         this.picture = recipe.getPicture()!=null? recipe.getPicture() : RecetasCookeoConstants.DEFAULT_PICTURE_NAME;
         this.downloadPicture = !this.picture.equals(RecetasCookeoConstants.DEFAULT_PICTURE_NAME);
         this.vegetarian = recipe.getVegetarian();

@@ -4,10 +4,9 @@ import android.os.Parcelable;
 import android.support.annotation.Nullable;
 
 import com.google.auto.value.AutoValue;
-import com.rukiasoft.androidapps.cocinaconroll.persistence.daoqueries.StepQueries;
-import com.rukiasoft.androidapps.cocinaconroll.persistence.model.IngredientDb;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.model.RecipeDb;
-import com.rukiasoft.androidapps.cocinaconroll.persistence.model.StepDb;
+import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
+import com.rukiasoft.androidapps.cocinaconroll.utilities.Tools;
 
 import java.util.List;
 
@@ -16,7 +15,7 @@ import java.util.List;
  */
 @AutoValue
 public abstract class RecipeComplete implements Parcelable{
-    abstract Long id();
+    @Nullable abstract Long id();
     abstract String key();
     abstract String name();
     abstract String type();
@@ -36,7 +35,7 @@ public abstract class RecipeComplete implements Parcelable{
     @Nullable abstract List<String> ingredients();
     @Nullable abstract List<String> steps();
 
-    static RecipeComplete.Builder builder() {
+    private static RecipeComplete.Builder builder() {
         return new $AutoValue_RecipeComplete.Builder();
     }
 
@@ -93,7 +92,47 @@ public abstract class RecipeComplete implements Parcelable{
         }
     }
 
-    public static RecipeComplete getRecipeFromRecipe(RecipeComplete recipe) {
+    public static RecipeComplete getRecipeFrom1Screen(RecipeComplete recipe, String key, String name, String picture,
+                                                      Boolean vegetarian, String type, Integer minutes,
+                                                      Integer portions, String author) {
+        try {
+            Long id = null;
+            Boolean favourite = false;
+            if(recipe != null) {
+                id = recipe.getId();
+                favourite = recipe.getFavourite();
+            }
+
+            if(picture == null || picture.isEmpty()){
+                picture = RecetasCookeoConstants.DEFAULT_PICTURE_NAME;
+            }
+            return RecipeComplete.builder()
+                    .setId(id)
+                    .setKey(key)
+                    .setTimestamp(System.currentTimeMillis())
+                    .setName(name)
+                    .setIcon(Tools.getIconFromType(type))
+                    .setPicture(picture)
+                    .setVegetarian(vegetarian)
+                    .setFavourite(favourite)
+                    .setOwner(RecetasCookeoConstants.FLAG_PERSONAL_RECIPE)
+                    .setType(type)
+                    .setMinutes(minutes)
+                    .setPortions(portions)
+                    .setAuthor(author)
+                    .setLink("")
+                    .setTip(null)
+                    .setIngredients(null)
+                    .setLanguage(RecetasCookeoConstants.LANG_SPANISH)
+                    .setSteps(null)
+                    .build();
+
+        }catch (IllegalStateException e){
+            return null;
+        }
+    }
+
+    public static RecipeComplete getRecipeFrom2Screen(RecipeComplete recipe, List<String> ingredients) {
         try {
             return RecipeComplete.builder()
                     .setId(recipe.getId())
@@ -112,8 +151,37 @@ public abstract class RecipeComplete implements Parcelable{
                     .setAuthor(recipe.getAuthor())
                     .setLink(recipe.getLink())
                     .setTip(recipe.getTip())
-                    .setIngredients(recipe.getIngredients())
+                    .setIngredients(ingredients)
                     .setSteps(recipe.getSteps())
+                    .setLanguage(recipe.getLanguage())
+                    .build();
+        }catch (IllegalStateException e){
+            return null;
+        }
+    }
+
+    public static RecipeComplete getRecipeFrom3Screen(RecipeComplete recipe, List<String> steps, String tip) {
+        try {
+            return RecipeComplete.builder()
+                    .setId(recipe.getId())
+                    .setKey(recipe.getKey())
+                    .setTimestamp(recipe.getTimestamp())
+                    .setName(recipe.getName())
+                    .setIcon(recipe.getIcon())
+                    .setPicture(recipe.getPicture())
+                    .setVegetarian(recipe.getVegetarian())
+                    .setFavourite(recipe.getFavourite())
+                    .setOwner(recipe.getOwner())
+                    .setTimestamp(recipe.getTimestamp())
+                    .setType(recipe.getType())
+                    .setMinutes(recipe.getMinutes())
+                    .setPortions(recipe.getPortions())
+                    .setAuthor(recipe.getAuthor())
+                    .setLink(recipe.getLink())
+                    .setTip(tip)
+                    .setLanguage(recipe.getLanguage())
+                    .setIngredients(recipe.getIngredients())
+                    .setSteps(steps)
                     .build();
         }catch (IllegalStateException e){
             return null;

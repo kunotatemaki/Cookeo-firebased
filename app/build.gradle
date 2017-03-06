@@ -5,7 +5,7 @@ apply plugin: 'org.greenrobot.greendao'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "23.0.3"
+    buildToolsVersion '25.0.0'
     //useLibrary 'org.apache.http.legacy'
     defaultConfig {
         applicationId "com.rukiasoft.androidapps.cocinaconroll"
@@ -79,7 +79,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
-        classpath 'org.greenrobot:greendao-gradle-plugin:3.2.1'
+        //classpath 'org.greenrobot:greendao-gradle-plugin:3.2.1'
     }
 
 }
@@ -105,7 +105,7 @@ dependencies {
     //Parcelable
     //Permisos
 
-
+    compile 'com.android.support:multidex:1.0.1'
     compile 'com.android.support:appcompat-v7:25.2.0'
     compile 'com.google.android.gms:play-services-gcm:10.2.0'
     compile 'com.jakewharton:butterknife:8.4.0'

@@ -15,17 +15,13 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -34,12 +30,15 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.rukiasoft.androidapps.cocinaconroll.CocinaConRollApplication;
 import com.rukiasoft.androidapps.cocinaconroll.R;
-import com.rukiasoft.androidapps.cocinaconroll.classes.RecipeItemOld;
-import com.rukiasoft.androidapps.cocinaconroll.database.RecipesTable;
-import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
+import com.rukiasoft.androidapps.cocinaconroll.ui.model.RecipeComplete;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.ReadWriteTools;
+import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.Tools;
 import com.squareup.leakcanary.RefWatcher;
 
@@ -51,16 +50,15 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import icepick.State;
 
 
 public class EditRecipePhotoFragment extends Fragment {
 
-    //private final static String TAG = "EditRecipePhotoFragment";
     private Uri mImageCaptureUri;
     
 
     private Bitmap photo;
-    private RecipeItemOld recipeItemOld;
     private Tools mTools;
     private ReadWriteTools rwTools;
     private String nameOfNewImage = "";
@@ -70,26 +68,21 @@ public class EditRecipePhotoFragment extends Fragment {
     private static final int PICK_FROM_FILE = 3;
     private static final int CROP_FROM_FILE = 4;
 
-    @Nullable
-    @BindView(R.id.create_recipe_author_edittext) EditText authorRecipe;
     @BindView(R.id.edit_recipe_photo) ImageView mImageView;
     @BindView(R.id.edit_recipe_minutes) EditText minutes;
     @BindView(R.id.edit_recipe_minutes_layout)
     TextInputLayout minutesLayout;
     @BindView(R.id.edit_recipe_portions_layout) TextInputLayout portionsLayout;
     @BindView(R.id.edit_recipe_portions) EditText portions;
-    @Nullable
     @BindView(R.id.create_recipe_name_layout) TextInputLayout createRecipeNameLayout;
-    @Nullable
     @BindView(R.id.create_recipe_name_edittext) EditText createRecipeName;
-    @Nullable
-    @BindView(R.id.edit_recipe_name)
-    TextView editRecipeName;
+    @BindView(R.id.spinner_type_dish) Spinner spinner;
+
     @BindView(R.id.checkbox_vegetarian)CheckBox checkBox;
+    @State String newPicName;
     private Unbinder unbinder;
 
     public EditRecipePhotoFragment() {
-        // Required empty public constructor
     }
 
     public String getNameOfNewImage() {
@@ -98,9 +91,8 @@ public class EditRecipePhotoFragment extends Fragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        //Log.d(TAG, "onCreateView");
         super.onCreate(savedInstanceState);
-        //setRetainInstance(true);
+        setRetainInstance(true);
         mTools = new Tools();
         rwTools = new ReadWriteTools();
     }
@@ -110,68 +102,67 @@ public class EditRecipePhotoFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        //Log.d(TAG, "onCreateView");
         // Inflate the layout for this fragment
         if(getActivity().isFinishing()){
             return null;
         }
         View view;
-        if(recipeItemOld == null){
-            setRecipe();
-        }
-        if(((recipeItemOld.getState() & RecetasCookeoConstants.FLAG_OWN) != 0) &&
-                ((recipeItemOld.getState() & RecetasCookeoConstants.FLAG_EDITED) == 0)) {
-            view = inflater.inflate(R.layout.fragment_edit_recipe_foto_create, container, false);
-            //author.setText(mTools.getOwnerName(getActivity()));
+        RecipeComplete recipe = ((EditRecipeActivity) getActivity()).getRecipe();
 
-        }else {
-            view = inflater.inflate(R.layout.fragment_edit_recipe_foto_modify, container, false);
-        }
+        view = inflater.inflate(R.layout.fragment_edit_recipe_foto_create, container, false);
+
         unbinder = ButterKnife.bind(this, view);
 
-        if(createRecipeName != null) {
-            createRecipeName.addTextChangedListener(new TextWatcher() {
+        List<String> list = new ArrayList<>();
+        list.add(getResources().getString(R.string.starters));
+        list.add(getResources().getString(R.string.main_courses));
+        list.add(getResources().getString(R.string.desserts));
 
+        ArrayAdapter<String> dataAdapter = new ArrayAdapter<>
+                (getActivity(), android.R.layout.simple_spinner_item, list);
 
-                @Override
-                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        dataAdapter.setDropDownViewResource
+                (android.R.layout.simple_spinner_dropdown_item);
 
-                }
+        spinner.setAdapter(dataAdapter);
 
-                @Override
-                public void onTextChanged(CharSequence s, int start,
-                                          int before, int count) {
-                    checkIfNameExists(s.toString());
-                }
-
-                @Override
-                public void afterTextChanged(Editable s) {
-
-                }
-            });
-        }
-        if(authorRecipe != null) {
-            authorRecipe.setText(mTools.getStringFromPreferences(getActivity(), RecetasCookeoConstants.PROPERTY_DEVICE_OWNER_EMAIL));
-        }
-        if(editRecipeName != null){
-            editRecipeName.setText(recipeItemOld.getName());
+        int currentApiVersion = Build.VERSION.SDK_INT;
+        if (currentApiVersion <= Build.VERSION_CODES.JELLY_BEAN){
+            final float scale = this.getResources().getDisplayMetrics().density;
+            checkBox.setPadding(checkBox.getPaddingLeft() + (int)(20.0f * scale + 0.5f),
+                    checkBox.getPaddingTop(),
+                    checkBox.getPaddingRight(),
+                    checkBox.getPaddingBottom());
         }
 
-        rwTools.loadImageFromPath(getActivity().getApplicationContext(), mImageView,
-                recipeItemOld.getPathPicture(),
-                R.drawable.default_dish, recipeItemOld.getVersion());
+        if (recipe != null && recipe.getName() != null) {
+            createRecipeName.setText(recipe.getName());
+            rwTools.loadImageFromPath(getActivity().getApplicationContext(), mImageView,
+                    recipe.getPicture(),
+                    R.drawable.default_dish, recipe.getTimestamp());
 
-        
-        if(recipeItemOld.getMinutes()>0)
-            minutes.setText(recipeItemOld.getMinutes().toString());
-        else
-            minutes.setText("0");
-        
-        if(recipeItemOld.getPortions()>0)
-            portions.setText(recipeItemOld.getPortions().toString());
-        else
-            portions.setText("0");
-        
+            if(recipe.getMinutes()>0)
+                minutes.setText(recipe.getMinutes().toString());
+            else
+                minutes.setText("0");
+
+            if(recipe.getPortions()>0)
+                portions.setText(recipe.getPortions().toString());
+            else
+                portions.setText("0");
+
+            checkBox.setChecked(recipe.getVegetarian());
+
+            String type = "";
+            if(recipe.getType().compareTo(RecetasCookeoConstants.TYPE_STARTERS) == 0)
+                type = getResources().getString(R.string.starters);
+            else if(recipe.getType().compareTo(RecetasCookeoConstants.TYPE_MAIN) == 0)
+                type = getResources().getString(R.string.main_courses);
+            else if(recipe.getType().compareTo(RecetasCookeoConstants.TYPE_DESSERTS) == 0)
+                type = getResources().getString(R.string.desserts);
+            spinner.setSelection(dataAdapter.getPosition(type));
+        }
+
         mImageView.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -208,64 +199,26 @@ public class EditRecipePhotoFragment extends Fragment {
             }
         });
 
-        if(checkBox != null) {
-            checkBox.setChecked(recipeItemOld.getVegetarian());
-            checkBox.setOnClickListener(new View.OnClickListener() {
 
-                @Override
-                public void onClick(View v) {
-                    recipeItemOld.setVegetarian(((CheckBox) v).isChecked());
-                }
-            });
-        }
-        int currentApiVersion = Build.VERSION.SDK_INT;
-        if (currentApiVersion <= Build.VERSION_CODES.JELLY_BEAN){
-            final float scale = this.getResources().getDisplayMetrics().density;
-            checkBox.setPadding(checkBox.getPaddingLeft() + (int)(20.0f * scale + 0.5f),
-                    checkBox.getPaddingTop(),
-                    checkBox.getPaddingRight(),
-                    checkBox.getPaddingBottom());
-        }
+        //spinner1.setOnItemSelectedListener(new CustomOnItemSelectedListener());
 
-        Spinner spinner1 = (Spinner) view.findViewById(R.id.spinner_type_dish);
-        List<String> list = new ArrayList<>();
-        list.add(getResources().getString(R.string.starters));
-        list.add(getResources().getString(R.string.main_courses));
-        list.add(getResources().getString(R.string.desserts));
-
-        ArrayAdapter<String> dataAdapter = new ArrayAdapter<>
-                (getActivity(), android.R.layout.simple_spinner_item, list);
-
-        dataAdapter.setDropDownViewResource
-                (android.R.layout.simple_spinner_dropdown_item);
-
-        spinner1.setAdapter(dataAdapter);
-        spinner1.setOnItemSelectedListener(new CustomOnItemSelectedListener());
-        String type = "";
-        if(recipeItemOld.getType().compareTo(RecetasCookeoConstants.TYPE_STARTERS) == 0)
-            type = getResources().getString(R.string.starters);
-        else if(recipeItemOld.getType().compareTo(RecetasCookeoConstants.TYPE_MAIN) == 0)
-            type = getResources().getString(R.string.main_courses);
-        else if(recipeItemOld.getType().compareTo(RecetasCookeoConstants.TYPE_DESSERTS) == 0)
-            type = getResources().getString(R.string.desserts);
-        spinner1.setSelection(dataAdapter.getPosition(type));
 
         return view;
     }
 
-    private class CustomOnItemSelectedListener implements AdapterView.OnItemSelectedListener {
+    /*private class CustomOnItemSelectedListener implements AdapterView.OnItemSelectedListener {
 
         public void onItemSelected(AdapterView<?> parent, View view, int pos,
                                    long id) {
             switch (pos){
                 case 0:
-                    recipeItemOld.setType(RecetasCookeoConstants.TYPE_STARTERS);
+                    recipe.setType(RecetasCookeoConstants.TYPE_STARTERS);
                     break;
                 case 1:
-                    recipeItemOld.setType(RecetasCookeoConstants.TYPE_MAIN);
+                    recipe.setType(RecetasCookeoConstants.TYPE_MAIN);
                     break;
                 case 2:
-                    recipeItemOld.setType(RecetasCookeoConstants.TYPE_DESSERTS);
+                    recipe.setType(RecetasCookeoConstants.TYPE_DESSERTS);
                     break;
                 default:
                     break;
@@ -277,7 +230,7 @@ public class EditRecipePhotoFragment extends Fragment {
 
         }
 
-    }
+    }*/
 
 
     public void selectPhoto(Boolean cameraAllowed){
@@ -338,13 +291,11 @@ public class EditRecipePhotoFragment extends Fragment {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            recipeItemOld.setPathPicture(rwTools.saveBitmap(photo, recipeItemOld.getPicture()));
-            //if(recipeItemOld.getState().compareTo(RecetasCookeoConstants.STATE_OWN) != 0)
-            recipeItemOld.setState(RecetasCookeoConstants.FLAG_EDITED_PICTURE);
+            // TODO: 5/3/17 descomentar
+            //newPicName = rwTools.saveBitmap(getActivity().getApplicationContext(), photo, recipe.getPicture());
 
-            rwTools.loadImageFromPath(getActivity().getApplicationContext(), mImageView, recipeItemOld.getPathPicture(),
-                    R.drawable.default_dish, recipeItemOld.getVersion());
-
+            rwTools.loadImageFromPath(getActivity().getApplicationContext(), mImageView, newPicName,
+                    R.drawable.default_dish, System.currentTimeMillis());
             return;
         }
         //set crop properties
@@ -404,15 +355,12 @@ public class EditRecipePhotoFragment extends Fragment {
                 Bundle extras = data.getExtras();
                 if (extras != null) {
                     photo = extras.getParcelable("data");
-                    recipeItemOld.setPicture(getPictureNameFromFileName());
-                    updateNameOfNewImage(recipeItemOld.getPicture());
-                    recipeItemOld.setPathPicture(rwTools.saveBitmap(photo, recipeItemOld.getPicture()));
-                    //if(recipeItemOld.getState().compareTo(RecetasCookeoConstants.STATE_OWN) != 0)
-                    recipeItemOld.setState(RecetasCookeoConstants.FLAG_EDITED_PICTURE);
+                    updateNameOfNewImage(newPicName);
+                    newPicName = rwTools.saveBitmap(getActivity().getApplicationContext(), photo, getPictureNameFromFileName());
 
                     rwTools.loadImageFromPath(getActivity().getApplicationContext(),
-                            mImageView, recipeItemOld.getPathPicture(),
-                            R.drawable.default_dish, recipeItemOld.getVersion());
+                            mImageView, newPicName,
+                            R.drawable.default_dish, System.currentTimeMillis());
                 }
                 File f = new File(mImageCaptureUri.getPath());
                 if (f.exists()) {
@@ -423,14 +371,12 @@ public class EditRecipePhotoFragment extends Fragment {
                 Bundle extras2 = data.getExtras();
                 if (extras2 != null) {
                     photo = extras2.getParcelable("data");
-                    recipeItemOld.setPicture(getPictureNameFromFileName());
-                    updateNameOfNewImage(recipeItemOld.getPicture());
-                    recipeItemOld.setPathPicture(rwTools.saveBitmap(photo, recipeItemOld.getPicture()));
-                    //if(recipeItemOld.getState().compareTo(RecetasCookeoConstants.STATE_OWN) != 0)
-                    recipeItemOld.setState(RecetasCookeoConstants.FLAG_EDITED_PICTURE);
+                    updateNameOfNewImage(newPicName);
+                    newPicName = rwTools.saveBitmap(getActivity().getApplicationContext(), photo, getPictureNameFromFileName());
+                    //if(recipe.getState().compareTo(RecetasCookeoConstants.STATE_OWN) != 0)
                     rwTools.loadImageFromPath(getActivity().getApplicationContext(),
-                            mImageView, recipeItemOld.getPathPicture(),
-                            R.drawable.default_dish, recipeItemOld.getVersion());
+                            mImageView, newPicName,
+                            R.drawable.default_dish, System.currentTimeMillis());
                 }
                 break;
         }
@@ -451,11 +397,7 @@ public class EditRecipePhotoFragment extends Fragment {
         return MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
     }
 
-    private void setRecipe(){
-        if(getActivity() instanceof EditRecipeActivity){
-            recipeItemOld = ((EditRecipeActivity) getActivity()).getRecipe();
-        }
-    }
+
 
     public int getPortions(){
         try {
@@ -482,27 +424,21 @@ public class EditRecipePhotoFragment extends Fragment {
     public Boolean checkInfoOk(){
         mTools.hideSoftKeyboard(getActivity());
         boolean ret = true;
-
+        Integer min;
         try {
-            int min = Integer.valueOf(minutes.getText().toString());
-            recipeItemOld.setMinutes(min);
+            min = Integer.valueOf(minutes.getText().toString());
         }catch (NumberFormatException e){
-            minutes.setText("0");
-            recipeItemOld.setMinutes(0);
+            min = 0;
+            minutes.setText(min.toString());
         }
-
+        Integer port;
         try {
-            int port = Integer.valueOf(portions.getText().toString());
-            recipeItemOld.setPortions(port);
+            port = Integer.valueOf(portions.getText().toString());
         }catch (NumberFormatException e){
-            portions.setText("0");
-            recipeItemOld.setPortions(0);
+            port = 0;
+            portions.setText(port.toString());
         }
 
-        if(createRecipeName == null) {
-            //modify case
-            return ret;
-        }
 
         //create case
         if(createRecipeNameLayout != null) {
@@ -516,25 +452,14 @@ public class EditRecipePhotoFragment extends Fragment {
             ret = false;
         }
 
-        if(authorRecipe != null) {
-            recipeItemOld.setAuthor(authorRecipe.getText().toString());
-        }
+        if(ret){
+            RecipeComplete recipe = getRecipeFromParams();
+            ((EditRecipeActivity)getActivity()).setRecipe(recipe);
 
+        }
         return ret;
     }
 
-    private void checkIfNameExists(String sName){
-        //// TODO: 21/2/17 habrá que repasaro todo este proceso
-//        List<RecipeItemOld> coincidences = dbTools.searchRecipesInDatabase(getActivity().getApplicationContext(),
-//                RecipesTable.FIELD_NAME_NORMALIZED, dbTools.getNormalizedString(sName));
-//        String error = null;
-//        if (coincidences.size() > 0) {
-//            error = getResources().getString(R.string.duplicated_recipe);
-//        }
-//        if(createRecipeNameLayout != null){
-//            createRecipeNameLayout.setError(error);
-//        }
-    }
 
     @Override
     public void onDestroy() {
@@ -547,7 +472,7 @@ public class EditRecipePhotoFragment extends Fragment {
     public void onPause(){
         if(createRecipeName != null) {
             String name = createRecipeName.getText().toString();
-            recipeItemOld.setName(name);
+            //recipe.setName(name);
         }
         super.onPause();
     }
@@ -556,9 +481,53 @@ public class EditRecipePhotoFragment extends Fragment {
         return mTools.getCurrentDate(getActivity()).concat(".jpg");
     }
 
+    private String getKey(String uid){
+        RecipeComplete recipe = ((EditRecipeActivity)getActivity()).getRecipe();
+        if(recipe == null || recipe.getKey() == null || recipe.getKey().isEmpty()){
+            DatabaseReference ref = FirebaseDatabase
+                    .getInstance()
+                    .getReference(RecetasCookeoConstants.PERSONAL_RECIPES_NODE);
+            return ref.child(uid).push().getKey();
+        }else{
+            return recipe.getKey();
+        }
+    }
 
+    private RecipeComplete getRecipeFromParams(){
+        String texto = (java.lang.String) spinner.getSelectedItem();
+        RecipeComplete recipe = ((EditRecipeActivity)getActivity()).getRecipe();
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        String author = "";
+        if(user != null) {
+            author = user.getDisplayName();
+        }else{
+            return null;
+        }
 
+        String key = getKey(user.getUid());
+        return RecipeComplete.getRecipeFrom1Screen(recipe, key, createRecipeName.getText().toString(),
+                newPicName, checkBox.isChecked(), getTypeFromSpinner(), Integer.valueOf(minutes.getText().toString()),
+                Integer.valueOf(portions.getText().toString()), author);
+    }
 
+    private String getTypeFromSpinner(){
+        int position = spinner.getSelectedItemPosition();
+        String type;
+        switch (position) {
+            case 0:
+                type = RecetasCookeoConstants.TYPE_STARTERS;
+                break;
+            case 1:
+                type = RecetasCookeoConstants.TYPE_MAIN;
+                break;
+            case 2:
+                type = RecetasCookeoConstants.TYPE_DESSERTS;
+                break;
+            default:
+                type = RecetasCookeoConstants.TYPE_MAIN;
+        }
+        return type;
+
+    }
 }
-
 

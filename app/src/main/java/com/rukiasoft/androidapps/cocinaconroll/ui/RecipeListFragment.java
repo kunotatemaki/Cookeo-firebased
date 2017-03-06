@@ -313,6 +313,7 @@ public class RecipeListFragment extends Fragment implements
             downloadRecipesOnFirstLoad();
         }else if(firstLoad){
             firstLoad = false;
+            filterRecipes(lastFilter);
             checkNewRecipesFromFirebase();
         }else if(mRecipes == null || mRecipes.size() == 0 || needToRefresh) {
             needToRefresh = false;
@@ -384,9 +385,6 @@ public class RecipeListFragment extends Fragment implements
         }
     }
 
-    public void restartLoader(Bundle bundle){
-        getActivity().getSupportLoaderManager().restartLoader(RecetasCookeoConstants.LOADER_ID, bundle, this);
-    }
 
     private void setData(){
         initDatabaseText.setVisibility(View.GONE);
@@ -527,7 +525,7 @@ public class RecipeListFragment extends Fragment implements
         }
         bundle.putInt(RecetasCookeoConstants.SEARCH_ICON_TYPE, iconResource);
         bundle.putString(RecetasCookeoConstants.SEARCH_NAME_TYPE, type);
-        restartLoader(bundle);
+        getActivity().getSupportLoaderManager().restartLoader(RecetasCookeoConstants.LOADER_ID, bundle, this);
 
         typeRecipesInRecipeList.setText(type);
         typeIconInRecipeList.setImageDrawable(ContextCompat.getDrawable(getActivity(), iconResource));
@@ -555,7 +553,7 @@ public class RecipeListFragment extends Fragment implements
     public void setVisibilityWithSearchWidget(int visibility){
         numberAndTypeBar.setVisibility(visibility);
         if(visibility == View.GONE) addRecipeButtonFAB.hide();
-        //else addRecipeButton.show();
+        else addRecipeButtonFAB.show();
     }
 
     public void insertRecipe(RecipeComplete recipe) {
@@ -605,7 +603,7 @@ public class RecipeListFragment extends Fragment implements
 
         //descargo las recetas
         DatabaseReference mRecipeRefDetailed = FirebaseDatabase.getInstance()
-                .getReference(RecetasCookeoConstants.ALLOWED_RECIPES_NODE +
+                .getReference(node +
                         "/" + RecetasCookeoConstants.DETAILED_RECIPES_NODE );
         mRecipeRefDetailed.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -629,7 +627,6 @@ public class RecipeListFragment extends Fragment implements
         protected Void doInBackground(DataSnapshot... snapshot) {
             RecipeController recipeController = new RecipeController();
             DataSnapshot dataSnapshot = snapshot[0];
-            int contador = 0;
             for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
                 RecipeFirebase recipeFromFirebase = postSnapshot.getValue(RecipeFirebase.class);
                 if (recipeFromFirebase == null) continue;
@@ -638,7 +635,7 @@ public class RecipeListFragment extends Fragment implements
                     continue;
                 }
                 recipeController.insertRecipeFromFirebase(application, postSnapshot, recipeFromFirebase);
-                contador++;
+
             }
             return null;
         }

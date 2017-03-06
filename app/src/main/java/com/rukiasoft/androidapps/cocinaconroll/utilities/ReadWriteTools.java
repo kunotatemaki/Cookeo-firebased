@@ -383,19 +383,19 @@ public class ReadWriteTools {
             file.delete();
     }
 
-    public String saveBitmap(Bitmap bitmap, String name){
+    public String saveBitmap(Context context, Bitmap bitmap, String name){
 
 
         FileOutputStream out = null;
         String filename = "";
-        File file = new File(getEditedStorageDir());
+        File file = new File(getOriginalStorageDir(context));
         if (!file.exists()) {
             Boolean ret = file.mkdirs();
             if(!ret)
                 return "";
         }
         try {
-            filename = getEditedStorageDir() + name;
+            filename = getOriginalStorageDir(context) + name;
             out = new FileOutputStream(filename);
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
         } catch (Exception e) {
