@@ -13,7 +13,6 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.ActivityCompat;
@@ -227,7 +226,7 @@ public class EditRecipePhotoFragment extends Fragment {
                     case 0:
                         Intent intent = new Intent();
                         intent.setType("image/*");
-                        intent.setAction(Intent.ACTION_GET_CONTENT);
+                        intent.setAction(Intent.ACTION_PICK);
                         startActivityForResult(Intent.createChooser(intent, "Complete action using"), PICK_FROM_FILE);
                         break;
                     case 1:
@@ -299,30 +298,21 @@ public class EditRecipePhotoFragment extends Fragment {
                 doCrop(CROP_FROM_CAMERA);
                 break;
             case PICK_FROM_FILE:
-                Uri originalUri = data.getData();
-
-                String id;
-                try{
-                    id = originalUri.getLastPathSegment().split(":")[1];
-                }catch(Exception e){
-                    id = originalUri.getLastPathSegment();
+                Uri selectedImage = data.getData();
+                String[] filePathColumn = {MediaStore.Images.Media.DATA };
+                Cursor cursor = getActivity().getContentResolver().query(selectedImage,
+                        filePathColumn, null, null, null);
+                if(cursor == null){
+                    return;
                 }
-                final String[] imageColumns = {MediaStore.Images.Media.DATA};
+                cursor.moveToFirst();
+                int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+                String picturePath = cursor.getString(columnIndex);
+                cursor.close();
 
-                Uri uri = getUri();
-                String selectedImagePath = "path";
-
-                Cursor cursor = getActivity().getContentResolver().query(uri, imageColumns,
-                        MediaStore.Images.Media._ID + "=" + id, null, null);
-
-                if (cursor != null && cursor.moveToFirst()) {
-                    selectedImagePath = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
-                    cursor.close();
-                }
-
-                File file = new File(selectedImagePath);
+                File file = new File(picturePath);
                 if (file.exists()) {
-                    mImageCaptureUri = Uri.fromFile(new File(selectedImagePath));
+                    mImageCaptureUri = Uri.fromFile(new File(picturePath));
                 }
 
                 doCrop(CROP_FROM_FILE);
@@ -363,16 +353,6 @@ public class EditRecipePhotoFragment extends Fragment {
             rwTools.deleteImage(getContext(), newPicName);
         }
     }
-
-    private Uri getUri() {
-        //String state = Environment.getExternalStorageState();
-        //if(!state.equalsIgnoreCase(Environment.MEDIA_MOUNTED))
-            return MediaStore.Images.Media.INTERNAL_CONTENT_URI;
-
-        //return MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-    }
-
-
 
     public int getPortions(){
         try {
@@ -469,7 +449,6 @@ public class EditRecipePhotoFragment extends Fragment {
     }
 
     private RecipeComplete getRecipeFromParams(){
-        String texto = (java.lang.String) spinner.getSelectedItem();
         RecipeComplete recipe = ((EditRecipeActivity)getActivity()).getRecipe();
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         String author = "";
