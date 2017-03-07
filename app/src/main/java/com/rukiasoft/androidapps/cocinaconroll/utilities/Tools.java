@@ -2,22 +2,14 @@ package com.rukiasoft.androidapps.cocinaconroll.utilities;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.rukiasoft.androidapps.cocinaconroll.R;
-import com.rukiasoft.androidapps.cocinaconroll.wifi.WifiHandler;
-
 
 import java.text.Normalizer;
 import java.text.SimpleDateFormat;
@@ -31,16 +23,6 @@ public class Tools {
     public Tools(){
     }
 
-    public Long getTimeframe(){
-        try {
-            Long miliseconds = RecetasCookeoConstants.TIMEFRAME_MILI_SECONDS_DAY * RecetasCookeoConstants.TIMEFRAME_NEW_RECIPE_DAYS;
-            return System.currentTimeMillis() - miliseconds;
-        }catch(Exception e){
-            e.printStackTrace();
-            return Long.MAX_VALUE;
-        }
-    }
-
     /**
      *
      * @param context context of the application
@@ -49,13 +31,10 @@ public class Tools {
     @SuppressLint("NewApi")
     public Boolean hasVibrator(Context context) {
 
-        if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB)
-            return true;
-        else{
-            String vs = Context.VIBRATOR_SERVICE;
-            Vibrator mVibrator = (Vibrator) context.getSystemService(vs);
-            return mVibrator.hasVibrator();
-        }
+        String vs = Context.VIBRATOR_SERVICE;
+        Vibrator mVibrator = (Vibrator) context.getSystemService(vs);
+        return mVibrator.hasVibrator();
+
     }
 
     /**
@@ -78,17 +57,6 @@ public class Tools {
         return preferences.getBoolean(name, false);
     }
 
-
-    public boolean isPackageInstalled(String packagename, Context context) {
-        PackageManager pm = context.getPackageManager();
-        try {
-            pm.getPackageInfo(packagename, PackageManager.GET_ACTIVITIES);
-            return true;
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
 
     public Integer getIntegerFromPreferences(Context context, String name) {
 
@@ -165,38 +133,12 @@ public class Tools {
         }
     }
 
-
-    public boolean hasPermissionForDownloading(Context context) {
-       Boolean downloadWithWifi = getBooleanFromPreferences(context, "option_update_wifi");
-            return !(downloadWithWifi && !WifiHandler.IsWifiConnected(context));
-    }
-
     public String getStringFromPreferences(Context context, String name) {
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         return preferences.getString(name, "");
 
     }
-
-    public String getJsonString(Object object) {
-        // Before converting to GSON check value of id
-        Gson gson = new GsonBuilder()
-                .excludeFieldsWithoutExposeAnnotation()
-                .create();
-        return gson.toJson(object);
-    }
-
-    public int getAppVersion(Application application) {
-        try {
-            PackageInfo packageInfo = application.getPackageManager()
-                    .getPackageInfo(application.getPackageName(), 0);
-            return packageInfo.versionCode;
-        } catch (PackageManager.NameNotFoundException e) {
-            return 0;
-        }
-    }
-
-
 
     public boolean isKeyboardShown(Activity activity){
         InputMethodManager imm = (InputMethodManager) activity
