@@ -49,7 +49,7 @@ public class FirebaseDbMethods {
         }
         uploading = true;
         ReadWriteTools readWriteTools = new ReadWriteTools();
-        List<String> recipeItemNameList = readWriteTools.loadOldEditedAndOriginalRecipes(context);
+        List<String> recipeItemNameList = readWriteTools.loadOldEditedAndOriginalRecipes();
         if(recipeItemNameList != null) {
             updateRecipesToPersonalStorage(context, recipeItemNameList);
         }

@@ -36,8 +36,6 @@ import java.util.List;
 
 
 public class ReadWriteTools {
-    //private final Context mContext;
-    private final String TAG = LogHelper.makeLogTag(ReadWriteTools.class);
     public ReadWriteTools(){
 
     }
@@ -48,7 +46,7 @@ public class ReadWriteTools {
 
         ret = isExternalStorageWritable();
         if(!ret){
-            LogHelper.e(TAG, "no hay external storage in loadfiles");
+            Logger.e("no hay external storage in loadfiles");
             return list;
         }
         // Get the directory for the app's private recipes directory.
@@ -74,7 +72,7 @@ public class ReadWriteTools {
 
         ret = isExternalStorageWritable();
         if(!ret){
-            LogHelper.e(TAG, "no hay external storage in loadrecipesfromolddirectory");
+            Logger.e("no hay external storage in loadrecipesfromolddirectory");
             return list;
         }
         // Get the directory for the old app's private recipes directory.
@@ -128,7 +126,7 @@ public class ReadWriteTools {
         return path;
     }
 
-    public String getOldEditedStorageDir(){
+    private String getOldEditedStorageDir(){
         File rootPath = Environment.getExternalStoragePublicDirectory("");
         String path = rootPath.getAbsolutePath() + String.valueOf(File.separatorChar) +
                 RecetasCookeoConstants.OLD_BASE_DIR + String.valueOf(File.separatorChar) +
@@ -138,13 +136,6 @@ public class ReadWriteTools {
             file.mkdirs();
         }
         return path;
-    }
-
-    public File getOldBaseEditedStorageDirToBeDeleted(){
-        File rootPath = Environment.getExternalStoragePublicDirectory("");
-        String path = rootPath.getAbsolutePath() + String.valueOf(File.separatorChar) +
-                RecetasCookeoConstants.OLD_BASE_DIR;
-        return new File(path);
     }
 
     /**
@@ -255,129 +246,9 @@ public class ReadWriteTools {
         return recipeItemOld;
     }
 
-    /*public void saveRecipeOnOrigialPath(RecipeItemOld recipe){
-        String path = getOriginalStorageDir();
-        saveRecipe(recipe, path);
-    }*/
 
-    public String saveRecipeOnEditedPath(Context mContext, RecipeItemOld recipe){
-        String dir = getEditedStorageDir();
-        String pathFile = recipe.getPathRecipe();
-        String name;
-        if(pathFile == null || pathFile.isEmpty()) {
-            Tools mTools = new Tools();
-            name = "own_" + mTools.getCurrentDate(mContext) + ".xml";
-        }else{
-            Uri uri = Uri.parse(pathFile);
-            name = uri.getLastPathSegment();
-        }
-        return saveRecipe(mContext, recipe, dir, name);
-    }
-
-    public String saveRecipe(Context mContext, RecipeItemOld recipe, String dir, String name){
-        if(!isExternalStorageWritable()){
-            if(mContext instanceof AppCompatActivity) {
-                Toast.makeText(mContext, mContext.getResources().getString(R.string.no_storage_available), Toast.LENGTH_LONG)
-                .show();
-            }
-            LogHelper.e(TAG, "no hay external storage in saverecipe");
-            return "";
-        }
-
-        File file = new File(dir);
-        if (!file.exists()) {
-            if(!file.mkdirs())
-                return "";
-        }
-
-        Serializer serializer = new Persister();
-        String path = dir.concat(name);
-        File result = new File(path);
-
-        try {
-            serializer.write(recipe, result);
-            return path;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "";
-        }
-
-    }
-
-    public void deleteRecipe(RecipeItemOld recipeItemOld){
-
-        try {
-            File file = new File(recipeItemOld.getPathRecipe());
-            if (file.exists())
-                file.delete();
-            if ((recipeItemOld.getState() & RecetasCookeoConstants.FLAG_EDITED_PICTURE) != 0) {
-                file = new File(String.valueOf(Uri.parse(recipeItemOld.getPathPicture())));
-                if (file.exists()) {
-                    file.delete();
-                } else {
-                    Uri uri = Uri.fromFile(file);
-                    String deletePath = getEditedStorageDir() + uri.getLastPathSegment();
-                    file = new File(deletePath);
-                    if (file.exists())
-                        file.delete();
-                }
-            }
-        }catch(Exception e){
-            // TODO: 14/1/17 aquí mandaba excepción con ACRA
-        }
-    }
-
-    public void deleteRecipe(String path){
-
-        try {
-            File file = new File(path);
-            if (file.exists())
-                file.delete();
-        }catch(Exception e){
-            // TODO: 14/1/17 aquí mandaba excepción con ACRA
-        }
-    }
-
-    public List<String> loadRecipesFromAssets(Context mContext) {
-
-        List<String> list;
-        File source;
-        InputStream inputStream;
-        try {
-            inputStream = mContext.getAssets().open("preinstalled_recipes.xml");
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-        source = createFileFromInputStream(mContext, inputStream);
-        list = parseFileIntoRecipeList(source);
-        if (source != null) {
-            source.delete();
-        }
-
-        return list;
-    }
-
-    private List<String> parseFileIntoRecipeList(File source){
-
-        Serializer serializer = new Persister();
-        PreinstalledRecipeNamesList preinstalledRecipeNames;
-        try {
-            preinstalledRecipeNames = serializer.read(PreinstalledRecipeNamesList.class, source);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-        return preinstalledRecipeNames.getPreinstalledRecipeNameListAsListOfStrings();
-    }
-
-    public void deleteImageFromEditedPath(String name) {
-        Uri uri = Uri.parse(name);
-        name =  uri.getLastPathSegment();
-        String path = getEditedStorageDir() + name;
+    private void deleteImageFromOriginalPath(Context context, String name) {
+        String path = getOriginalStorageDir(context) + name;
         File file = new File(path);
         if(file.exists())
             file.delete();
@@ -409,7 +280,7 @@ public class ReadWriteTools {
                 e.printStackTrace();
             }
         }
-        return RecetasCookeoConstants.FILE_PATH.concat(filename);
+        return name;
     }
 
     public void loadImageFromPath(Context mContext, ImageView imageView, String path, int defaultImage, long version) {
@@ -507,6 +378,7 @@ public class ReadWriteTools {
         if(pathRecipe == null){
             Exception caughtException = new Exception("Error intentado leer una receta sin pathRecipe");
             // TODO: 14/1/17 aquí mandaba excepción con ACRA return null;
+            return null;
         }
 
         if(pathRecipe.contains(RecetasCookeoConstants.ASSETS_PATH)) {
@@ -552,17 +424,10 @@ public class ReadWriteTools {
         }
     }
 
-    public void deleteImage(String image){
+    public void deleteImage(Context context, String image){
         if(image != null){
-            deleteImageFromEditedPath(image);
+            deleteImageFromOriginalPath(context, image);
         }
-        /*if(file != null){
-            deleteRecipe(file);
-        }*/
-    }
-
-    public boolean deleteFile(Uri path){
-        return deleteFile(path.getPath());
     }
 
     public boolean deleteFile(String path) {
@@ -570,12 +435,12 @@ public class ReadWriteTools {
         return file.exists() && file.delete();
     }
 
-    public List<String> loadOldEditedAndOriginalRecipes(Context context){
+    public List<String> loadOldEditedAndOriginalRecipes(){
         List<String> names = new ArrayList<>();
         MyFileFilter filter = new MyFileFilter();
 
         if(!isExternalStorageReadable()){
-            LogHelper.e(TAG, "no hay external storage in loadOldEditedAndOriginalRecipes");
+            Logger.e("no hay external storage in loadOldEditedAndOriginalRecipes");
             return names;
         }
 

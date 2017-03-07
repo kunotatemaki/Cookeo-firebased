@@ -481,7 +481,7 @@ public class RecipeDetailsFragment extends Fragment implements
         //Set the author
         String sAuthor = getResources().getString(R.string.default_author);
         if (recipe.getAuthor().equals(sAuthor) || recipe.getLink() == null || recipe.getLink().isEmpty()){
-            author.setText(getString(R.string.author).concat(" ").concat(sAuthor));
+            author.setText(getString(R.string.author).concat(" ").concat(recipe.getAuthor()));
         }else {
             String link = getString(R.string.original_link)
                     .concat(" <a href=\"")

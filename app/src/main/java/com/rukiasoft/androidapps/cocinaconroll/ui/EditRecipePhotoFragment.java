@@ -27,7 +27,6 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -61,7 +60,6 @@ public class EditRecipePhotoFragment extends Fragment {
     private Bitmap photo;
     private Tools mTools;
     private ReadWriteTools rwTools;
-    private String nameOfNewImage = "";
 
     private static final int PICK_FROM_CAMERA = 1;
     private static final int CROP_FROM_CAMERA = 2;
@@ -86,7 +84,7 @@ public class EditRecipePhotoFragment extends Fragment {
     }
 
     public String getNameOfNewImage() {
-        return nameOfNewImage;
+        return newPicName;
     }
 
     @Override
@@ -202,36 +200,14 @@ public class EditRecipePhotoFragment extends Fragment {
 
         //spinner1.setOnItemSelectedListener(new CustomOnItemSelectedListener());
 
+        if(newPicName != null){
+            rwTools.loadImageFromPath(getActivity().getApplicationContext(),
+                    mImageView, newPicName,
+                    R.drawable.default_dish, System.currentTimeMillis());
+        }
 
         return view;
     }
-
-    /*private class CustomOnItemSelectedListener implements AdapterView.OnItemSelectedListener {
-
-        public void onItemSelected(AdapterView<?> parent, View view, int pos,
-                                   long id) {
-            switch (pos){
-                case 0:
-                    recipe.setType(RecetasCookeoConstants.TYPE_STARTERS);
-                    break;
-                case 1:
-                    recipe.setType(RecetasCookeoConstants.TYPE_MAIN);
-                    break;
-                case 2:
-                    recipe.setType(RecetasCookeoConstants.TYPE_DESSERTS);
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        @Override
-        public void onNothingSelected(AdapterView<?> arg0) {
-
-        }
-
-    }*/
-
 
     public void selectPhoto(Boolean cameraAllowed){
 
@@ -256,7 +232,7 @@ public class EditRecipePhotoFragment extends Fragment {
                         break;
                     case 1:
                         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                        mImageCaptureUri = Uri.fromFile(new File(rwTools.getEditedStorageDir(),
+                        mImageCaptureUri = Uri.fromFile(new File(rwTools.getOriginalStorageDir(getContext()),
                                 RecetasCookeoConstants.TEMP_CAMERA_NAME + String.valueOf(System.currentTimeMillis()) + ".jpg"));
                         takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, mImageCaptureUri);
                         try {
@@ -355,7 +331,7 @@ public class EditRecipePhotoFragment extends Fragment {
                 Bundle extras = data.getExtras();
                 if (extras != null) {
                     photo = extras.getParcelable("data");
-                    updateNameOfNewImage(newPicName);
+                    updateNameOfNewImage();
                     newPicName = rwTools.saveBitmap(getActivity().getApplicationContext(), photo, getPictureNameFromFileName());
 
                     rwTools.loadImageFromPath(getActivity().getApplicationContext(),
@@ -371,7 +347,7 @@ public class EditRecipePhotoFragment extends Fragment {
                 Bundle extras2 = data.getExtras();
                 if (extras2 != null) {
                     photo = extras2.getParcelable("data");
-                    updateNameOfNewImage(newPicName);
+                    updateNameOfNewImage();
                     newPicName = rwTools.saveBitmap(getActivity().getApplicationContext(), photo, getPictureNameFromFileName());
                     //if(recipe.getState().compareTo(RecetasCookeoConstants.STATE_OWN) != 0)
                     rwTools.loadImageFromPath(getActivity().getApplicationContext(),
@@ -382,11 +358,10 @@ public class EditRecipePhotoFragment extends Fragment {
         }
     }
 
-    private void updateNameOfNewImage(String name){
-        if(!nameOfNewImage.isEmpty()){
-            rwTools.deleteImageFromEditedPath(nameOfNewImage);
+    private void updateNameOfNewImage(){
+        if(newPicName != null && !newPicName.isEmpty()){
+            rwTools.deleteImage(getContext(), newPicName);
         }
-        nameOfNewImage = name;
     }
 
     private Uri getUri() {

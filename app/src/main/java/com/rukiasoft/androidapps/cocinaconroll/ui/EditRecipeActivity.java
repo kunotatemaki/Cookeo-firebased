@@ -194,7 +194,7 @@ public class EditRecipeActivity extends AppCompatActivity {
     private void finishWithoutSave(){
         if(!editRecipePhotoFragment.getNameOfNewImage().isEmpty()){
             ReadWriteTools rwTools = new ReadWriteTools();
-            rwTools.deleteImageFromEditedPath(editRecipePhotoFragment.getNameOfNewImage());
+            rwTools.deleteImage(getApplicationContext(), editRecipePhotoFragment.getNameOfNewImage());
         }
         Intent resultIntent = new Intent();
         setResult(RESULT_CANCELED, resultIntent);
