@@ -35,8 +35,6 @@ import com.google.android.gms.common.GoogleApiAvailability;
 import com.karumi.dexter.Dexter;
 import com.rukiasoft.androidapps.cocinaconroll.BuildConfig;
 import com.rukiasoft.androidapps.cocinaconroll.R;
-import com.rukiasoft.androidapps.cocinaconroll.gcm.QuickstartPreferences;
-import com.rukiasoft.androidapps.cocinaconroll.gcm.RegistrationIntentService;
 import com.rukiasoft.androidapps.cocinaconroll.permissions.ErrorListener;
 import com.rukiasoft.androidapps.cocinaconroll.permissions.RecetasCookeoMultiplePermissionListener;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.LogHelper;
@@ -126,13 +124,7 @@ public class RecipeListActivity extends ToolbarAndProgressActivity {
         if(getIntent() != null && getIntent().hasExtra(RecetasCookeoConstants.KEY_TYPE)){
             mLastFilter = getIntent().getStringExtra(RecetasCookeoConstants.KEY_TYPE);
         }
-        if (checkPlayServices()) {
-            // Start IntentService to register this application with GCM.
-            if(!mTools.getBooleanFromPreferences(this, QuickstartPreferences.SENT_TOKEN_TO_SERVER)) {
-                Intent intent = new Intent(this, RegistrationIntentService.class);
-                startService(intent);
-            }
-        }
+
 
         //Set default values for preferences
         if (mTools.hasVibrator(getApplicationContext())) {
