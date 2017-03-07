@@ -376,8 +376,6 @@ public class ReadWriteTools {
         RecipeItemOld recipeItemOld;
         File source;
         if(pathRecipe == null){
-            Exception caughtException = new Exception("Error intentado leer una receta sin pathRecipe");
-            // TODO: 14/1/17 aquí mandaba excepción con ACRA return null;
             return null;
         }
 

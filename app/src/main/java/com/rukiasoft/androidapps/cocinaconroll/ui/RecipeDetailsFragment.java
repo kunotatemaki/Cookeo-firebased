@@ -371,7 +371,6 @@ public class RecipeDetailsFragment extends Fragment implements
     }
 
     private void clickOnHeartButton(){
-        // TODO: 21/2/17 cambiar a lo que ya está hecho
         recipe = RecipeComplete.getRecipeFromDatabase(mRecipeController.switchFavourite(getActivity().getApplication(),
                 recipe.getId()));
         if (!recipe.getFavourite()) {

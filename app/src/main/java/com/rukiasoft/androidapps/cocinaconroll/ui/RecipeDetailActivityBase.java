@@ -101,7 +101,7 @@ public class RecipeDetailActivityBase extends ToolbarAndProgressActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent intentData) {
         if(requestCode == RecetasCookeoConstants.REQUEST_EDIT_RECIPE){
             if(resultCode == RecetasCookeoConstants.RESULT_UPDATE_RECIPE && intentData != null && intentData.hasExtra(RecetasCookeoConstants.KEY_RECIPE)){
-                // TODO: 27/2/17 salvar la receta
+                // TODO: 27/2/17 salvaba la receta, ahora la recargaré
                 /*RecipeComplete recipe = intentData.getParcelableExtra(RecetasCookeoConstants.KEY_RECIPE);
                 RecipeDetailsFragment recipeDetailsFragment = (RecipeDetailsFragment) getSupportFragmentManager().findFragmentById(R.id.details_recipes_fragment);
                 if(recipeDetailsFragment != null)

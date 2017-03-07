@@ -339,7 +339,7 @@ public class RecipeListActivity extends ToolbarAndProgressActivity {
 
     @Override
     public void onBackPressed(){
-        if(mProgressDialog.isShowing()){
+        if(mProgressDialog != null && mProgressDialog.isShowing()){
             return;
         }
         if(drawerLayout.isDrawerOpen(GravityCompat.START)){
@@ -568,8 +568,5 @@ public class RecipeListActivity extends ToolbarAndProgressActivity {
         Intent intent = new Intent(RecipeListActivity.this, SignInActivity.class);
         startActivityForResult(intent, RecetasCookeoConstants.REQUEST_CODE_SIGNING_FROM_RECIPELIST);
     }
-
-
-// TODO: 27/02/2017 revisar las búsquedas, que habrá que ajustarlas
 
 }

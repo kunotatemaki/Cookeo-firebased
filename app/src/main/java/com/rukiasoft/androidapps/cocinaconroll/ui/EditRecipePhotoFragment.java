@@ -266,8 +266,6 @@ public class EditRecipePhotoFragment extends Fragment {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            // TODO: 5/3/17 descomentar
-            //newPicName = rwTools.saveBitmap(getActivity().getApplicationContext(), photo, recipe.getPicture());
 
             rwTools.loadImageFromPath(getActivity().getApplicationContext(), mImageView, newPicName,
                     R.drawable.default_dish, System.currentTimeMillis());

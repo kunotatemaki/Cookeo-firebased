@@ -192,7 +192,6 @@ public class Tools {
                     .getPackageInfo(application.getPackageName(), 0);
             return packageInfo.versionCode;
         } catch (PackageManager.NameNotFoundException e) {
-            // TODO: 14/1/17 aquí mandaba excepción con ACRA
             return 0;
         }
     }

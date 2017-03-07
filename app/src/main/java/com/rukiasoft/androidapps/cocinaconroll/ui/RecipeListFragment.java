@@ -137,7 +137,6 @@ public class RecipeListFragment extends Fragment implements
     private int columnCount = 10;
     @State String lastFilter = null;
     private InterstitialAd mInterstitialAd;
-    // TODO: 27/02/2017 revisar si esto no casca cuando es null
     @State RecipeComplete recipeToShow;
     private RecipeController mRecipeController;
     @State int numRecipesDownloaded;
@@ -602,7 +601,6 @@ public class RecipeListFragment extends Fragment implements
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                // TODO: 27/02/2017 ver si cuando no puede acceder al nodo entra aquí (forbidden)
                 numNodesOnInitDatabase--;
             }
         });
