@@ -7,17 +7,6 @@
             android:summaryOn="@string/screen_on_description"
             android:summaryOff="@string/screen_of_description"
             android:defaultValue="true" />
-        <Preference
-            android:title="@string/cloud_backup"
-            android:summary="@string/cloud_backup_on_description">
-            <intent android:action="com.rukiasoft.androidapps.cocinaconroll.action.SIGN_IN" />
-        </Preference>
-        <CheckBoxPreference
-            android:key="option_update_wifi"
-            android:title="@string/update_wifi"
-            android:summaryOn="@string/update_with_wifi_description"
-            android:summaryOff="@string/update_wihtout_wifi_description"
-            android:defaultValue="false" />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/notifications">
         <RingtonePreference
