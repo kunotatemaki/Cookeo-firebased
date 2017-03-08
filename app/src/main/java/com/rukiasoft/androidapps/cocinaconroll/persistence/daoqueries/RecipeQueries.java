@@ -216,9 +216,12 @@ public class RecipeQueries {
     private static void initializeCursorOwnRecipes(DaoSession session){
         RecipeDbDao recipeDbDao = session.getRecipeDbDao();
         recipeDbDao.detachAll();
-        cursorOwnRecipes = recipeDbDao.queryBuilder().where(
-                RecipeDbDao.Properties.Owner.eq(RecetasCookeoConstants.FLAG_PERSONAL_RECIPE)
+        QueryBuilder qb = recipeDbDao.queryBuilder();
+        cursorOwnRecipes = qb.where(
+                qb.or(RecipeDbDao.Properties.Owner.eq(RecetasCookeoConstants.FLAG_PERSONAL_RECIPE),
+                        RecipeDbDao.Properties.Edited.eq(1))
         ).buildCursor();
+
     }
 
     private static void initializeCursorLatestRecipes(DaoSession session){

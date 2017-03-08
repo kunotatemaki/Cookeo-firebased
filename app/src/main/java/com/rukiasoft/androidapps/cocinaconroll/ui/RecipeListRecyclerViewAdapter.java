@@ -240,7 +240,8 @@ class RecipeListRecyclerViewAdapter extends RecyclerView.Adapter<RecipeListRecyc
             }else{
                 favoriteIcon.setVisibility(View.GONE);
             }
-            if(item.getOwner().equals(RecetasCookeoConstants.FLAG_PERSONAL_RECIPE)){
+            if(item.getOwner().equals(RecetasCookeoConstants.FLAG_PERSONAL_RECIPE) ||
+                    item.getEdited()){
                 visibilityProtection = View.VISIBLE;
                 ownRecipeIcon.setVisibility(View.VISIBLE);
             }else{

@@ -2,7 +2,6 @@ package com.rukiasoft.androidapps.cocinaconroll.utilities;
 
 
 public class RecetasCookeoConstants {
-    public static final String SENDER_ID = "962580870211";
     public static final String PACKAGE_NAME = "com.rukiasoft.androidapps.cocinaconroll";
 
     public static final String PREFERENCE_INTERSTITIAL = PACKAGE_NAME + ".interstitial";
@@ -38,7 +37,6 @@ public class RecetasCookeoConstants {
     public static final String KEY_SIGN_OUT = RecetasCookeoConstants.PACKAGE_NAME + ".sign_out";
     public static final int REQUEST_DETAILS = 200;
     public static final int REQUEST_CREATE_RECIPE = 201;
-    public static final int REQUEST_EDIT_RECIPE = 202;
     public static final int RESULT_UPDATE_RECIPE = 300;
     public static final int RESULT_DELETE_RECIPE = 301;
 
@@ -70,15 +68,7 @@ public class RecetasCookeoConstants {
     public static final String ACTION_BROADCAST_UPLOADED_RECIPE = PACKAGE_NAME + ".action.ACTION_BROADCAST_UPLOADED_RECIPE";
     public static final String ACTION_BROADCAST_DELETED_RECIPE = PACKAGE_NAME + ".action.ACTION_BROADCAST_DELETED_RECIPE";
 
-    public static final String MIME_TYPE_RECIPE = "application/xml";
     public static final String MIME_TYPE_PICTURE = "image/jpeg";
-    public static final String MIME_TYPE_ZIP = "application/zip";
-
-    public static final Integer STATE_NOT_DOWNLOADED = 0;
-    public static final Integer STATE_DOWNLOADED_NOT_UNZIPED = 1;
-    public static final Integer STATE_DOWNLOADED_UNZIPED_NOT_ERASED = 2;
-    public static final Integer STATE_DOWNLOADED_UNZIPED_ERASED = 3;
-
 
     public static final String ALLOWED_RECIPES_NODE = "allowed_recipes";
     public static final String FORBIDDEN_RECIPES_NODE = "forbidden_recipes";
@@ -140,7 +130,6 @@ public class RecetasCookeoConstants {
     public static final int FLAG_ALLOWED_RECIPE = 1;
     public static final int FLAG_FORBIDDEN_RECIPE = 2;
     public static final int FLAG_PERSONAL_RECIPE = 4;
-
 
 
 }

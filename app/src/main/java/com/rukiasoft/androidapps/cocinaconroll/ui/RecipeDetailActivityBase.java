@@ -99,60 +99,25 @@ public class RecipeDetailActivityBase extends ToolbarAndProgressActivity {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent intentData) {
-        if(requestCode == RecetasCookeoConstants.REQUEST_EDIT_RECIPE){
+        if(requestCode == RecetasCookeoConstants.REQUEST_CREATE_RECIPE){
             if(resultCode == RecetasCookeoConstants.RESULT_UPDATE_RECIPE && intentData != null && intentData.hasExtra(RecetasCookeoConstants.KEY_RECIPE)){
-                // TODO: 27/2/17 salvaba la receta, ahora la recargaré
-                /*RecipeComplete recipe = intentData.getParcelableExtra(RecetasCookeoConstants.KEY_RECIPE);
-                RecipeDetailsFragment recipeDetailsFragment = (RecipeDetailsFragment) getSupportFragmentManager().findFragmentById(R.id.details_recipes_fragment);
-                if(recipeDetailsFragment != null)
-                    recipeDetailsFragment.updateRecipe(recipe);
-                //save recipe
-                CommonRecipeOperations commonRecipeOperations = new CommonRecipeOperations(this, recipe);
-                String oldPicture = "";
-                if(intentData.hasExtra(RecetasCookeoConstants.KEY_DELETE_OLD_PICTURE)){
-                    oldPicture = intentData.getStringExtra(RecetasCookeoConstants.KEY_DELETE_OLD_PICTURE);
+                // TODO: 8/3/17 revisar que funciona
+                RecipeComplete tmpRecipe = intentData.getParcelableExtra(RecetasCookeoConstants.KEY_RECIPE);
+                if(tmpRecipe != null){
+                    RecipeDetailsFragment recipeDetailsFragment = (RecipeDetailsFragment) getSupportFragmentManager().findFragmentById(R.id.details_recipes_fragment);
+                    if(recipeDetailsFragment != null){
+                        recipeDetailsFragment.setRecipe(tmpRecipe);
+                    }
                 }
-                commonRecipeOperations.updateRecipe(oldPicture);
-                //set results
-                Intent returnIntent = new Intent();
-                Bundle bundle = new Bundle();
-                bundle.putParcelable(RecetasCookeoConstants.KEY_RECIPE, recipe);
-                returnIntent.putExtras(bundle);
-                setResult(RecetasCookeoConstants.RESULT_UPDATE_RECIPE, returnIntent);*/
+
             }
         }
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
-        switch (requestCode) {
-            case RecetasCookeoConstants.MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE: {
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    RecipeDetailsFragment mRecipeDetailsFragment = (RecipeDetailsFragment) getSupportFragmentManager().
-                            findFragmentById(R.id.details_recipes_fragment);
-                    if(mRecipeDetailsFragment != null) {
-                        mRecipeDetailsFragment.editRecipe();
-                    }
-                } else {
-                    AlertDialog.Builder builder =
-                            new AlertDialog.Builder(this);
 
-                    builder.setMessage(getResources().getString(R.string.write_external_denied))
-                            .setTitle(getResources().getString(R.string.permissions_title))
-                            .setPositiveButton(getResources().getString(R.string.accept),
-                                    new DialogInterface.OnClickListener() {
-                                        public void onClick(DialogInterface dialog, int id) {
-                                            dialog.cancel();
-                                        }
-                                    });
-                    builder.create().show();
-                }
-            }
 
-            // other 'case' lines to check for other
-            // permissions this app might request
-        }
+    public void launchSignInActivity(){
+        Intent intent = new Intent(RecipeDetailActivityBase.this, SignInActivity.class);
+        startActivityForResult(intent, RecetasCookeoConstants.REQUEST_CODE_SIGNING_FROM_RECIPELIST);
     }
 }

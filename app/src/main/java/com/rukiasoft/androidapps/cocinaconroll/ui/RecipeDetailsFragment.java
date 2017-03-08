@@ -76,7 +76,6 @@ public class RecipeDetailsFragment extends Fragment implements
     private static final float PERCENTAGE_TO_ELLIPSIZE_TITLE  = 0.1f;
 
     private static final String KEY_SAVE_RECIPE = RecetasCookeoConstants.PACKAGE_NAME + "." + RecipeDetailsFragment.class.getSimpleName() + ".saverecipe";
-    private static final String KEY_ANIMATED = RecetasCookeoConstants.PACKAGE_NAME + "." + RecipeDetailsFragment.class.getSimpleName() + ".animate";
 
 
     @BindView(R.id.recipe_details_icon_minutes) ImageView iconMinutes;
@@ -106,9 +105,8 @@ public class RecipeDetailsFragment extends Fragment implements
     private boolean recipeLoaded = false;
     private ActionBar actionBar;
     @BindView(R.id.cardview_link_textview) TextView author;
-    private boolean own;
     private boolean land;
-    private boolean animated;
+    @State boolean animated = false;
     private View viewToReveal;
     private ReadWriteTools rwTools;
     RecipeController mRecipeController;
@@ -148,7 +146,6 @@ public class RecipeDetailsFragment extends Fragment implements
         if (recipe != null) {
             savedInstanceState.putParcelable(KEY_SAVE_RECIPE, recipe);
         }
-        savedInstanceState.putBoolean(KEY_ANIMATED, animated);
         super.onSaveInstanceState(savedInstanceState);
     }
 
@@ -156,11 +153,13 @@ public class RecipeDetailsFragment extends Fragment implements
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.recipe_description_menu, menu);
-        menu.findItem(R.id.menu_item_remove).setVisible(own);
-        menu.findItem(R.id.menu_item_share_recipe).setVisible(own);
+        if(recipe != null) {
+            menu.findItem(R.id.menu_item_remove).setVisible(recipe.getEdited() |
+                    recipe.getOwner().equals(RecetasCookeoConstants.FLAG_PERSONAL_RECIPE));
+            menu.findItem(R.id.menu_item_share_recipe).setVisible(recipe.getOwner().equals(RecetasCookeoConstants.FLAG_PERSONAL_RECIPE));
+        }
 
-        if(android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB)
-            onPrepareOptionsMenu(menu);
+
     }
 
     private final DialogInterface.OnClickListener removeDialogClickListener = new DialogInterface.OnClickListener() {
@@ -185,9 +184,15 @@ public class RecipeDetailsFragment extends Fragment implements
     @SuppressLint("NewApi")
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        Tools tools = new Tools();
         switch (item.getItemId()) {
             case R.id.menu_item_edit_recipe:
-                editRecipe();
+                if(tools.getBooleanFromPreferences(getContext().getApplicationContext(),
+                        RecetasCookeoConstants.PROPERTY_SIGNED_IN)){
+                    editRecipe();
+                }else{
+                    requestSignInForNewRecipe();
+                }
                 return true;
             case R.id.menu_item_remove:
                 AlertDialog.Builder removeBuilder = new AlertDialog.Builder(getActivity());
@@ -217,37 +222,9 @@ public class RecipeDetailsFragment extends Fragment implements
     }
 
     public void editRecipe(){
-        // TODO: 27/2/17  ver esto
-        /*if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
-                ContextCompat.checkSelfPermission(getActivity(),
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                        != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(),
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                android.support.v7.app.AlertDialog.Builder builder =
-                        new android.support.v7.app.AlertDialog.Builder(getActivity());
-
-                builder.setMessage(getResources().getString(R.string.write_external_explanation))
-                        .setTitle(getResources().getString(R.string.permissions_title))
-                        .setPositiveButton(getResources().getString(R.string.accept),
-                                new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
-                                        dialog.cancel();
-                                        ActivityCompat.requestPermissions(getActivity(),
-                                                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                                                RecetasCookeoConstants.MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
-                                    }
-                                });
-                builder.create().show();
-            } else {
-                ActivityCompat.requestPermissions(getActivity(),
-                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                        RecetasCookeoConstants.MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
-            }
-        }else{
-            CommonRecipeOperations commonRecipeOperations = new CommonRecipeOperations(getActivity(), recipe);
-            commonRecipeOperations.editRecipe();
-        }*/
+        Intent intent = new Intent(getActivity(), EditRecipeActivity.class);
+        intent.putExtra(RecetasCookeoConstants.KEY_RECIPE, recipe);
+        getActivity().startActivityForResult(intent, RecetasCookeoConstants.REQUEST_CREATE_RECIPE);
     }
 
     private final Runnable scaleIn = new Runnable() {
@@ -317,10 +294,7 @@ public class RecipeDetailsFragment extends Fragment implements
             if(savedInstanceState.containsKey(KEY_SAVE_RECIPE)) {
                 recipe = savedInstanceState.getParcelable(KEY_SAVE_RECIPE);
             }
-            animated = false;
-            if(savedInstanceState.containsKey(KEY_ANIMATED)) {
-                animated = savedInstanceState.getBoolean(KEY_ANIMATED);
-            }
+
         }
 
         if(recipe != null){
@@ -407,9 +381,7 @@ public class RecipeDetailsFragment extends Fragment implements
             recipeName.setVisibility(View.GONE);
         }else{
             recipeName.setVisibility(View.VISIBLE);
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-                recipeName.setAlpha(1 - percentage / PERCENTAGE_TO_ELLIPSIZE_TITLE);
-            }
+            recipeName.setAlpha(1 - percentage / PERCENTAGE_TO_ELLIPSIZE_TITLE);
         }
     }
 
@@ -571,11 +543,35 @@ public class RecipeDetailsFragment extends Fragment implements
 
     }
 
+    private void requestSignInForNewRecipe(){
+        android.support.v7.app.AlertDialog.Builder builder =
+                new android.support.v7.app.AlertDialog.Builder(getActivity());
+
+        builder.setMessage(getResources().getString(R.string.create_recipe_explanation))
+                .setTitle(getResources().getString(R.string.permissions_title))
+                .setPositiveButton(getResources().getString(R.string.sign_in),
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel();
+                                ((RecipeListActivity) getActivity()).launchSignInActivity();
+                            }
+                        })
+                .setNegativeButton(getResources().getString(R.string.cancel),
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel();
+                            }
+                        })
+        ;
+
+        builder.create().show();
+    }
 
     @SuppressLint("NewApi")
     public void updateRecipe(RecipeComplete recipe) {
         this.recipe = recipe;
         loadRecipe();
+        // TODO: 7/3/17 revisar que actualiza los iconos
         Boolean compatRequired = Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB;
         if(!compatRequired)
             getActivity().invalidateOptionsMenu();// creates call to onPrepareOptionsMenu()

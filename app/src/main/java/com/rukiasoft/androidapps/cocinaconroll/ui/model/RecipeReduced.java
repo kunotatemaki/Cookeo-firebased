@@ -17,6 +17,7 @@ public abstract class RecipeReduced implements Parcelable{
     abstract Boolean vegetarian();
     abstract Boolean favourite();
     abstract Integer owner();
+    abstract Boolean edited();
     abstract Long timestamp();
 
     static Builder builder() {
@@ -33,6 +34,7 @@ public abstract class RecipeReduced implements Parcelable{
         abstract Builder setFavourite(Boolean value);
         abstract Builder setOwner(Integer value);
         abstract Builder setTimestamp(Long value);
+        abstract Builder setEdited(Boolean value);
         abstract RecipeReduced build();
     }
 
@@ -47,6 +49,7 @@ public abstract class RecipeReduced implements Parcelable{
                     .setFavourite(recipeDb.getFavourite())
                     .setOwner(recipeDb.getOwner())
                     .setTimestamp(recipeDb.getTimestamp())
+                    .setEdited(recipeDb.getEdited())
                     .build();
         }catch (IllegalStateException e){
             return null;
@@ -83,6 +86,10 @@ public abstract class RecipeReduced implements Parcelable{
 
     public Long getTimestamp(){
         return timestamp();
+    }
+
+    public Boolean getEdited() {
+        return edited();
     }
 
 }

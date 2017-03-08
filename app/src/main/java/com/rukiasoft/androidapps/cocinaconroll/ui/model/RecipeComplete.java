@@ -8,6 +8,7 @@ import com.rukiasoft.androidapps.cocinaconroll.persistence.model.RecipeDb;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.Tools;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -31,6 +32,7 @@ public abstract class RecipeComplete implements Parcelable{
     @Nullable
     abstract String tip();
     abstract Integer owner();
+    abstract Boolean edited();
     abstract Long timestamp();
     @Nullable abstract List<String> ingredients();
     @Nullable abstract List<String> steps();
@@ -56,6 +58,7 @@ public abstract class RecipeComplete implements Parcelable{
         abstract RecipeComplete.Builder setAuthor(String value);
         abstract RecipeComplete.Builder setLink(String value);
         abstract RecipeComplete.Builder setTip(String value);
+        abstract RecipeComplete.Builder setEdited(Boolean value);
         abstract RecipeComplete.Builder setLanguage(Integer value);
         abstract RecipeComplete.Builder setIngredients(List<String> value);
         abstract RecipeComplete.Builder setSteps(List<String> value);
@@ -85,6 +88,7 @@ public abstract class RecipeComplete implements Parcelable{
                     .setLanguage(recipeDb.getLanguage())
                     .setIngredients(recipeDb.getIngredientsAsStringList())
                     .setSteps(recipeDb.getStepsAsStringList())
+                    .setEdited(recipeDb.getEdited())
                     .build();
         }catch (IllegalStateException e){
             e.printStackTrace();
@@ -94,17 +98,29 @@ public abstract class RecipeComplete implements Parcelable{
 
     public static RecipeComplete getRecipeFrom1Screen(RecipeComplete recipe, String key, String name, String picture,
                                                       Boolean vegetarian, String type, Integer minutes,
-                                                      Integer portions, String author) {
+                                                      Integer portions, String author, boolean edited) {
         try {
             Long id = null;
             Boolean favourite = false;
+            int owner = RecetasCookeoConstants.FLAG_PERSONAL_RECIPE;
+            String tip = null;
+            List<String> ingredients = new ArrayList<>();
+            List<String> steps = new ArrayList<>();
             if(recipe != null) {
                 id = recipe.getId();
                 favourite = recipe.getFavourite();
+                owner = recipe.getOwner();
+                ingredients = recipe.getIngredients();
+                steps = recipe.getSteps();
+                tip = recipe.tip();
             }
 
-            if(picture == null || picture.isEmpty()){
-                picture = RecetasCookeoConstants.DEFAULT_PICTURE_NAME;
+            if(picture.isEmpty()){
+                if(recipe == null) {
+                    picture = RecetasCookeoConstants.DEFAULT_PICTURE_NAME;
+                }else{
+                    picture = recipe.getPicture();
+                }
             }
             return RecipeComplete.builder()
                     .setId(id)
@@ -115,16 +131,17 @@ public abstract class RecipeComplete implements Parcelable{
                     .setPicture(picture)
                     .setVegetarian(vegetarian)
                     .setFavourite(favourite)
-                    .setOwner(RecetasCookeoConstants.FLAG_PERSONAL_RECIPE)
+                    .setOwner(owner)
+                    .setEdited(edited)
                     .setType(type)
                     .setMinutes(minutes)
                     .setPortions(portions)
                     .setAuthor(author)
                     .setLink("")
-                    .setTip(null)
-                    .setIngredients(null)
+                    .setTip(tip)
+                    .setIngredients(ingredients)
                     .setLanguage(RecetasCookeoConstants.LANG_SPANISH)
-                    .setSteps(null)
+                    .setSteps(steps)
                     .build();
 
         }catch (IllegalStateException e){
@@ -140,6 +157,7 @@ public abstract class RecipeComplete implements Parcelable{
                     .setTimestamp(recipe.getTimestamp())
                     .setName(recipe.getName())
                     .setIcon(recipe.getIcon())
+                    .setEdited(recipe.getEdited())
                     .setPicture(recipe.getPicture())
                     .setVegetarian(recipe.getVegetarian())
                     .setFavourite(recipe.getFavourite())
@@ -168,6 +186,7 @@ public abstract class RecipeComplete implements Parcelable{
                     .setTimestamp(recipe.getTimestamp())
                     .setName(recipe.getName())
                     .setIcon(recipe.getIcon())
+                    .setEdited(recipe.getEdited())
                     .setPicture(recipe.getPicture())
                     .setVegetarian(recipe.getVegetarian())
                     .setFavourite(recipe.getFavourite())
@@ -260,4 +279,5 @@ public abstract class RecipeComplete implements Parcelable{
         return steps();
     }
 
+    public Boolean getEdited(){ return  edited(); }
 }

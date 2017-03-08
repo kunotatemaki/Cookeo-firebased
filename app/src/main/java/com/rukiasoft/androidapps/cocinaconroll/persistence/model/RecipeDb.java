@@ -1,6 +1,5 @@
 package com.rukiasoft.androidapps.cocinaconroll.persistence.model;
 
-import com.rukiasoft.androidapps.cocinaconroll.R;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.database.model.RecipeFirebase;
 import com.rukiasoft.androidapps.cocinaconroll.ui.model.RecipeComplete;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
@@ -45,6 +44,7 @@ public class RecipeDb {
     private String link;
     private String tip;
     private Integer owner;
+    private Boolean edited;
     @NotNull
     private Long timestamp;
     @NotNull
@@ -94,6 +94,7 @@ public class RecipeDb {
         recipeDb.setIngredients(RecipeDb.addIngredients(recipeComplete.getIngredients(), recipeComplete.getKey()));
         recipeDb.setSteps(RecipeDb.addSteps(recipeComplete.getSteps(), recipeComplete.getKey()));
         recipeDb.setTimestamp(System.currentTimeMillis());
+        recipeDb.setEdited(recipeComplete.getEdited());
         recipeDb.setDownloadRecipe(false);
         recipeDb.setDownloadPicture(false);
         return recipeDb;
@@ -119,6 +120,7 @@ public class RecipeDb {
         this.tip = recipe.getTip();
         this.language = recipe.getLanguage();
         this.link = recipe.getLink();
+        this.edited = false;
         this.ingredients = RecipeDb.addIngredients(recipe.getIngredients(), this.key);
         this.steps = RecipeDb.addSteps(recipe.getSteps(), this.key);
 
@@ -165,11 +167,11 @@ public class RecipeDb {
         return list;
     }
 
-    @Generated(hash = 256029834)
+    @Generated(hash = 1803456598)
     public RecipeDb(Long id, @NotNull String key, String name, String normalizedName, String type, Integer icon,
             String picture, Boolean vegetarian, Boolean favourite, Integer minutes, Integer portions, Integer language,
-            String author, String link, String tip, Integer owner, @NotNull Long timestamp, @NotNull Boolean downloadRecipe,
-            Boolean downloadPicture) {
+            String author, String link, String tip, Integer owner, Boolean edited, @NotNull Long timestamp,
+            @NotNull Boolean downloadRecipe, Boolean downloadPicture) {
         this.id = id;
         this.key = key;
         this.name = name;
@@ -186,6 +188,7 @@ public class RecipeDb {
         this.link = link;
         this.tip = tip;
         this.owner = owner;
+        this.edited = edited;
         this.timestamp = timestamp;
         this.downloadRecipe = downloadRecipe;
         this.downloadPicture = downloadPicture;
@@ -215,11 +218,11 @@ public class RecipeDb {
         this.name = name;
     }
 
-    public String getNormalizedName() {
+    String getNormalizedName() {
         return this.normalizedName;
     }
 
-    public void setNormalizedName(String normalizedName) {
+    void setNormalizedName(String normalizedName) {
         this.normalizedName = normalizedName;
     }
 
@@ -327,7 +330,7 @@ public class RecipeDb {
         this.timestamp = timestamp;
     }
 
-    public Boolean getDownloadRecipe() {
+    Boolean getDownloadRecipe() {
         return this.downloadRecipe;
     }
 
@@ -335,7 +338,7 @@ public class RecipeDb {
         this.downloadRecipe = downloadRecipe;
     }
 
-    public Boolean getDownloadPicture() {
+    Boolean getDownloadPicture() {
         return this.downloadPicture;
     }
 
@@ -441,6 +444,14 @@ public class RecipeDb {
             throw new DaoException("Entity is detached from DAO context");
         }
         myDao.update(this);
+    }
+
+    public Boolean getEdited() {
+        return this.edited;
+    }
+
+    void setEdited(Boolean edited) {
+        this.edited = edited;
     }
 
     /** called by internal mechanisms, do not call yourself. */

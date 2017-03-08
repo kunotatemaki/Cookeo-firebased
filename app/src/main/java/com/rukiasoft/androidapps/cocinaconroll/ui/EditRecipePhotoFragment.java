@@ -76,14 +76,15 @@ public class EditRecipePhotoFragment extends Fragment {
     @BindView(R.id.spinner_type_dish) Spinner spinner;
 
     @BindView(R.id.checkbox_vegetarian)CheckBox checkBox;
-    @State String newPicName;
-    private Unbinder unbinder;
+    @State String mNewPicName;
+    @State Boolean mEdited = false;
+    private Unbinder mUnbinder;
 
     public EditRecipePhotoFragment() {
     }
 
     public String getNameOfNewImage() {
-        return newPicName;
+        return mNewPicName != null? mNewPicName : "";
     }
 
     @Override
@@ -108,7 +109,7 @@ public class EditRecipePhotoFragment extends Fragment {
 
         view = inflater.inflate(R.layout.fragment_edit_recipe_foto_create, container, false);
 
-        unbinder = ButterKnife.bind(this, view);
+        mUnbinder = ButterKnife.bind(this, view);
 
         List<String> list = new ArrayList<>();
         list.add(getResources().getString(R.string.starters));
@@ -133,6 +134,7 @@ public class EditRecipePhotoFragment extends Fragment {
         }
 
         if (recipe != null && recipe.getName() != null) {
+            mEdited = true;
             createRecipeName.setText(recipe.getName());
             rwTools.loadImageFromPath(getActivity().getApplicationContext(), mImageView,
                     recipe.getPicture(),
@@ -199,9 +201,9 @@ public class EditRecipePhotoFragment extends Fragment {
 
         //spinner1.setOnItemSelectedListener(new CustomOnItemSelectedListener());
 
-        if(newPicName != null){
+        if(mNewPicName != null){
             rwTools.loadImageFromPath(getActivity().getApplicationContext(),
-                    mImageView, newPicName,
+                    mImageView, mNewPicName,
                     R.drawable.default_dish, System.currentTimeMillis());
         }
 
@@ -256,10 +258,10 @@ public class EditRecipePhotoFragment extends Fragment {
         Intent cropIntent = new Intent("com.android.camera.action.CROP");
         //indicate image type and Uri
         cropIntent.setDataAndType(mImageCaptureUri, "image/*");
-        List<ResolveInfo> list = getActivity().getPackageManager().queryIntentActivities(
-                cropIntent, 0);
+        //List<ResolveInfo> list = getActivity().getPackageManager().queryIntentActivities(
+        //        cropIntent, 0);
 
-        if (list.size() == 0) {
+        /*if (list.size() == 0) {
 
             try {
                 photo = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), mImageCaptureUri);
@@ -267,10 +269,10 @@ public class EditRecipePhotoFragment extends Fragment {
                 e.printStackTrace();
             }
 
-            rwTools.loadImageFromPath(getActivity().getApplicationContext(), mImageView, newPicName,
+            rwTools.loadImageFromPath(getActivity().getApplicationContext(), mImageView, mNewPicName,
                     R.drawable.default_dish, System.currentTimeMillis());
             return;
-        }
+        }*/
         //set crop properties
         cropIntent.putExtra("crop", "true");
         //indicate aspect of desired crop
@@ -320,10 +322,10 @@ public class EditRecipePhotoFragment extends Fragment {
                 if (extras != null) {
                     photo = extras.getParcelable("data");
                     updateNameOfNewImage();
-                    newPicName = rwTools.saveBitmap(getActivity().getApplicationContext(), photo, getPictureNameFromFileName());
+                    mNewPicName = rwTools.saveBitmap(getActivity().getApplicationContext(), photo, getPictureNameFromFileName());
 
                     rwTools.loadImageFromPath(getActivity().getApplicationContext(),
-                            mImageView, newPicName,
+                            mImageView, mNewPicName,
                             R.drawable.default_dish, System.currentTimeMillis());
                 }
                 File f = new File(mImageCaptureUri.getPath());
@@ -336,10 +338,10 @@ public class EditRecipePhotoFragment extends Fragment {
                 if (extras2 != null) {
                     photo = extras2.getParcelable("data");
                     updateNameOfNewImage();
-                    newPicName = rwTools.saveBitmap(getActivity().getApplicationContext(), photo, getPictureNameFromFileName());
+                    mNewPicName = rwTools.saveBitmap(getActivity().getApplicationContext(), photo, getPictureNameFromFileName());
                     //if(recipe.getState().compareTo(RecetasCookeoConstants.STATE_OWN) != 0)
                     rwTools.loadImageFromPath(getActivity().getApplicationContext(),
-                            mImageView, newPicName,
+                            mImageView, mNewPicName,
                             R.drawable.default_dish, System.currentTimeMillis());
                 }
                 break;
@@ -347,8 +349,8 @@ public class EditRecipePhotoFragment extends Fragment {
     }
 
     private void updateNameOfNewImage(){
-        if(newPicName != null && !newPicName.isEmpty()){
-            rwTools.deleteImage(getContext(), newPicName);
+        if(mNewPicName != null && !mNewPicName.isEmpty()){
+            rwTools.deleteImage(getContext(), mNewPicName);
         }
     }
 
@@ -371,7 +373,7 @@ public class EditRecipePhotoFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        unbinder.unbind();
+        mUnbinder.unbind();
     }
 
     public Boolean checkInfoOk(){
@@ -449,7 +451,7 @@ public class EditRecipePhotoFragment extends Fragment {
     private RecipeComplete getRecipeFromParams(){
         RecipeComplete recipe = ((EditRecipeActivity)getActivity()).getRecipe();
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        String author = "";
+        String author;
         if(user != null) {
             author = user.getDisplayName();
         }else{
@@ -458,8 +460,8 @@ public class EditRecipePhotoFragment extends Fragment {
 
         String key = getKey(user.getUid());
         return RecipeComplete.getRecipeFrom1Screen(recipe, key, createRecipeName.getText().toString(),
-                newPicName, checkBox.isChecked(), getTypeFromSpinner(), Integer.valueOf(minutes.getText().toString()),
-                Integer.valueOf(portions.getText().toString()), author);
+                getNameOfNewImage(), checkBox.isChecked(), getTypeFromSpinner(), Integer.valueOf(minutes.getText().toString()),
+                Integer.valueOf(portions.getText().toString()), author, mEdited);
     }
 
     private String getTypeFromSpinner(){
