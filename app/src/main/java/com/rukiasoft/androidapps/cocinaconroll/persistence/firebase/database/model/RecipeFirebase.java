@@ -72,7 +72,7 @@ public class RecipeFirebase {
 
 
     /*public RecipeDetailedFirebase(DatabaseItem recipe) {
-        this.picture = recipe.getPicture();
+        this.picture = recipe.getPullPicture();
         this.language = CukioConstants.LANG_SPANISH;
     }*/
 

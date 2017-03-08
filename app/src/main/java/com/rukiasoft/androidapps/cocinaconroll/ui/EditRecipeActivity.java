@@ -3,7 +3,6 @@ package com.rukiasoft.androidapps.cocinaconroll.ui;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
@@ -211,6 +210,10 @@ public class EditRecipeActivity extends AppCompatActivity {
     private void setResultData(){
         RecipeController recipeController = new RecipeController();
         RecipeDb recipeDb = RecipeDb.fromRecipeComplete(recipe);
+        recipeDb.setUpdateRecipe(RecetasCookeoConstants.FLAG_UPLOAD_RECIPE);
+        if(!recipe.getPicture().equals(RecetasCookeoConstants.DEFAULT_PICTURE_NAME)){
+            recipeDb.setUpdatePicture(RecetasCookeoConstants.FLAG_UPLOAD_PICTURE);
+        }
         recipeController.insertOrReplaceRecipe(getApplication(), recipeDb);
         finish();
     }

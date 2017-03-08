@@ -1,7 +1,6 @@
 package com.rukiasoft.androidapps.cocinaconroll.ui;
 
 
-import android.Manifest;
 import android.animation.Animator;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
@@ -9,7 +8,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
@@ -22,7 +20,6 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
@@ -53,14 +50,10 @@ import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.rukiasoft.androidapps.cocinaconroll.CocinaConRollApplication;
 import com.rukiasoft.androidapps.cocinaconroll.R;
-import com.rukiasoft.androidapps.cocinaconroll.classes.RecipeItemOld;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.controllers.RecipeController;
-import com.rukiasoft.androidapps.cocinaconroll.persistence.model.IngredientDb;
-import com.rukiasoft.androidapps.cocinaconroll.persistence.model.StepDb;
 import com.rukiasoft.androidapps.cocinaconroll.ui.model.RecipeComplete;
-import com.rukiasoft.androidapps.cocinaconroll.utilities.CommonRecipeOperations;
-import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.ReadWriteTools;
+import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.Tools;
 import com.squareup.leakcanary.RefWatcher;
 
@@ -72,7 +65,6 @@ import icepick.State;
 
 public class RecipeDetailsFragment extends Fragment implements
         AppBarLayout.OnOffsetChangedListener{
-    //private static final String TAG = LogHelper.makeLogTag(RecipeDetailsFragment.class);
     private static final float PERCENTAGE_TO_ELLIPSIZE_TITLE  = 0.1f;
 
     private static final String KEY_SAVE_RECIPE = RecetasCookeoConstants.PACKAGE_NAME + "." + RecipeDetailsFragment.class.getSimpleName() + ".saverecipe";

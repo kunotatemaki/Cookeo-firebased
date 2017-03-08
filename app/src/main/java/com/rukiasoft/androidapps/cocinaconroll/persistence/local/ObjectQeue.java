@@ -22,15 +22,24 @@ public abstract class ObjectQeue implements Parcelable {
 
     @Nullable abstract List<RecipeDb> pullRecipes();
     @Nullable abstract List<RecipeDb> pullPictureNames();
+    @Nullable abstract List<RecipeDb> pushRecipes();
+    @Nullable abstract List<RecipeDb> pushPictureNames();
 
-    public boolean isPictureListEmpty(){
+    public boolean isPicturePullListEmpty(){
         return pullPictureNames() == null || pullPictureNames().isEmpty();
     }
-    public boolean isRecipeListEmpty(){
+    public boolean isRecipePullListEmpty(){
         return pullRecipes() == null || pullRecipes().isEmpty();
     }
 
-    public RecipeDb getPicture(int index){
+    public boolean isPicturePushListEmpty(){
+        return pushPictureNames() == null || pushPictureNames().isEmpty();
+    }
+    public boolean isRecipePushListEmpty(){
+        return pushRecipes() == null || pushRecipes().isEmpty();
+    }
+
+    public RecipeDb getPullPicture(int index){
         if(pullPictureNames().size() > index) {
             return pullPictureNames().get(index);
         }else{
@@ -38,7 +47,7 @@ public abstract class ObjectQeue implements Parcelable {
         }
     }
 
-    public RecipeDb getRecipe(int index){
+    public RecipeDb getPullRecipe(int index){
         if(pullRecipes().size() > index) {
             return pullRecipes().get(index);
         }else{
@@ -46,15 +55,37 @@ public abstract class ObjectQeue implements Parcelable {
         }
     }
 
-    public int recipeSize(){
-        return pullRecipes().size();
+    public RecipeDb getPushPicture(int index){
+        if(pushPictureNames().size() > index) {
+            return pushPictureNames().get(index);
+        }else{
+            return null;
+        }
     }
-    public RecipeDb removePicture(int index){
+
+    public RecipeDb getPushRecipe(int index){
+        if(pushRecipes().size() > index) {
+            return pushRecipes().get(index);
+        }else{
+            return null;
+        }
+    }
+
+
+    public RecipeDb removePullPicture(int index){
         return pullPictureNames().remove(index);
     }
 
-    public RecipeDb removeRecipe(int index){
+    public RecipeDb removePullRecipe(int index){
         return pullRecipes().remove(index);
+    }
+
+    public RecipeDb removePushPicture(int index){
+        return pushPictureNames().remove(index);
+    }
+
+    public RecipeDb removePushRecipe(int index){
+        return pushRecipes().remove(index);
     }
 
 }

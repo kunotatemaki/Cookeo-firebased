@@ -312,12 +312,14 @@ public class RecipeListFragment extends Fragment implements
             firstLoad = false;
             filterRecipes(lastFilter);
             checkNewRecipesFromFirebase();
+            uploadOwnRecipesToFirebase();
         }else if(mRecipes == null || mRecipes.size() == 0 || needToRefresh) {
             needToRefresh = false;
             filterRecipes(lastFilter);
         }else{
             setData();
         }
+
 
 
     }
@@ -726,7 +728,7 @@ public class RecipeListFragment extends Fragment implements
                         recipeDbFromDatabase.getTimestamp() < timestampFirebase.getTimestamp()) {
                     recipeDbFromDatabase.setKey(key);
                     recipeDbFromDatabase.setTimestamp(System.currentTimeMillis());
-                    recipeDbFromDatabase.setDownloadRecipe(true);
+                    recipeDbFromDatabase.setUpdateRecipe(RecetasCookeoConstants.FLAG_DOWNLOAD_RECIPE);
                     recipeDbFromDatabase.setOwner(recipeOwner);
                     recipeController.insertOrReplaceRecipe(application, recipeDbFromDatabase);
                 }
@@ -756,15 +758,15 @@ public class RecipeListFragment extends Fragment implements
             return;
         }
         RecipeController recipeController = new RecipeController();
-        if(pullItems == null || pullItems.isRecipeListEmpty()) {
-            List<RecipeDb> list = recipeController.getListOnlyRecipeToDownload(application);
+        if(pullItems == null || pullItems.isRecipePullListEmpty()) {
+            List<RecipeDb> list = recipeController.getListOnlyRecipeToUpdate(application, true);
             pullItems = ObjectQeue.create((ArrayList<RecipeDb>) list, null);
             if(list.size() > 0 && getActivity() != null) {
                 ((RecipeListActivity) getActivity()).showProgressDialog(getString(R.string.downloading_recipes));
             }
         }
 
-        if(pullItems.isRecipeListEmpty()){
+        if(pullItems.isRecipePullListEmpty()){
             //veo si hay que descargar fotos
             Logger.d("Descargadas todas las recetas");
             isDownloadingRecipes = false;
@@ -776,7 +778,7 @@ public class RecipeListFragment extends Fragment implements
             return;
         }
 
-        RecipeDb recipe = pullItems.getRecipe(0);
+        RecipeDb recipe = pullItems.getPullRecipe(0);
         String node = FirebaseDbMethods.getNodeNameFromRecipeFlag(recipe.getOwner());
 
         if (node.equals(RecetasCookeoConstants.PERSONAL_RECIPES_NODE)) {
@@ -801,7 +803,7 @@ public class RecipeListFragment extends Fragment implements
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 numRecipesDownloaded++;
-                pullItems.removeRecipe(0);
+                pullItems.removePullRecipe(0);
                 downloadRecipesFromFirebase();
             }
         });
@@ -834,7 +836,98 @@ public class RecipeListFragment extends Fragment implements
             if(numRecipesDownloaded%20 == 0){
                 filterRecipes(lastFilter);
             }
-            pullItems.removeRecipe(0);
+            pullItems.removePullRecipe(0);
+            downloadRecipesFromFirebase();
+        }
+    }
+
+    public void uploadOwnRecipesToFirebase(){
+
+        isUploadingRecipes = true;
+        if(application == null){
+            return;
+        }
+        RecipeController recipeController = new RecipeController();
+        if(pullItems == null || pullItems.isRecipePushListEmpty()) {
+            List<RecipeDb> list = recipeController.getListOnlyRecipeToUpdate(application, false);
+            // TODO: 8/3/17 voy por aqui
+            pullItems = ObjectQeue.create((ArrayList<RecipeDb>) list, null);
+            if(list.size() > 0 && getActivity() != null) {
+                ((RecipeListActivity) getActivity()).showProgressDialog(getString(R.string.downloading_recipes));
+            }
+        }
+
+        if(pullItems.isRecipePullListEmpty()){
+            //veo si hay que descargar fotos
+            Logger.d("Descargadas todas las recetas");
+            isDownloadingRecipes = false;
+            if(getActivity() != null){
+                ((RecipeListActivity)getActivity()).hideProgressDialog();
+            }
+            filterRecipes(lastFilter);
+            downloadPicturesFromStorage();
+            return;
+        }
+
+        RecipeDb recipe = pullItems.getPullRecipe(0);
+        String node = FirebaseDbMethods.getNodeNameFromRecipeFlag(recipe.getOwner());
+
+        if (node.equals(RecetasCookeoConstants.PERSONAL_RECIPES_NODE)) {
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            if (user != null && !user.isAnonymous()) {
+                node += "/" + user.getUid();
+            } else {
+                return;
+            }
+        }
+        //descargo la receta
+        DatabaseReference mRecipeRefDetailed = FirebaseDatabase.getInstance()
+                .getReference(node +
+                        "/" + RecetasCookeoConstants.DETAILED_RECIPES_NODE + "/" + recipe.getKey());
+        mRecipeRefDetailed.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                DownloadRecipeTask downloadTask = new DownloadRecipeTask();
+                downloadTask.execute(dataSnapshot);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                numRecipesDownloaded++;
+                pullItems.removePullRecipe(0);
+                downloadRecipesFromFirebase();
+            }
+        });
+
+    }
+
+    //ASYNCTASKS
+    /**
+     * Tarea que almacena las recetas descargadas
+     */
+    private class DownloadRecipeTask extends AsyncTask<DataSnapshot, Integer, Void> {
+
+        @Override
+        protected Void doInBackground(DataSnapshot... snapshot) {
+            RecipeController recipeController = new RecipeController();
+            DataSnapshot dataSnapshot = snapshot[0];
+            RecipeFirebase recipeFromFirebase = dataSnapshot.getValue(RecipeFirebase.class);
+            if(recipeFromFirebase == null)  return null;
+            //String key = dataSnapshot.getRef().getParent().getParent().getKey();
+            if(application == null){
+                return null;
+            }
+            recipeController.insertRecipeFromFirebase(application, dataSnapshot, recipeFromFirebase);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void param) {
+            numRecipesDownloaded++;
+            if(numRecipesDownloaded%20 == 0){
+                filterRecipes(lastFilter);
+            }
+            pullItems.removePullRecipe(0);
             downloadRecipesFromFirebase();
         }
     }
@@ -846,15 +939,15 @@ public class RecipeListFragment extends Fragment implements
             return;
         }
         RecipeController recipeController = new RecipeController();
-        if(pullItems == null || pullItems.isPictureListEmpty()) {
-            List<RecipeDb> list = recipeController.getListOnlyPicturesToDownload(application);
+        if(pullItems == null || pullItems.isPicturePullListEmpty()) {
+            List<RecipeDb> list = recipeController.getListOnlyPicturesToUpdate(application, true);
             pullItems = ObjectQeue.create(null, (ArrayList<RecipeDb>) list);
             if(getContext() != null && isResumed()) {
                 Toast.makeText(getContext(), getString(R.string.downloading_pictures),
                         Toast.LENGTH_LONG).show();
             }
         }
-        if(pullItems.isPictureListEmpty()){
+        if(pullItems.isPicturePullListEmpty()){
             //veo si hay que descargar fotos
             Logger.d("Descargadas todas las fotos");
             isDownloadingPics = false;
@@ -862,7 +955,7 @@ public class RecipeListFragment extends Fragment implements
             return;
         }
 
-        RecipeDb picture = pullItems.getPicture(0);
+        RecipeDb picture = pullItems.getPullPicture(0);
         final String name = picture.getPicture();
         final long id =  picture.getId();
         StorageReference storageRef = FirebaseStorage.getInstance().getReference();
@@ -897,11 +990,11 @@ public class RecipeListFragment extends Fragment implements
         }).addOnCompleteListener(new OnCompleteListener<FileDownloadTask.TaskSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<FileDownloadTask.TaskSnapshot> task) {
-                pullItems.removePicture(0);
+                pullItems.removePullPicture(0);
                 downloadPicturesFromStorage();
                 if(application != null){
                     RecipeController recipeController = new RecipeController();
-                    recipeController.updateDownloadPictureFlag(application, id, false);
+                    recipeController.updateDownloadPictureFlag(application, id, RecetasCookeoConstants.FLAG_NOT_UPDATE_PICTURE);
                 }
             }
         });

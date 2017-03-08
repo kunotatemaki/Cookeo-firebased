@@ -1,7 +1,6 @@
 package com.rukiasoft.androidapps.cocinaconroll.persistence.daoqueries;
 
 import android.database.Cursor;
-import android.os.SystemClock;
 
 import com.rukiasoft.androidapps.cocinaconroll.persistence.model.DaoSession;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.model.RecipeDb;
@@ -12,8 +11,6 @@ import org.greenrobot.greendao.query.CursorQuery;
 import org.greenrobot.greendao.query.Query;
 import org.greenrobot.greendao.query.QueryBuilder;
 
-import java.util.List;
-
 /**
  * Created by iRoll on 27/1/17.O
  */
@@ -21,8 +18,8 @@ import java.util.List;
 public class RecipeQueries {
 
     private static Query queryBothRecipesAndPicturesToDownload;
-    private static Query queryOnlyRecipesToDownload;
-    private static Query queryOnlyPicturesToDownload;
+    private static Query queryOnlyRecipesToUpdate;
+    private static Query queryOnlyPicturesToUpdate;
     private static Query queryRecipeByPictureName;
     private static Query queryRecipeByKey;
     private static Query queryRecipeById;
@@ -41,18 +38,18 @@ public class RecipeQueries {
         return queryBothRecipesAndPicturesToDownload.forCurrentThread();
     }
 
-    public static Query getQueryOnlyRecipesToDownload(DaoSession session) {
-        if(queryOnlyRecipesToDownload == null){
-            initializeQueryOnlyRecipesToDownload(session);
+    public static Query getQueryOnlyRecipesToUpdate(DaoSession session, boolean download) {
+        if(queryOnlyRecipesToUpdate == null){
+            initializeQueryOnlyRecipesToUpdate(session, download);
         }
-        return queryOnlyRecipesToDownload.forCurrentThread();
+        return queryOnlyRecipesToUpdate.forCurrentThread();
     }
 
-    public static Query getQueryOnlyPicturesToDownload(DaoSession session) {
-        if(queryOnlyPicturesToDownload == null){
-            initializeQueryOnlyPicturesToDownload(session);
+    public static Query getQueryOnlyPicturesToUpdate(DaoSession session, boolean download) {
+        if(queryOnlyPicturesToUpdate == null){
+            initializeQueryOnlyPicturesToUpdate(session, download);
         }
-        return queryOnlyPicturesToDownload.forCurrentThread();
+        return queryOnlyPicturesToUpdate.forCurrentThread();
     }
 
     public static Query getQueryRecipeByPictureName(DaoSession session) {
@@ -141,26 +138,28 @@ public class RecipeQueries {
         recipeDbDao.detachAll();
         QueryBuilder qb = recipeDbDao.queryBuilder();
         queryBothRecipesAndPicturesToDownload = qb.where(
-                qb.or(RecipeDbDao.Properties.DownloadRecipe.eq(1),
-                        RecipeDbDao.Properties.DownloadPicture.eq(1))
+                qb.or(RecipeDbDao.Properties.UpdateRecipe.eq(RecetasCookeoConstants.FLAG_DOWNLOAD_RECIPE),
+                        RecipeDbDao.Properties.UpdatePicture.eq(RecetasCookeoConstants.FLAG_DOWNLOAD_PICTURE))
         ).build();
     }
 
-    private static void initializeQueryOnlyRecipesToDownload(DaoSession session){
+    private static void initializeQueryOnlyRecipesToUpdate(DaoSession session, boolean download){
+        int action = download? RecetasCookeoConstants.FLAG_DOWNLOAD_RECIPE : RecetasCookeoConstants.FLAG_UPLOAD_RECIPE;
         RecipeDbDao recipeDbDao = session.getRecipeDbDao();
         recipeDbDao.detachAll();
         QueryBuilder qb = recipeDbDao.queryBuilder();
-        queryOnlyRecipesToDownload = qb.where(
-                RecipeDbDao.Properties.DownloadRecipe.eq(1)
+        queryOnlyRecipesToUpdate = qb.where(
+                RecipeDbDao.Properties.UpdateRecipe.eq(action)
         ).build();
     }
 
-    private static void initializeQueryOnlyPicturesToDownload(DaoSession session){
+    private static void initializeQueryOnlyPicturesToUpdate(DaoSession session, boolean download){
+        int action = download? RecetasCookeoConstants.FLAG_DOWNLOAD_PICTURE : RecetasCookeoConstants.FLAG_UPLOAD_PICTURE;
         RecipeDbDao recipeDbDao = session.getRecipeDbDao();
         recipeDbDao.detachAll();
         QueryBuilder qb = recipeDbDao.queryBuilder();
-        queryOnlyPicturesToDownload = qb.where(
-                RecipeDbDao.Properties.DownloadPicture.eq(1)
+        queryOnlyPicturesToUpdate = qb.where(
+                RecipeDbDao.Properties.UpdatePicture.eq(action)
         ).build();
     }
 

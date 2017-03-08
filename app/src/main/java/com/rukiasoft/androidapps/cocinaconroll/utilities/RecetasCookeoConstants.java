@@ -131,5 +131,12 @@ public class RecetasCookeoConstants {
     public static final int FLAG_FORBIDDEN_RECIPE = 2;
     public static final int FLAG_PERSONAL_RECIPE = 4;
 
+    public static final int FLAG_NOT_UPDATE_RECIPE = 0;
+    public static final int FLAG_DOWNLOAD_RECIPE = 1;
+    public static final int FLAG_UPLOAD_RECIPE = 2;
+    public static final int FLAG_NOT_UPDATE_PICTURE = 0;
+    public static final int FLAG_DOWNLOAD_PICTURE = 1;
+    public static final int FLAG_UPLOAD_PICTURE = 2;
+
 
 }

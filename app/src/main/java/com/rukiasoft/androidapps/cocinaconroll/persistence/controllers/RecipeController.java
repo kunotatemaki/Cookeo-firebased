@@ -127,23 +127,23 @@ public class RecipeController {
         return RecipeQueries.getQueryBothRecipesAndPicturesToDownload(session).list();
     }
 
-    public List<RecipeDb> getListOnlyRecipeToDownload(Application application){
+    public List<RecipeDb> getListOnlyRecipeToUpdate(Application application, boolean download){
         DaoSession session = CommonController.getDaosessionFromApplication(application, "RecipeDb");
-        return RecipeQueries.getQueryOnlyRecipesToDownload(session).list();
+        return RecipeQueries.getQueryOnlyRecipesToUpdate(session, download).list();
     }
 
-    public List<RecipeDb> getListOnlyPicturesToDownload(Application application){
+    public List<RecipeDb> getListOnlyPicturesToUpdate(Application application, boolean download){
         DaoSession session = CommonController.getDaosessionFromApplication(application, "RecipeDb");
-        return RecipeQueries.getQueryOnlyPicturesToDownload(session).list();
+        return RecipeQueries.getQueryOnlyPicturesToUpdate(session, download).list();
     }
 
-    public void updateDownloadPictureFlag(Application application, long id, boolean state) {
+    public void updateDownloadPictureFlag(Application application, long id, int downloadFlag) {
         DaoSession session = CommonController.getDaosessionFromApplication(application, "RecipeDb");
         Query query = RecipeQueries.getQueryRecipeById(session);
         query.setParameter(0, id);
         RecipeDb recipeDbFromDatabase = (RecipeDb) query.unique();
         if(recipeDbFromDatabase != null) {
-            recipeDbFromDatabase.setDownloadPicture(state);
+            recipeDbFromDatabase.setUpdatePicture(downloadFlag);
             recipeDbFromDatabase.update();
         }
     }

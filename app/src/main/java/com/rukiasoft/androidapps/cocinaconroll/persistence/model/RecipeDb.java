@@ -5,9 +5,7 @@ import com.rukiasoft.androidapps.cocinaconroll.ui.model.RecipeComplete;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.Tools;
 
-import org.greenrobot.greendao.DaoException;
 import org.greenrobot.greendao.annotation.Entity;
-import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Index;
 import org.greenrobot.greendao.annotation.JoinProperty;
@@ -17,6 +15,8 @@ import org.greenrobot.greendao.annotation.ToMany;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.greenrobot.greendao.annotation.Generated;
+import org.greenrobot.greendao.DaoException;
 
 
 @Entity(
@@ -48,8 +48,8 @@ public class RecipeDb {
     @NotNull
     private Long timestamp;
     @NotNull
-    private Boolean downloadRecipe = false;
-    private Boolean downloadPicture;
+    private Integer updateRecipe = RecetasCookeoConstants.FLAG_NOT_UPDATE_RECIPE;
+    private Integer updatePicture = RecetasCookeoConstants.FLAG_NOT_UPDATE_PICTURE;
 
     @ToMany(joinProperties = {
             @JoinProperty(name = "key", referencedName = "key")
@@ -72,106 +72,11 @@ public class RecipeDb {
     public RecipeDb() {
     }
 
-    public static RecipeDb fromRecipeComplete(RecipeComplete recipeComplete){
-        RecipeDb recipeDb = new RecipeDb();
-        recipeDb.setId(recipeComplete.getId());
-        recipeDb.setKey(recipeComplete.getKey());
-        recipeDb.setName(recipeComplete.getName());
-        Tools tools = new Tools();
-        recipeDb.setNormalizedName(tools.getNormalizedString(recipeComplete.getName()));
-        recipeDb.setType(recipeComplete.getType());
-        recipeDb.setIcon(recipeComplete.getIcon());
-        recipeDb.setPicture(recipeComplete.getPicture());
-        recipeDb.setFavourite(recipeComplete.getFavourite());
-        recipeDb.setVegetarian(recipeComplete.getVegetarian());
-        recipeDb.setMinutes(recipeComplete.getMinutes());
-        recipeDb.setPortions(recipeComplete.getPortions());
-        recipeDb.setLanguage(recipeComplete.getLanguage());
-        recipeDb.setAuthor(recipeComplete.getAuthor());
-        recipeDb.setLink(recipeComplete.getLink());
-        recipeDb.setTip(recipeComplete.getTip());
-        recipeDb.setOwner(recipeComplete.getOwner());
-        recipeDb.setIngredients(RecipeDb.addIngredients(recipeComplete.getIngredients(), recipeComplete.getKey()));
-        recipeDb.setSteps(RecipeDb.addSteps(recipeComplete.getSteps(), recipeComplete.getKey()));
-        recipeDb.setTimestamp(System.currentTimeMillis());
-        recipeDb.setEdited(recipeComplete.getEdited());
-        recipeDb.setDownloadRecipe(false);
-        recipeDb.setDownloadPicture(false);
-        return recipeDb;
-    }
-
-    public RecipeDb(RecipeFirebase recipe, String key, Integer owner){
-        this.key = key;
-        this.owner = owner;
-        this.name = recipe.getName();
-        Tools tools = new Tools();
-        this.normalizedName = tools.getNormalizedString(recipe.getName());
-        this.type = recipe.getType();
-        this.icon = Tools.getIconFromType(recipe.getType());
-        this.picture = recipe.getPicture()!=null? recipe.getPicture() : RecetasCookeoConstants.DEFAULT_PICTURE_NAME;
-        this.downloadPicture = !this.picture.equals(RecetasCookeoConstants.DEFAULT_PICTURE_NAME);
-        this.vegetarian = recipe.getVegetarian();
-        this.favourite = false;
-        this.downloadRecipe = false;
-        this.timestamp = System.currentTimeMillis();
-        this.author = recipe.getAuthor();
-        this.minutes = recipe.getMinutes();
-        this.portions = recipe.getPortions();
-        this.tip = recipe.getTip();
-        this.language = recipe.getLanguage();
-        this.link = recipe.getLink();
-        this.edited = false;
-        this.ingredients = RecipeDb.addIngredients(recipe.getIngredients(), this.key);
-        this.steps = RecipeDb.addSteps(recipe.getSteps(), this.key);
-
-    }
-
-    private static List<IngredientDb> addIngredients(List<String> ingredients, String key){
-        List<IngredientDb> mIngredients = new ArrayList<>();
-        for(int i=0; i<ingredients.size(); i++){
-            IngredientDb ingredientDb = new IngredientDb();
-            ingredientDb.setIngredient(ingredients.get(i));
-            ingredientDb.setPosition(i);
-            ingredientDb.setKey(key);
-            mIngredients.add(ingredientDb);
-        }
-        return mIngredients;
-    }
-
-    private static List<StepDb> addSteps(List<String> steps, String key){
-        List<StepDb> mSteps = new ArrayList<>();
-        for(int i=0; i<steps.size(); i++){
-            StepDb stepDb = new StepDb();
-            stepDb.setStep(steps.get(i));
-            stepDb.setPosition(i);
-            stepDb.setKey(key);
-            mSteps.add(stepDb);
-        }
-        return mSteps;
-
-    }
-
-    public List<String> getStepsAsStringList(){
-        List<String> list = new ArrayList<>();
-        for(StepDb stepDb : steps){
-            list.add(stepDb.getStep());
-        }
-        return list;
-    }
-
-    public List<String> getIngredientsAsStringList(){
-        List<String> list = new ArrayList<>();
-        for(IngredientDb ingredientDb : ingredients){
-            list.add(ingredientDb.getIngredient());
-        }
-        return list;
-    }
-
-    @Generated(hash = 1803456598)
+    @Generated(hash = 1012747291)
     public RecipeDb(Long id, @NotNull String key, String name, String normalizedName, String type, Integer icon,
             String picture, Boolean vegetarian, Boolean favourite, Integer minutes, Integer portions, Integer language,
             String author, String link, String tip, Integer owner, Boolean edited, @NotNull Long timestamp,
-            @NotNull Boolean downloadRecipe, Boolean downloadPicture) {
+            @NotNull Integer updateRecipe, Integer updatePicture) {
         this.id = id;
         this.key = key;
         this.name = name;
@@ -190,8 +95,8 @@ public class RecipeDb {
         this.owner = owner;
         this.edited = edited;
         this.timestamp = timestamp;
-        this.downloadRecipe = downloadRecipe;
-        this.downloadPicture = downloadPicture;
+        this.updateRecipe = updateRecipe;
+        this.updatePicture = updatePicture;
     }
 
     public Long getId() {
@@ -218,11 +123,11 @@ public class RecipeDb {
         this.name = name;
     }
 
-    String getNormalizedName() {
+    public String getNormalizedName() {
         return this.normalizedName;
     }
 
-    void setNormalizedName(String normalizedName) {
+    public void setNormalizedName(String normalizedName) {
         this.normalizedName = normalizedName;
     }
 
@@ -322,6 +227,14 @@ public class RecipeDb {
         this.owner = owner;
     }
 
+    public Boolean getEdited() {
+        return this.edited;
+    }
+
+    public void setEdited(Boolean edited) {
+        this.edited = edited;
+    }
+
     public Long getTimestamp() {
         return this.timestamp;
     }
@@ -330,28 +243,20 @@ public class RecipeDb {
         this.timestamp = timestamp;
     }
 
-    Boolean getDownloadRecipe() {
-        return this.downloadRecipe;
+    public Integer getUpdateRecipe() {
+        return this.updateRecipe;
     }
 
-    public void setDownloadRecipe(Boolean downloadRecipe) {
-        this.downloadRecipe = downloadRecipe;
+    public void setUpdateRecipe(Integer updateRecipe) {
+        this.updateRecipe = updateRecipe;
     }
 
-    Boolean getDownloadPicture() {
-        return this.downloadPicture;
+    public Integer getUpdatePicture() {
+        return this.updatePicture;
     }
 
-    public void setIngredients(List<IngredientDb> ingredients) {
-        this.ingredients = ingredients;
-    }
-
-    public void setSteps(List<StepDb> steps) {
-        this.steps = steps;
-    }
-
-    public void setDownloadPicture(Boolean downloadPicture) {
-        this.downloadPicture = downloadPicture;
+    public void setUpdatePicture(Integer updatePicture) {
+        this.updatePicture = updatePicture;
     }
 
     /**
@@ -446,12 +351,113 @@ public class RecipeDb {
         myDao.update(this);
     }
 
-    public Boolean getEdited() {
-        return this.edited;
+    public static RecipeDb fromRecipeComplete(RecipeComplete recipeComplete){
+        RecipeDb recipeDb = new RecipeDb();
+        recipeDb.setId(recipeComplete.getId());
+        recipeDb.setKey(recipeComplete.getKey());
+        recipeDb.setName(recipeComplete.getName());
+        Tools tools = new Tools();
+        recipeDb.setNormalizedName(tools.getNormalizedString(recipeComplete.getName()));
+        recipeDb.setType(recipeComplete.getType());
+        recipeDb.setIcon(recipeComplete.getIcon());
+        recipeDb.setPicture(recipeComplete.getPicture());
+        recipeDb.setFavourite(recipeComplete.getFavourite());
+        recipeDb.setVegetarian(recipeComplete.getVegetarian());
+        recipeDb.setMinutes(recipeComplete.getMinutes());
+        recipeDb.setPortions(recipeComplete.getPortions());
+        recipeDb.setLanguage(recipeComplete.getLanguage());
+        recipeDb.setAuthor(recipeComplete.getAuthor());
+        recipeDb.setLink(recipeComplete.getLink());
+        recipeDb.setTip(recipeComplete.getTip());
+        recipeDb.setOwner(recipeComplete.getOwner());
+        recipeDb.setIngredients(RecipeDb.addIngredients(recipeComplete.getIngredients(), recipeComplete.getKey()));
+        recipeDb.setSteps(RecipeDb.addSteps(recipeComplete.getSteps(), recipeComplete.getKey()));
+        recipeDb.setTimestamp(System.currentTimeMillis());
+        recipeDb.setEdited(recipeComplete.getEdited());
+        recipeDb.setUpdateRecipe(0);
+        recipeDb.setUpdatePicture(0);
+        return recipeDb;
     }
 
-    void setEdited(Boolean edited) {
-        this.edited = edited;
+    public RecipeDb(RecipeFirebase recipe, String key, Integer owner){
+        this.key = key;
+        this.owner = owner;
+        this.name = recipe.getName();
+        Tools tools = new Tools();
+        this.normalizedName = tools.getNormalizedString(recipe.getName());
+        this.type = recipe.getType();
+        this.icon = Tools.getIconFromType(recipe.getType());
+        this.picture = recipe.getPicture()!=null? recipe.getPicture() : RecetasCookeoConstants.DEFAULT_PICTURE_NAME;
+        this.updatePicture = this.picture.equals(RecetasCookeoConstants.DEFAULT_PICTURE_NAME)?
+                0 : RecetasCookeoConstants.FLAG_DOWNLOAD_PICTURE;
+        this.vegetarian = recipe.getVegetarian();
+        this.favourite = false;
+        this.updateRecipe = RecetasCookeoConstants.FLAG_NOT_UPDATE_PICTURE;
+        this.timestamp = System.currentTimeMillis();
+        this.author = recipe.getAuthor();
+        this.minutes = recipe.getMinutes();
+        this.portions = recipe.getPortions();
+        this.tip = recipe.getTip();
+        this.language = recipe.getLanguage();
+        this.link = recipe.getLink();
+        this.edited = false;
+        this.ingredients = RecipeDb.addIngredients(recipe.getIngredients(), this.key);
+        this.steps = RecipeDb.addSteps(recipe.getSteps(), this.key);
+
+    }
+
+
+
+    private static List<IngredientDb> addIngredients(List<String> ingredients, String key){
+        List<IngredientDb> mIngredients = new ArrayList<>();
+        for(int i=0; i<ingredients.size(); i++){
+            IngredientDb ingredientDb = new IngredientDb();
+            ingredientDb.setIngredient(ingredients.get(i));
+            ingredientDb.setPosition(i);
+            ingredientDb.setKey(key);
+            mIngredients.add(ingredientDb);
+        }
+        return mIngredients;
+    }
+
+    private static List<StepDb> addSteps(List<String> steps, String key){
+        List<StepDb> mSteps = new ArrayList<>();
+        for(int i=0; i<steps.size(); i++){
+            StepDb stepDb = new StepDb();
+            stepDb.setStep(steps.get(i));
+            stepDb.setPosition(i);
+            stepDb.setKey(key);
+            mSteps.add(stepDb);
+        }
+        return mSteps;
+
+    }
+
+
+    public void setIngredients(List<IngredientDb> ingredients) {
+        this.ingredients = ingredients;
+    }
+
+    public void setSteps(List<StepDb> steps) {
+        this.steps = steps;
+    }
+
+
+
+    public List<String> getStepsAsStringList(){
+        List<String> list = new ArrayList<>();
+        for(StepDb stepDb : steps){
+            list.add(stepDb.getStep());
+        }
+        return list;
+    }
+
+    public List<String> getIngredientsAsStringList(){
+        List<String> list = new ArrayList<>();
+        for(IngredientDb ingredientDb : ingredients){
+            list.add(ingredientDb.getIngredient());
+        }
+        return list;
     }
 
     /** called by internal mechanisms, do not call yourself. */
@@ -460,5 +466,7 @@ public class RecipeDb {
         this.daoSession = daoSession;
         myDao = daoSession != null ? daoSession.getRecipeDbDao() : null;
     }
+
     
+
 }

@@ -1,19 +1,14 @@
 package com.rukiasoft.androidapps.cocinaconroll.ui;
 
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.support.v7.app.AlertDialog;
 import android.view.MenuItem;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.rukiasoft.androidapps.cocinaconroll.BuildConfig;
 import com.rukiasoft.androidapps.cocinaconroll.R;
-import com.rukiasoft.androidapps.cocinaconroll.classes.RecipeItemOld;
 import com.rukiasoft.androidapps.cocinaconroll.ui.model.RecipeComplete;
-import com.rukiasoft.androidapps.cocinaconroll.utilities.CommonRecipeOperations;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.Tools;
 
