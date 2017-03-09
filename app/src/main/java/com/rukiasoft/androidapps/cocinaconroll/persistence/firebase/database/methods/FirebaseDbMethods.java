@@ -3,7 +3,6 @@ package com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.database.me
 import android.app.Application;
 import android.content.Context;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -37,9 +36,6 @@ public class FirebaseDbMethods {
         this.recipeController = recipeController;
     }
 
-
-
-    // TODO: 22/2/17 llamar a este método cuando corresponda (antes se llamaba en el timer) 
     public void updateOldRecipesToPersonalStorage(Context context){
         if(uploadingOld){
             Logger.d("Estaba subiendo old recipes");
@@ -133,7 +129,7 @@ public class FirebaseDbMethods {
         });
     }
 
-    private void updateRecipesToPersonalStorage(final Context context, final List<RecipeDb> recipeList){
+    public void updateRecipesToPersonalStorage(final Context context){
 
         if(uploadingRegular){
             Logger.d("Estaba subiendo regular recipes");
@@ -147,6 +143,7 @@ public class FirebaseDbMethods {
             return;
         }
 
+        final List<RecipeDb> recipeList = recipeController.getListOnlyRecipeToUpdate((Application)context.getApplicationContext(), false);
         DatabaseReference ref = FirebaseDatabase
                 .getInstance()
                 .getReference("/" + RecetasCookeoConstants.PERSONAL_RECIPES_NODE);
