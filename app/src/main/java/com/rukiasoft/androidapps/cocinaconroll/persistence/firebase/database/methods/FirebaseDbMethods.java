@@ -14,6 +14,7 @@ import com.rukiasoft.androidapps.cocinaconroll.persistence.controllers.RecipeCon
 import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.Authentication;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.database.model.RecipeFirebase;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.database.model.TimestampFirebase;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.storage.methods.StorageMethods;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.model.RecipeDb;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.ReadWriteTools;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
@@ -126,7 +127,8 @@ public class FirebaseDbMethods {
                             name;
                     readWriteTools.deleteFile(sbPath);
                 }
-                uploadOldPicturesToFirebaseStorage(pictureNames);
+                StorageMethods storageMethods = new StorageMethods();
+                storageMethods.uploadOldPicturesToPersonalStorage(pictureNames);
             }
         });
     }
@@ -138,7 +140,7 @@ public class FirebaseDbMethods {
             return;
         }
 
-        FirebaseUser user = getCurrentUser();
+        FirebaseUser user = Authentication.getCurrentUser();
         if(user == null || user.isAnonymous()){
             Logger.d("No puede subir recetas por el user");
             uploadingRegular = false;
@@ -174,21 +176,10 @@ public class FirebaseDbMethods {
                     recipe.setUpdateRecipe(RecetasCookeoConstants.FLAG_NOT_UPDATE_RECIPE);
                     recipeController.insertOrReplaceRecipe((Application)context.getApplicationContext(), recipe);
                 }
-                uploadPendingRecipesToFirebaseStorage();
+                StorageMethods storageMethods = new StorageMethods();
+                storageMethods.uploadPendingPicturesToPersonalStorage(context);
             }
         });
-    }
-
-    private void uploadNextRecipe(Context context, List<String> recipeList){
-        if(recipeList.isEmpty()){
-            return;
-        }
-        recipeList.remove(0);
-        if(!recipeList.isEmpty()){
-            updateRecipesToPersonalStorage(context, recipeList);
-        }else{
-            uploadingOld = false;
-        }
     }
 
     public static Integer getRecipeFlagFromNodeName(String node){
