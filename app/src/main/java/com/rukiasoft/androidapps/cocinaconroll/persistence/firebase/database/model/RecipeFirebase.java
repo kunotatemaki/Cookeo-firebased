@@ -7,6 +7,7 @@ package com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.database.mo
 import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
 import com.rukiasoft.androidapps.cocinaconroll.classes.RecipeItemOld;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.model.RecipeDb;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 
 import java.util.HashMap;
@@ -67,6 +68,20 @@ public class RecipeFirebase {
         this.minutes = recipeItemOld.getMinutes();
         this.language = RecetasCookeoConstants.LANG_SPANISH;
         this.tip = recipeItemOld.getTip();
+    }
+
+    public RecipeFirebase(RecipeDb recipeDb) {
+        this.name = recipeDb.getName();
+        this.type = recipeDb.getType();
+        this.picture = recipeDb.getPicture();
+        this.ingredients = recipeDb.getIngredientsAsStringList();
+        this.steps = recipeDb.getStepsAsStringList();
+        this.author = recipeDb.getAuthor();
+        this.vegetarian = recipeDb.getVegetarian();
+        this.portions = recipeDb.getPortions();
+        this.minutes = recipeDb.getMinutes();
+        this.language = RecetasCookeoConstants.LANG_SPANISH;
+        this.tip = recipeDb.getTip();
     }
 
 

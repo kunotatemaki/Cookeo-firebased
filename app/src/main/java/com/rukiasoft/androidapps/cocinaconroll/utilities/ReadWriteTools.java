@@ -447,7 +447,9 @@ public class ReadWriteTools {
         File file = new File(path);
         if (file.exists()) {
             String[] files = file.list(filter);
-            Collections.addAll(names, files);
+            if(files != null) {
+                Collections.addAll(names, files);
+            }
         }
         return names;
     }
