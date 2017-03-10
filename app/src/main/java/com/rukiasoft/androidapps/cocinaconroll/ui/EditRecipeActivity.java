@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import com.rukiasoft.androidapps.cocinaconroll.R;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.controllers.RecipeController;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.database.methods.FirebaseDbMethods;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.model.RecipeDb;
 import com.rukiasoft.androidapps.cocinaconroll.ui.model.RecipeComplete;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.ReadWriteTools;
@@ -215,6 +216,8 @@ public class EditRecipeActivity extends AppCompatActivity {
             recipeDb.setUpdatePicture(RecetasCookeoConstants.FLAG_UPLOAD_PICTURE);
         }
         recipeController.insertOrReplaceRecipe(getApplication(), recipeDb);
+        FirebaseDbMethods firebaseDbMethods = new FirebaseDbMethods(recipeController);
+        firebaseDbMethods.updateRecipesToPersonalStorage(getApplicationContext());
         finish();
     }
 

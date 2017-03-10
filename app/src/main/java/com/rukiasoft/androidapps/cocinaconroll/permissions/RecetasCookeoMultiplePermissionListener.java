@@ -12,7 +12,8 @@ import com.rukiasoft.androidapps.cocinaconroll.R;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.controllers.RecipeController;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.database.methods.FirebaseDbMethods;
 import com.rukiasoft.androidapps.cocinaconroll.ui.RecipeListActivity;
-import com.rukiasoft.androidapps.cocinaconroll.utilities.LogHelper;
+import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
+import com.rukiasoft.androidapps.cocinaconroll.utilities.Tools;
 
 import java.util.List;
 
@@ -22,7 +23,6 @@ import java.util.List;
 
 public class RecetasCookeoMultiplePermissionListener implements MultiplePermissionsListener {
 
-    private final String TAG = LogHelper.makeLogTag(RecetasCookeoMultiplePermissionListener.class);
     private final PermissionMethods permissionMethods;
     private Context context;
 
@@ -34,6 +34,9 @@ public class RecetasCookeoMultiplePermissionListener implements MultiplePermissi
     @Override public void onPermissionsChecked(MultiplePermissionsReport report) {
         for (PermissionGrantedResponse response : report.getGrantedPermissionResponses()) {
             if(response.getRequestedPermission().getName().equals(android.Manifest.permission.READ_EXTERNAL_STORAGE)){
+                Tools tools = new Tools();
+
+                tools.savePreferences(context, RecetasCookeoConstants.PROPERTY_CAN_UPLOAD_OWN_RECIPES, true);
                 RecipeController recipeController = new RecipeController();
                 FirebaseDbMethods firebaseDbMethods = new FirebaseDbMethods(recipeController);
                 //Log.d(TAG, "***********************************************************");

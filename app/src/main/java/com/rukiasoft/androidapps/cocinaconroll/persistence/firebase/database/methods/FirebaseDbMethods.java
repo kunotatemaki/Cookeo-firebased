@@ -17,6 +17,7 @@ import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.storage.meth
 import com.rukiasoft.androidapps.cocinaconroll.persistence.model.RecipeDb;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.ReadWriteTools;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
+import com.rukiasoft.androidapps.cocinaconroll.utilities.Tools;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,6 +38,10 @@ public class FirebaseDbMethods {
     }
 
     public void updateOldRecipesToPersonalStorage(Context context){
+        Tools tools = new Tools();
+        if(!tools.getBooleanFromPreferences(context, RecetasCookeoConstants.PROPERTY_CAN_UPLOAD_OWN_RECIPES)){
+            return;
+        }
         if(uploadingOld){
             Logger.d("Estaba subiendo old recipes");
             return;
@@ -110,7 +115,9 @@ public class FirebaseDbMethods {
                     System.out.println("Data could not be saved " + databaseError.getMessage());
                     return;
                 }
-                //Si ha ido bien, borro las recetas (saco primero las fotos)
+                //Si ha ido bien, borro las recetas (saco primero las fotos) y quito el flag de permitir subir
+                Tools tools = new Tools();
+                tools.savePreferences(context, RecetasCookeoConstants.PROPERTY_CAN_UPLOAD_OWN_RECIPES, false);
                 List<String> pictureNames = new ArrayList<>();
                 for(String name : recipeList) {
                     RecipeItemOld recipeOld = readWriteTools.readRecipe(context, name,
