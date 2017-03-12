@@ -719,7 +719,8 @@ public class RecipeListFragment extends Fragment implements
                     if(nodeName == null || !nodeName.equals(RecetasCookeoConstants.PERSONAL_RECIPES_NODE)){
                         recipeDownloadedOwn = false;
                     }
-                    Boolean recipeStoredOwn = recipeDbFromDatabase.getOwner().equals(RecetasCookeoConstants.FLAG_PERSONAL_RECIPE);
+                    Boolean recipeStoredOwn = recipeDbFromDatabase.getOwner().equals(RecetasCookeoConstants.FLAG_PERSONAL_RECIPE) &
+                            recipeDbFromDatabase.getEdited();
                     //Casos para continuar y no guardar
                     //  Receta descargada personal, receta almacenada personal con timestamp superior
                     if(recipeDownloadedOwn && recipeStoredOwn &&
