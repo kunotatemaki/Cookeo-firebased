@@ -15,7 +15,9 @@
         import com.rukiasoft.androidapps.cocinaconroll.persistence.model.RecipeDb;
         import com.rukiasoft.androidapps.cocinaconroll.persistence.model.RecipeDbDao;
         import com.rukiasoft.androidapps.cocinaconroll.persistence.model.StepDb;
+        import com.rukiasoft.androidapps.cocinaconroll.ui.model.RecipeComplete;
         import com.rukiasoft.androidapps.cocinaconroll.ui.model.RecipeReduced;
+        import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 
         import org.greenrobot.greendao.query.Query;
 
@@ -127,14 +129,14 @@ public class RecipeController {
         return RecipeQueries.getQueryBothRecipesAndPicturesToDownload(session).list();
     }
 
-    public List<RecipeDb> getListOnlyRecipeToUpdate(Application application, boolean download){
+    public List<RecipeDb> getListOnlyRecipeToUpdate(Application application, int action){
         DaoSession session = CommonController.getDaosessionFromApplication(application, "RecipeDb");
-        return RecipeQueries.getQueryOnlyRecipesToUpdate(session, download).list();
+        return RecipeQueries.getQueryOnlyRecipesToUpdate(session, action).list();
     }
 
-    public List<RecipeDb> getListOnlyPicturesToUpdate(Application application, boolean download){
+    public List<RecipeDb> getListOnlyPicturesToUpdate(Application application, int action){
         DaoSession session = CommonController.getDaosessionFromApplication(application, "RecipeDb");
-        return RecipeQueries.getQueryOnlyPicturesToUpdate(session, download).list();
+        return RecipeQueries.getQueryOnlyPicturesToUpdate(session, action).list();
     }
 
     public void updateDownloadPictureFlag(Application application, long id, int downloadFlag) {
@@ -174,25 +176,22 @@ public class RecipeController {
 
     // INSERT ZONE
 
-    public void insertOrReplaceRecipe(Application application, RecipeDb recipeDb){
+    public RecipeDb insertOrReplaceRecipe(Application application, RecipeDb recipeDb){
         DaoSession session = CommonController.getDaosessionFromApplication(application, "RecipeDb");
         RecipeDbDao recipeDao = session.getRecipeDbDao();
         recipeDao.detachAll();
         recipeDao.insertOrReplace(recipeDb);
 
         //Guardo los ingredientes si los hay
-        boolean reloadRecipe = false;
         if(recipeDb.getIngredients() != null){
             insertOrReplaceRecipeIngredients(application, recipeDb);
-            reloadRecipe = true;
         }
         if(recipeDb.getSteps() != null){
             insertOrReplaceRecipeSteps(application, recipeDb);
-            reloadRecipe = true;
         }
-        if(reloadRecipe){
-            recipeDb = getRecipeById(application, recipeDb.getId());
-        }
+
+        return getRecipeById(application, recipeDb.getId());
+
 
     }
 
@@ -229,12 +228,23 @@ public class RecipeController {
     public RecipeDb switchFavourite(Application application, Long id){
         RecipeDb recipeDb = getRecipeById(application, id);
         recipeDb.setFavourite(!recipeDb.getFavourite());
-        insertOrReplaceRecipe(application, recipeDb);
-        return recipeDb;
+        return insertOrReplaceRecipe(application, recipeDb);
+    }
+
+    public void deleteRecipe(Application application, Long id){
+        RecipeDb recipeDb = getRecipeById(application, id);
+        if(recipeDb != null){
+            recipeDb.delete();
+        }
     }
 
 
-
+    public void setRecipeForDeleting(Application application, Long id) {
+        RecipeDb recipe = getRecipeById(application, id);
+        recipe.setUpdatePicture(RecetasCookeoConstants.FLAG_DELETE_PICTURE);
+        recipe.setUpdateRecipe(RecetasCookeoConstants.FLAG_DELETE_RECIPE);
+        insertOrReplaceRecipe(application, recipe);
+    }
 }
 
 

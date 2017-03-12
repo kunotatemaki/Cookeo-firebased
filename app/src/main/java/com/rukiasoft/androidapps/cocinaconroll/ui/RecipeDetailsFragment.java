@@ -51,6 +51,7 @@ import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.rukiasoft.androidapps.cocinaconroll.CocinaConRollApplication;
 import com.rukiasoft.androidapps.cocinaconroll.R;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.controllers.RecipeController;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.database.methods.FirebaseDbMethods;
 import com.rukiasoft.androidapps.cocinaconroll.ui.model.RecipeComplete;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.ReadWriteTools;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
@@ -161,9 +162,10 @@ public class RecipeDetailsFragment extends Fragment implements
         public void onClick(DialogInterface dialog, int which) {
             switch (which){
                 case DialogInterface.BUTTON_POSITIVE:
-                    Intent resultIntent = new Intent();
-                    resultIntent.putExtra(RecetasCookeoConstants.KEY_RECIPE, recipe);
-                    getActivity().setResult(RecetasCookeoConstants.RESULT_DELETE_RECIPE, resultIntent);
+                    RecipeController recipeController = new RecipeController();
+                    recipeController.setRecipeForDeleting(getActivity().getApplication(), recipe.getId());
+                    FirebaseDbMethods firebaseDbMethods = new FirebaseDbMethods(recipeController);
+                    firebaseDbMethods.deleteRecipe(getActivity().getApplication(), recipe.getKey(), recipe.getId());
                     getActivity().finish();
                     break;
 

@@ -104,7 +104,8 @@ public class StorageMethods {
         }
 
         RecipeController recipeController = new RecipeController();
-        mPics = recipeController.getListOnlyPicturesToUpdate((Application) context.getApplicationContext(), false);
+        mPics = recipeController.getListOnlyPicturesToUpdate((Application) context.getApplicationContext(),
+                RecetasCookeoConstants.FLAG_UPLOAD_PICTURE);
 
         downloadNextPic(context);
     }

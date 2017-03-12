@@ -3,7 +3,6 @@ package com.rukiasoft.androidapps.cocinaconroll.persistence.daoqueries;
 import android.database.Cursor;
 
 import com.rukiasoft.androidapps.cocinaconroll.persistence.model.DaoSession;
-import com.rukiasoft.androidapps.cocinaconroll.persistence.model.RecipeDb;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.model.RecipeDbDao;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 
@@ -38,16 +37,16 @@ public class RecipeQueries {
         return queryBothRecipesAndPicturesToDownload.forCurrentThread();
     }
 
-    public static Query getQueryOnlyRecipesToUpdate(DaoSession session, boolean download) {
+    public static Query getQueryOnlyRecipesToUpdate(DaoSession session, int action) {
         if(queryOnlyRecipesToUpdate == null){
-            initializeQueryOnlyRecipesToUpdate(session, download);
+            initializeQueryOnlyRecipesToUpdate(session, action);
         }
         return queryOnlyRecipesToUpdate.forCurrentThread();
     }
 
-    public static Query getQueryOnlyPicturesToUpdate(DaoSession session, boolean download) {
+    public static Query getQueryOnlyPicturesToUpdate(DaoSession session, int action) {
         if(queryOnlyPicturesToUpdate == null){
-            initializeQueryOnlyPicturesToUpdate(session, download);
+            initializeQueryOnlyPicturesToUpdate(session, action);
         }
         return queryOnlyPicturesToUpdate.forCurrentThread();
     }
@@ -143,8 +142,7 @@ public class RecipeQueries {
         ).build();
     }
 
-    private static void initializeQueryOnlyRecipesToUpdate(DaoSession session, boolean download){
-        int action = download? RecetasCookeoConstants.FLAG_DOWNLOAD_RECIPE : RecetasCookeoConstants.FLAG_UPLOAD_RECIPE;
+    private static void initializeQueryOnlyRecipesToUpdate(DaoSession session, int action){
         RecipeDbDao recipeDbDao = session.getRecipeDbDao();
         recipeDbDao.detachAll();
         QueryBuilder qb = recipeDbDao.queryBuilder();
@@ -153,8 +151,7 @@ public class RecipeQueries {
         ).build();
     }
 
-    private static void initializeQueryOnlyPicturesToUpdate(DaoSession session, boolean download){
-        int action = download? RecetasCookeoConstants.FLAG_DOWNLOAD_PICTURE : RecetasCookeoConstants.FLAG_UPLOAD_PICTURE;
+    private static void initializeQueryOnlyPicturesToUpdate(DaoSession session, int action){
         RecipeDbDao recipeDbDao = session.getRecipeDbDao();
         recipeDbDao.detachAll();
         QueryBuilder qb = recipeDbDao.queryBuilder();
@@ -191,35 +188,53 @@ public class RecipeQueries {
     private static void initializeQueryRecipesByName(DaoSession session){
         RecipeDbDao recipeDbDao = session.getRecipeDbDao();
         recipeDbDao.detachAll();
-        queryRecipesByName = recipeDbDao.queryBuilder().where(
-                RecipeDbDao.Properties.NormalizedName.like(null)
-        ).build();
+        queryRecipesByName = recipeDbDao.queryBuilder()
+                .where(RecipeDbDao.Properties.NormalizedName.like(null))
+                .orderAsc(RecipeDbDao.Properties.NormalizedName)
+                .build();
     }
 
     private static void initializeCursorFavouriteRecipes(DaoSession session){
         RecipeDbDao recipeDbDao = session.getRecipeDbDao();
         recipeDbDao.detachAll();
-        cursorFavouriteRecipes = recipeDbDao.queryBuilder().where(
-                RecipeDbDao.Properties.Favourite.eq(1)
-        ).buildCursor();
+        QueryBuilder qb = recipeDbDao.queryBuilder();
+        cursorFavouriteRecipes = qb
+                .where(
+                        qb.and(
+                                RecipeDbDao.Properties.Favourite.eq(1),
+                                RecipeDbDao.Properties.UpdateRecipe.notEq(RecetasCookeoConstants.FLAG_DELETE_RECIPE))
+                )
+                .orderAsc(RecipeDbDao.Properties.NormalizedName)
+                .buildCursor();
     }
 
     private static void initializeCursorVegetarianRecipes(DaoSession session){
         RecipeDbDao recipeDbDao = session.getRecipeDbDao();
         recipeDbDao.detachAll();
-        cursorVegetarianRecipes = recipeDbDao.queryBuilder().where(
-                RecipeDbDao.Properties.Vegetarian.eq(1)
-        ).buildCursor();
+        QueryBuilder qb = recipeDbDao.queryBuilder();
+        cursorVegetarianRecipes = qb
+                .where(
+                        qb.and(
+                            RecipeDbDao.Properties.Vegetarian.eq(1),
+                            RecipeDbDao.Properties.UpdateRecipe.notEq(RecetasCookeoConstants.FLAG_DELETE_RECIPE))
+                )
+                .orderAsc(RecipeDbDao.Properties.NormalizedName)
+                .buildCursor();
     }
 
     private static void initializeCursorOwnRecipes(DaoSession session){
         RecipeDbDao recipeDbDao = session.getRecipeDbDao();
         recipeDbDao.detachAll();
         QueryBuilder qb = recipeDbDao.queryBuilder();
-        cursorOwnRecipes = qb.where(
-                qb.or(RecipeDbDao.Properties.Owner.eq(RecetasCookeoConstants.FLAG_PERSONAL_RECIPE),
-                        RecipeDbDao.Properties.Edited.eq(1))
-        ).buildCursor();
+        cursorOwnRecipes = qb
+                .where(
+                        qb.and(
+                                qb.or(RecipeDbDao.Properties.Owner.eq(RecetasCookeoConstants.FLAG_PERSONAL_RECIPE),
+                                    RecipeDbDao.Properties.Edited.eq(1)),
+                                RecipeDbDao.Properties.UpdateRecipe.notEq(RecetasCookeoConstants.FLAG_DELETE_RECIPE))
+                )
+                .orderAsc(RecipeDbDao.Properties.NormalizedName)
+                .buildCursor();
 
     }
 
@@ -228,32 +243,43 @@ public class RecipeQueries {
         recipeDbDao.detachAll();
         long timestamp = System.currentTimeMillis() -
                 RecetasCookeoConstants.TIMEFRAME_NEW_RECIPE_DAYS * RecetasCookeoConstants.TIMEFRAME_MILI_SECONDS_DAY;
-        cursorLatestRecipes = recipeDbDao.queryBuilder().where(
-                RecipeDbDao.Properties.Timestamp.ge(timestamp)
-        ).buildCursor();
+        QueryBuilder qb = recipeDbDao.queryBuilder();
+        cursorLatestRecipes = qb
+                .where(
+                        qb.and(RecipeDbDao.Properties.Timestamp.ge(timestamp),
+                                RecipeDbDao.Properties.UpdateRecipe.notEq(RecetasCookeoConstants.FLAG_DELETE_RECIPE))
+                )
+                .orderAsc(RecipeDbDao.Properties.NormalizedName)
+                .buildCursor();
     }
 
     private static CursorQuery initializeCursorRecipesByType(DaoSession session, String type){
         RecipeDbDao recipeDbDao = session.getRecipeDbDao();
         recipeDbDao.detachAll();
-        return recipeDbDao.queryBuilder().where(
-                RecipeDbDao.Properties.Type.like(type)
-        ).buildCursor();
+        QueryBuilder qb = recipeDbDao.queryBuilder();
+        return qb
+                .where(
+                        qb.and(RecipeDbDao.Properties.Type.like(type),
+                                RecipeDbDao.Properties.UpdateRecipe.notEq(RecetasCookeoConstants.FLAG_DELETE_RECIPE))
+                )
+                .orderAsc(RecipeDbDao.Properties.NormalizedName)
+                .buildCursor();
     }
 
     private static CursorQuery initializeCursorRecipesByName(DaoSession session, String name){
         RecipeDbDao recipeDbDao = session.getRecipeDbDao();
         recipeDbDao.detachAll();
-        Query<RecipeDb> query = recipeDbDao.queryRawCreate("select name as suggest_text_1, icon as suggest_icon_1, normalized_name as suggest_intent_data_id where normalized_name like ?", "%" + name + "%");
-        return recipeDbDao.queryBuilder().where(
-                RecipeDbDao.Properties.NormalizedName.like("%" + name + "%")
-        ).buildCursor();
+        return recipeDbDao.queryBuilder()
+                .where(RecipeDbDao.Properties.NormalizedName.like("%" + name + "%"))
+                .orderAsc(RecipeDbDao.Properties.NormalizedName)
+                .buildCursor();
     }
 
     private static void initializeCursorAllRecipes(DaoSession session){
         RecipeDbDao recipeDbDao = session.getRecipeDbDao();
         recipeDbDao.detachAll();
         cursorAllRecipes = recipeDbDao.queryBuilder()
+                .where(RecipeDbDao.Properties.UpdateRecipe.notEq(RecetasCookeoConstants.FLAG_DELETE_RECIPE))
                 .orderAsc(RecipeDbDao.Properties.NormalizedName)
                 .buildCursor();
     }
@@ -262,6 +288,7 @@ public class RecipeQueries {
         RecipeDbDao recipeDbDao = session.getRecipeDbDao();
         recipeDbDao.detachAll();
         queryAllRecipes = recipeDbDao.queryBuilder()
+                .where(RecipeDbDao.Properties.UpdateRecipe.notEq(RecetasCookeoConstants.FLAG_DELETE_RECIPE))
                 .orderAsc(RecipeDbDao.Properties.NormalizedName)
                 .build();
     }

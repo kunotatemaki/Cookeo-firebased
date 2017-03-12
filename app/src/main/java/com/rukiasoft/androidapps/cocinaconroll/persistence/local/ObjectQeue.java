@@ -48,11 +48,19 @@ public abstract class ObjectQeue implements Parcelable {
 
 
     public RecipeDb removePicture(int index){
-        return listPictureNames().remove(index);
+        if(listPictureNames() != null && listPictureNames().size() > index) {
+            return listPictureNames().remove(index);
+        }else{
+            return null;
+        }
     }
 
     public RecipeDb removeRecipe(int index){
-        return listRecipes().remove(index);
+        if(listRecipes() != null && listRecipes().size() > index) {
+            return listRecipes().remove(index);
+        }else{
+            return null;
+        }
     }
 
 

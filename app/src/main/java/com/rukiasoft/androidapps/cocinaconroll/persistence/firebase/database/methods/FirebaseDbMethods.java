@@ -150,13 +150,16 @@ public class FirebaseDbMethods {
             return;
         }
 
-        final List<RecipeDb> recipeList = recipeController.getListOnlyRecipeToUpdate((Application)context.getApplicationContext(), false);
+        final List<RecipeDb> recipeList = recipeController.getListOnlyRecipeToUpdate((Application)context.getApplicationContext(),
+                RecetasCookeoConstants.FLAG_UPLOAD_RECIPE);
         DatabaseReference ref = FirebaseDatabase
                 .getInstance()
                 .getReference("/" + RecetasCookeoConstants.PERSONAL_RECIPES_NODE);
         final Map<String, Object> childUpdates = new HashMap<>();
 
         for (RecipeDb recipe : recipeList) {
+            recipe.getIngredients();
+            recipe.getSteps();
             TimestampFirebase timestampFirebase = new TimestampFirebase();
             String key = recipe.getKey();
             RecipeFirebase recipeFirebase = new RecipeFirebase(recipe);
@@ -220,4 +223,34 @@ public class FirebaseDbMethods {
         }
         return node;
     }
+
+    public void deleteRecipe(final Application application, String key, final Long id) {
+        String uid = Authentication.getCurrentUser().getUid();
+        DatabaseReference ref = FirebaseDatabase
+                .getInstance()
+                .getReference("/" + RecetasCookeoConstants.PERSONAL_RECIPES_NODE + "/" + uid);
+        ref.child(RecetasCookeoConstants.ALLOWED_RECIPES_NODE).child(key).removeValue(new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                if(databaseError != null){
+                    Logger.d(databaseError.getMessage());
+                }
+            }
+        });
+        ref.child(RecetasCookeoConstants.TIMESTAMP_RECIPES_NODE).child(key).removeValue(new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                if(databaseError != null){
+                    Logger.d(databaseError.getMessage());
+                    return;
+                }
+                //borro la receta de la base de datos
+                recipeController.deleteRecipe(application, id);
+
+            }
+        });
+    }
 }
+
+
+

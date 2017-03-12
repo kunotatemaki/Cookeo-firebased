@@ -28,23 +28,23 @@ public class RecipesDB {
     	mAliasMap = new HashMap<>();
     	
     	// Unique id for the each Suggestions ( Mandatory ) 
-    	mAliasMap.put("_ID", RecipesTable.FIELD_ID + " as " + "_id" );
+    	mAliasMap.put("_ID", RecetasCookeoConstants.FIELD_ID + " as " + "_id" );
     	
     	// Text for Suggestions ( Mandatory )
-    	mAliasMap.put(SearchManager.SUGGEST_COLUMN_TEXT_1,  RecipesTable.FIELD_NAME + " as " + SearchManager.SUGGEST_COLUMN_TEXT_1);
+    	mAliasMap.put(SearchManager.SUGGEST_COLUMN_TEXT_1,  RecetasCookeoConstants.FIELD_NAME + " as " + SearchManager.SUGGEST_COLUMN_TEXT_1);
     	
     	// Icon for Suggestions ( Optional ) 
-    	mAliasMap.put(SearchManager.SUGGEST_COLUMN_ICON_1, RecipesTable.FIELD_ICON + " as " + SearchManager.SUGGEST_COLUMN_ICON_1);
+    	mAliasMap.put(SearchManager.SUGGEST_COLUMN_ICON_1, RecetasCookeoConstants.FIELD_ICON + " as " + SearchManager.SUGGEST_COLUMN_ICON_1);
     	
     	// This value will be appended to the Intent data on selecting an item from Search result or Suggestions ( Optional )
-    	mAliasMap.put(SearchManager.SUGGEST_COLUMN_INTENT_DATA_ID, RecipesTable.FIELD_ID + " as " + SearchManager.SUGGEST_COLUMN_INTENT_DATA_ID);
+    	mAliasMap.put(SearchManager.SUGGEST_COLUMN_INTENT_DATA_ID, RecetasCookeoConstants.FIELD_ID + " as " + SearchManager.SUGGEST_COLUMN_INTENT_DATA_ID);
 	}
 		
 
 	/** Returns Recipes  */
     public Cursor getSuggestions(String[] selectionArgs){
         //call from search widget
-    	String selection =  RecipesTable.FIELD_NAME_NORMALIZED + " like ? ";
+    	String selection =  RecetasCookeoConstants.FIELD_NAME_NORMALIZED + " like ? ";
         Tools tools = new Tools();
         if(selectionArgs!=null){
     		selectionArgs[0] = "%" + tools.getNormalizedString(selectionArgs[0]) + "%";
@@ -64,7 +64,7 @@ public class RecipesDB {
                 selectionArgs,
                 null,
                 null,
-				RecipesTable.FIELD_NAME_NORMALIZED + " asc ", "50"
+                RecetasCookeoConstants.FIELD_NAME_NORMALIZED + " asc ", "50"
         );
     }
 
@@ -73,12 +73,12 @@ public class RecipesDB {
                              String[] selectionArgs, String sortOrder){
 
         SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
-        queryBuilder.setTables(RecipesTable.RECIPES_TABLE_NAME);
+        queryBuilder.setTables(RecetasCookeoConstants.RECIPES_TABLE_NAME);
 
         Tools tools = new Tools();
         if(selection == null){
         //call from search widget when pressed, when user presses "Go" in the Keyboard of Search Dialog
-            selection =  RecipesTable.FIELD_NAME_NORMALIZED + " like ? ";
+            selection =  RecetasCookeoConstants.FIELD_NAME_NORMALIZED + " like ? ";
             if(selectionArgs!=null){
                 for(int i=0; i<selectionArgs.length; i++){
                     selectionArgs[i] = "%"+ tools.getNormalizedString(selectionArgs[i]) + "%";
@@ -94,7 +94,7 @@ public class RecipesDB {
                     SearchManager.SUGGEST_COLUMN_INTENT_DATA_ID};
         }
         if(sortOrder == null){
-            sortOrder = RecipesTable.FIELD_NAME_NORMALIZED + " asc ";
+            sortOrder = RecetasCookeoConstants.FIELD_NAME_NORMALIZED + " asc ";
         }
 
 
@@ -111,10 +111,11 @@ public class RecipesDB {
     /** Return Suggestion corresponding to the id */
     public Cursor getSuggestion(String id){
         SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
-        queryBuilder.setTables( RecipesTable.RECIPES_TABLE_NAME);
+        queryBuilder.setTables( RecetasCookeoConstants.RECIPES_TABLE_NAME);
         return queryBuilder.query(mCocinaConRollDatabaseHelper.getReadableDatabase(),
-                new String[]{RecipesTable.FIELD_ID, RecipesTable.FIELD_NAME, RecipesTable.FIELD_NAME_NORMALIZED, RecipesTable.FIELD_ICON},
-                RecipesTable.FIELD_ID + " = ?", new String[]{id}, null, null, null, "1"
+                new String[]{RecetasCookeoConstants.FIELD_ID, RecetasCookeoConstants.FIELD_NAME,
+                        RecetasCookeoConstants.FIELD_NAME_NORMALIZED, RecetasCookeoConstants.FIELD_ICON},
+                RecetasCookeoConstants.FIELD_ID + " = ?", new String[]{id}, null, null, null, "1"
         );
     }
 

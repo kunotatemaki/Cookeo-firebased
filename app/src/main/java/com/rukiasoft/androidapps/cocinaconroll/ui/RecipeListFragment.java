@@ -310,6 +310,7 @@ public class RecipeListFragment extends Fragment implements
 
         if(!isDatabaseCreated){
             downloadRecipesOnFirstLoad();
+            firstLoad = false;
         }else if(firstLoad){
             firstLoad = false;
             filterRecipes(lastFilter);
@@ -594,6 +595,10 @@ public class RecipeListFragment extends Fragment implements
     private void downloadRecipesOnFirstLoad(String node){
 
         //descargo las recetas
+        if(node.equals(RecetasCookeoConstants.PERSONAL_RECIPES_NODE)){
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            node += "/" + user.getUid();
+        }
         DatabaseReference mRecipeRefDetailed = FirebaseDatabase.getInstance()
                 .getReference(node +
                         "/" + RecetasCookeoConstants.DETAILED_RECIPES_NODE );
@@ -628,6 +633,9 @@ public class RecipeListFragment extends Fragment implements
                 recipeController.insertRecipeFromFirebase(application, postSnapshot, recipeFromFirebase);
 
             }
+
+
+
             return null;
         }
 
@@ -762,7 +770,8 @@ public class RecipeListFragment extends Fragment implements
         }
         RecipeController recipeController = new RecipeController();
         if(pullItems == null || pullItems.isRecipeListEmpty()) {
-            List<RecipeDb> list = recipeController.getListOnlyRecipeToUpdate(application, true);
+            List<RecipeDb> list = recipeController.getListOnlyRecipeToUpdate(application,
+                    RecetasCookeoConstants.FLAG_DOWNLOAD_RECIPE);
             pullItems = ObjectQeue.create((ArrayList<RecipeDb>) list, null);
             if(list.size() > 0 && getActivity() != null) {
                 ((RecipeListActivity) getActivity()).showProgressDialog(getString(R.string.downloading_recipes));
@@ -854,9 +863,10 @@ public class RecipeListFragment extends Fragment implements
         }
         RecipeController recipeController = new RecipeController();
         if(pullItems == null || pullItems.isPictureListEmpty()) {
-            List<RecipeDb> list = recipeController.getListOnlyPicturesToUpdate(application, true);
+            List<RecipeDb> list = recipeController.getListOnlyPicturesToUpdate(application,
+                    RecetasCookeoConstants.FLAG_DOWNLOAD_PICTURE);
             pullItems = ObjectQeue.create(null, (ArrayList<RecipeDb>) list);
-            if(getContext() != null && isResumed()) {
+            if(getContext() != null && isResumed() && list.size() > 0) {
                 Toast.makeText(getContext(), getString(R.string.downloading_pictures),
                         Toast.LENGTH_LONG).show();
             }
@@ -889,7 +899,7 @@ public class RecipeListFragment extends Fragment implements
             @Override
             public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
                 // Local temp file has been created
-                Logger.d("Salvado correctamente: " + name);
+                //Logger.d("Salvado correctamente: " + name);
 
             }
         }).addOnFailureListener(new OnFailureListener() {

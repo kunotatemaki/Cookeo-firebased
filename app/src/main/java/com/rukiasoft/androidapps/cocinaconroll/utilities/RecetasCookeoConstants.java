@@ -41,17 +41,10 @@ public class RecetasCookeoConstants {
     public static final int RESULT_DELETE_RECIPE = 301;
 
     public static final String PROPERTY_DATABASE_CREATED = "database_created";
-    public static final String PROPERTY_INIT_DATABASE_WITH_EDITED_PATH = "initdatabaseedited";
-    public static final String PROPERTY_RELOAD_NEW_ORIGINALS = "reloadneworiginals";
-    public static final String PROPERTY_DAYS_TO_NEXT_UPDATE = "last_updated";
-    public static final String PROPERTY_EXPIRATION_TIME = "time_to_check_new_zips_again";
-    public static final String PROPERTY_AVOID_GOOGLE_SIGN_IN = "avoid_google_sign_in";
     public static final String PROPERTY_HIDE_SWIPE_DIALOG = "hide_swipe_dialog";
     public static final String PROPERTY_DEVICE_OWNER_EMAIL = "device_owner_email";
     public static final String PROPERTY_DEVICE_OWNER_NAME = "device_owner_name";
     public static final String PROPERTY_FIREBASE_ID = "firebase_id";
-    public static final String PROPERTY_UPLOADED_RECIPES_ON_FIRST_BOOT = "uploaded_recipes_on_first_boot";
-    public static final String PROPERTY_APP_VERSION_STORED = "app_version_stored";
     public static final String PROPERTY_CAN_UPLOAD_OWN_RECIPES = "own_old_recipes";
     public static final String PROPERTY_SIGNED_IN = "signed_in";
 
@@ -62,9 +55,6 @@ public class RecetasCookeoConstants {
 
 
     public static final String TEMP_CAMERA_NAME = "tmp_avatar_";
-    public static final String START_DOWNLOAD_ACTION_INTENT = PACKAGE_NAME + ".action.START_DOWNLOAD";
-    public static final String ACTION_UPLOAD_RECIPE = PACKAGE_NAME + ".action.UPLOAD_RECIPE";
-    public static final String ACTION_DELETE_RECIPE = PACKAGE_NAME + ".action.DELETE_RECIPE";
     public static final String ACTION_BROADCAST_UPLOADED_RECIPE = PACKAGE_NAME + ".action.ACTION_BROADCAST_UPLOADED_RECIPE";
     public static final String ACTION_BROADCAST_DELETED_RECIPE = PACKAGE_NAME + ".action.ACTION_BROADCAST_DELETED_RECIPE";
 
@@ -78,7 +68,6 @@ public class RecetasCookeoConstants {
 
     public static final String DETAILED_RECIPES_NODE = "detailed_recipes";
     public static final String TIMESTAMP_RECIPES_NODE = "timestamp";
-    public static final String SHORT_RECIPES_NODE = "short_recipes";
 
     public static final Integer PATH_TYPE_ASSETS = 0;
     public static final Integer PATH_TYPE_ORIGINAL = 1;
@@ -113,6 +102,18 @@ public class RecetasCookeoConstants {
     public static final String FIELD_ID = "_id";
     public static final String FIELD_NAME = "name";
     public static final String FIELD_ICON = "icon";
+    public static final String FIELD_NAME_NORMALIZED = "NORMALIZED_NAME";
+    public static final String FIELD_TYPE = "type";
+    public static final String FIELD_FAVORITE = "favorite";
+    public static final String FIELD_STATE = "state";
+    public static final String FIELD_VEGETARIAN = "vegetarian";
+    public static final String FIELD_PATH_PICTURE = "path_picture";
+    public static final String FIELD_PATH_RECIPE = "path_recipe";
+    public static final String FIELD_PATH_PICTURE_EDITED = "path_picture_edited";
+    public static final String FIELD_PATH_RECIPE_EDITED = "path_recipe_edited";
+    public static final String FIELD_DATE = "date";
+    public static final String FIELD_DATE_OLD = "path_date";
+    public static final String FIELD_VERSION = "version";
 
     public static final String STORAGE_URL = "gs://hardy-binder-89508.appspot.com";
     public static final String STORAGE_NODE = "recipes";
@@ -134,9 +135,11 @@ public class RecetasCookeoConstants {
     public static final int FLAG_NOT_UPDATE_RECIPE = 0;
     public static final int FLAG_DOWNLOAD_RECIPE = 1;
     public static final int FLAG_UPLOAD_RECIPE = 2;
+    public static final int FLAG_DELETE_RECIPE = 3;
     public static final int FLAG_NOT_UPDATE_PICTURE = 0;
     public static final int FLAG_DOWNLOAD_PICTURE = 1;
     public static final int FLAG_UPLOAD_PICTURE = 2;
+    public static final int FLAG_DELETE_PICTURE = 3;
 
 
 }

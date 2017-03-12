@@ -62,7 +62,7 @@ public class CocinaConRollContentProvider extends ContentProvider {
         uriMatcher.addURI(AUTHORITY, RecetasCookeoConstants.SEARCH_LATEST, GET_LATEST);
 
         // This URI is invoked, when user selects a suggestion from search dialog or an item from the listview
-        uriMatcher.addURI(AUTHORITY, RecipesTable.RECIPES_TABLE_NAME + "/#", GET_RECIPE);
+        uriMatcher.addURI(AUTHORITY, RecetasCookeoConstants.RECIPES_TABLE_NAME + "/#", GET_RECIPE);
 
         return uriMatcher;
     }
