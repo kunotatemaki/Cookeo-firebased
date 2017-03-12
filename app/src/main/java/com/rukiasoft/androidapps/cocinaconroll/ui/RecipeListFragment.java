@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
@@ -145,6 +146,7 @@ public class RecipeListFragment extends Fragment implements
     @State int numNodesOnInitDatabase;
 
     Application application;
+    @State boolean isDeletingRecipes = false;
 
 
     public RecipeListFragment() {
@@ -317,15 +319,13 @@ public class RecipeListFragment extends Fragment implements
             checkNewRecipesFromFirebase();
             firebaseDbMethods.updateOldRecipesToPersonalStorage(getActivity().getApplicationContext());
             firebaseDbMethods.updateRecipesToPersonalStorage(getActivity().getApplicationContext());
+            deletePendingRecipes();
         }else if(mRecipes == null || mRecipes.size() == 0 || needToRefresh) {
             needToRefresh = false;
             filterRecipes(lastFilter);
         }else{
             setData();
         }
-
-
-
     }
 
     @Override
@@ -480,6 +480,9 @@ public class RecipeListFragment extends Fragment implements
 
 
     public void filterRecipes(String filter) {
+        if(getActivity() == null){
+            return;
+        }
         if(filter == null || filter.isEmpty()) {
             filter = RecetasCookeoConstants.FILTER_ALL_RECIPES;
         }
@@ -633,9 +636,6 @@ public class RecipeListFragment extends Fragment implements
                 recipeController.insertRecipeFromFirebase(application, postSnapshot, recipeFromFirebase);
 
             }
-
-
-
             return null;
         }
 
@@ -766,6 +766,7 @@ public class RecipeListFragment extends Fragment implements
 
         isDownloadingRecipes = true;
         if(application == null){
+            isDownloadingRecipes = false;
             return;
         }
         RecipeController recipeController = new RecipeController();
@@ -924,7 +925,32 @@ public class RecipeListFragment extends Fragment implements
 
     }
 
+    private void deletePendingRecipes(){
+        if(isDeletingRecipes){
+            return;
+        }
 
+        isDeletingRecipes = true;
+        if(application == null){
+            isDeletingRecipes = false;
+            return;
+        }
+        RecipeController recipeController = new RecipeController();
+        List<RecipeDb> list = recipeController.getListOnlyRecipeToUpdate(application,
+                RecetasCookeoConstants.FLAG_DELETE_RECIPE);
+
+        if(list.isEmpty()){
+            //veo si hay que descargar fotos
+            isDownloadingRecipes = false;
+            return;
+        }
+        for(RecipeDb recipe : list) {
+            firebaseDbMethods.deleteRecipe(application, recipe.getKey(),
+                    recipe.getId(), recipe.getPicture());
+            SystemClock.sleep(2000);
+        }
+
+    }
 
 }
 

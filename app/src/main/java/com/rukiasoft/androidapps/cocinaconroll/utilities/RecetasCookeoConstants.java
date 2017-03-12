@@ -103,20 +103,10 @@ public class RecetasCookeoConstants {
     public static final String FIELD_NAME = "name";
     public static final String FIELD_ICON = "icon";
     public static final String FIELD_NAME_NORMALIZED = "NORMALIZED_NAME";
-    public static final String FIELD_TYPE = "type";
-    public static final String FIELD_FAVORITE = "favorite";
-    public static final String FIELD_STATE = "state";
-    public static final String FIELD_VEGETARIAN = "vegetarian";
-    public static final String FIELD_PATH_PICTURE = "path_picture";
-    public static final String FIELD_PATH_RECIPE = "path_recipe";
-    public static final String FIELD_PATH_PICTURE_EDITED = "path_picture_edited";
-    public static final String FIELD_PATH_RECIPE_EDITED = "path_recipe_edited";
-    public static final String FIELD_DATE = "date";
-    public static final String FIELD_DATE_OLD = "path_date";
-    public static final String FIELD_VERSION = "version";
 
-    public static final String STORAGE_URL = "gs://hardy-binder-89508.appspot.com";
-    public static final String STORAGE_NODE = "recipes";
+    public static final String STORAGE_PICTURES_NODE = "recipes";
+    public static final String STORAGE_PERSONAL_NODE = "personal";
+    public static final String STORAGE_PENDING_NODE = "pending";
     public static final String RUKIA_TAG = "RUKIA";
 
     public static int LANG_SPANISH = 0;

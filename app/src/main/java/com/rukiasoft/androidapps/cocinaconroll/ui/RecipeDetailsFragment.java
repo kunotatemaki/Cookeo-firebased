@@ -110,7 +110,8 @@ public class RecipeDetailsFragment extends Fragment implements
         public void onClick(DialogInterface dialog, int which) {
             switch (which){
                 case DialogInterface.BUTTON_POSITIVE:
-                    rwTools.share(getActivity(), recipe);
+                    FirebaseDbMethods firebaseDbMethods = new FirebaseDbMethods(mRecipeController);
+                    firebaseDbMethods.share(getActivity().getApplication(), recipe.getId());
                     break;
                 case DialogInterface.BUTTON_NEGATIVE:
                     break;
@@ -165,7 +166,8 @@ public class RecipeDetailsFragment extends Fragment implements
                     RecipeController recipeController = new RecipeController();
                     recipeController.setRecipeForDeleting(getActivity().getApplication(), recipe.getId());
                     FirebaseDbMethods firebaseDbMethods = new FirebaseDbMethods(recipeController);
-                    firebaseDbMethods.deleteRecipe(getActivity().getApplication(), recipe.getKey(), recipe.getId());
+                    firebaseDbMethods.deleteRecipe(getActivity().getApplication(), recipe.getKey(),
+                            recipe.getId(), recipe.getPicture());
                     getActivity().finish();
                     break;
 
@@ -191,7 +193,8 @@ public class RecipeDetailsFragment extends Fragment implements
             case R.id.menu_item_remove:
                 AlertDialog.Builder removeBuilder = new AlertDialog.Builder(getActivity());
                 String message;
-                if(recipe.getOwner() == RecetasCookeoConstants.FLAG_PERSONAL_RECIPE){
+                if(recipe.getOwner() == RecetasCookeoConstants.FLAG_PERSONAL_RECIPE ||
+                        recipe.getEdited()){
                     message = getActivity().getResources().getString(R.string.delete_recipe_confirmation);
                 }else{
                     return false;

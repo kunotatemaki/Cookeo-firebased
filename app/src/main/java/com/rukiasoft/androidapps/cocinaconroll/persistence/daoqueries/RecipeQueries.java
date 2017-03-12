@@ -16,9 +16,7 @@ import org.greenrobot.greendao.query.QueryBuilder;
 
 public class RecipeQueries {
 
-    private static Query queryBothRecipesAndPicturesToDownload;
-    private static Query queryOnlyRecipesToUpdate;
-    private static Query queryOnlyPicturesToUpdate;
+    //private static Query queryBothRecipesAndPicturesToDownload;
     private static Query queryRecipeByPictureName;
     private static Query queryRecipeByKey;
     private static Query queryRecipeById;
@@ -31,24 +29,15 @@ public class RecipeQueries {
     private static Query queryAllRecipes;
 
     public static Query getQueryBothRecipesAndPicturesToDownload(DaoSession session) {
-        if(queryBothRecipesAndPicturesToDownload == null){
-            initializeQueryBothRecipesAndPicturesToDownload(session);
-        }
-        return queryBothRecipesAndPicturesToDownload.forCurrentThread();
+        return initializeQueryBothRecipesAndPicturesToDownload(session).forCurrentThread();
     }
 
     public static Query getQueryOnlyRecipesToUpdate(DaoSession session, int action) {
-        if(queryOnlyRecipesToUpdate == null){
-            initializeQueryOnlyRecipesToUpdate(session, action);
-        }
-        return queryOnlyRecipesToUpdate.forCurrentThread();
+        return initializeQueryOnlyRecipesToUpdate(session, action).forCurrentThread();
     }
 
     public static Query getQueryOnlyPicturesToUpdate(DaoSession session, int action) {
-        if(queryOnlyPicturesToUpdate == null){
-            initializeQueryOnlyPicturesToUpdate(session, action);
-        }
-        return queryOnlyPicturesToUpdate.forCurrentThread();
+        return initializeQueryOnlyPicturesToUpdate(session, action).forCurrentThread();
     }
 
     public static Query getQueryRecipeByPictureName(DaoSession session) {
@@ -132,30 +121,30 @@ public class RecipeQueries {
         return cursorLatestRecipes.forCurrentThread().query();
     }
 
-    private static void initializeQueryBothRecipesAndPicturesToDownload(DaoSession session){
+    private static Query initializeQueryBothRecipesAndPicturesToDownload(DaoSession session){
         RecipeDbDao recipeDbDao = session.getRecipeDbDao();
         recipeDbDao.detachAll();
         QueryBuilder qb = recipeDbDao.queryBuilder();
-        queryBothRecipesAndPicturesToDownload = qb.where(
+        return qb.where(
                 qb.or(RecipeDbDao.Properties.UpdateRecipe.eq(RecetasCookeoConstants.FLAG_DOWNLOAD_RECIPE),
                         RecipeDbDao.Properties.UpdatePicture.eq(RecetasCookeoConstants.FLAG_DOWNLOAD_PICTURE))
         ).build();
     }
 
-    private static void initializeQueryOnlyRecipesToUpdate(DaoSession session, int action){
+    private static Query initializeQueryOnlyRecipesToUpdate(DaoSession session, int action){
         RecipeDbDao recipeDbDao = session.getRecipeDbDao();
         recipeDbDao.detachAll();
         QueryBuilder qb = recipeDbDao.queryBuilder();
-        queryOnlyRecipesToUpdate = qb.where(
+        return qb.where(
                 RecipeDbDao.Properties.UpdateRecipe.eq(action)
         ).build();
     }
 
-    private static void initializeQueryOnlyPicturesToUpdate(DaoSession session, int action){
+    private static Query initializeQueryOnlyPicturesToUpdate(DaoSession session, int action){
         RecipeDbDao recipeDbDao = session.getRecipeDbDao();
         recipeDbDao.detachAll();
         QueryBuilder qb = recipeDbDao.queryBuilder();
-        queryOnlyPicturesToUpdate = qb.where(
+        return qb.where(
                 RecipeDbDao.Properties.UpdatePicture.eq(action)
         ).build();
     }

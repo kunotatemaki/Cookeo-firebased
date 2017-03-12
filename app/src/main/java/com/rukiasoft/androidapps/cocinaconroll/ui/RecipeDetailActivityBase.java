@@ -109,10 +109,4 @@ public class RecipeDetailActivityBase extends ToolbarAndProgressActivity {
         }
     }
 
-
-
-    public void launchSignInActivity(){
-        Intent intent = new Intent(RecipeDetailActivityBase.this, SignInActivity.class);
-        startActivityForResult(intent, RecetasCookeoConstants.REQUEST_CODE_SIGNING_FROM_RECIPELIST);
-    }
 }

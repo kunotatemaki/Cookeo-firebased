@@ -2,12 +2,14 @@ package com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.database.me
 
 import android.app.Application;
 import android.content.Context;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.orhanobut.logger.Logger;
+import com.rukiasoft.androidapps.cocinaconroll.R;
 import com.rukiasoft.androidapps.cocinaconroll.classes.RecipeItemOld;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.controllers.RecipeController;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.Authentication;
@@ -15,6 +17,7 @@ import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.database.mod
 import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.database.model.TimestampFirebase;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.storage.methods.StorageMethods;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.model.RecipeDb;
+import com.rukiasoft.androidapps.cocinaconroll.ui.model.RecipeComplete;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.ReadWriteTools;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.Tools;
@@ -224,12 +227,12 @@ public class FirebaseDbMethods {
         return node;
     }
 
-    public void deleteRecipe(final Application application, String key, final Long id) {
+    public void deleteRecipe(final Application application, String key, final Long id, final String pictureName) {
         String uid = Authentication.getCurrentUser().getUid();
         DatabaseReference ref = FirebaseDatabase
                 .getInstance()
                 .getReference("/" + RecetasCookeoConstants.PERSONAL_RECIPES_NODE + "/" + uid);
-        ref.child(RecetasCookeoConstants.ALLOWED_RECIPES_NODE).child(key).removeValue(new DatabaseReference.CompletionListener() {
+        ref.child(RecetasCookeoConstants.DETAILED_RECIPES_NODE).child(key).removeValue(new DatabaseReference.CompletionListener() {
             @Override
             public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
                 if(databaseError != null){
@@ -246,6 +249,49 @@ public class FirebaseDbMethods {
                 }
                 //borro la receta de la base de datos
                 recipeController.deleteRecipe(application, id);
+                if(!pictureName.equals(RecetasCookeoConstants.DEFAULT_PICTURE_NAME)){
+                    StorageMethods storageMethods = new StorageMethods();
+                    storageMethods.deletePicture(pictureName);
+                }
+            }
+        });
+    }
+
+    public void share(final Application application, Long id) {
+        final RecipeDb recipeDb = recipeController.getRecipeById(application, id);
+        if(recipeDb == null){
+            return;
+        }
+        DatabaseReference ref = FirebaseDatabase
+                .getInstance()
+                .getReference("/" + RecetasCookeoConstants.PENDING_RECIPES_NODE);
+        final Map<String, Object> childUpdates = new HashMap<>();
+
+        recipeDb.getIngredients();
+        recipeDb.getSteps();
+        final String recipeName = recipeDb.getPicture();
+        String key = recipeDb.getKey();
+        RecipeFirebase recipeFirebase = new RecipeFirebase(recipeDb);
+        Map<String, Object> postDetailedValues = recipeFirebase.toMap();
+        String uid = Authentication.getCurrentUser().getUid();
+
+        childUpdates.put("/" + uid + "/" + key, postDetailedValues);
+
+        ref.updateChildren(childUpdates, new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+
+                if (databaseError != null) {
+                    Logger.d("Data could not be saved: " + databaseError.getMessage());
+                    return;
+                }
+                //subo la foto
+                Toast.makeText(application.getApplicationContext(),
+                        application.getApplicationContext().getString(R.string.recipe_shared), Toast.LENGTH_LONG).show();
+                if(!recipeName.equals(RecetasCookeoConstants.DEFAULT_PICTURE_NAME)){
+                    StorageMethods storageMethods = new StorageMethods();
+                    storageMethods.sharePic(application.getApplicationContext(), recipeName);
+                }
 
             }
         });
