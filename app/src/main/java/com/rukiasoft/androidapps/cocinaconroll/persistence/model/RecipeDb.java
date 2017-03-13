@@ -401,8 +401,16 @@ public class RecipeDb {
         this.language = recipe.getLanguage();
         this.link = recipe.getLink();
         this.edited = false;
-        this.ingredients = RecipeDb.addIngredients(recipe.getIngredients(), this.key);
-        this.steps = RecipeDb.addSteps(recipe.getSteps(), this.key);
+        if(recipe.getIngredients() != null) {
+            this.ingredients = RecipeDb.addIngredients(recipe.getIngredients(), this.key);
+        }else{
+            this.ingredients = new ArrayList<>();
+        }
+        if(recipe.getSteps() != null) {
+            this.steps = RecipeDb.addSteps(recipe.getSteps(), this.key);
+        }else{
+            this.steps = new ArrayList<>();
+        }
 
     }
 

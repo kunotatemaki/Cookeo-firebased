@@ -55,6 +55,7 @@ public class RecetasCookeoConstants {
 
 
     public static final String TEMP_CAMERA_NAME = "tmp_avatar_";
+    public static final String TEMP_CROP_NAME = "tmp_crop";
     public static final String ACTION_BROADCAST_UPLOADED_RECIPE = PACKAGE_NAME + ".action.ACTION_BROADCAST_UPLOADED_RECIPE";
     public static final String ACTION_BROADCAST_DELETED_RECIPE = PACKAGE_NAME + ".action.ACTION_BROADCAST_DELETED_RECIPE";
 

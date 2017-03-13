@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -79,6 +80,7 @@ public class EditRecipePhotoFragment extends Fragment {
     @State String mNewPicName;
     @State Boolean mEdited = false;
     private Unbinder mUnbinder;
+    private Uri mImageCropUri;
 
     public EditRecipePhotoFragment() {
     }
@@ -258,31 +260,20 @@ public class EditRecipePhotoFragment extends Fragment {
         Intent cropIntent = new Intent("com.android.camera.action.CROP");
         //indicate image type and Uri
         cropIntent.setDataAndType(mImageCaptureUri, "image/*");
-        //List<ResolveInfo> list = getActivity().getPackageManager().queryIntentActivities(
-        //        cropIntent, 0);
 
-        /*if (list.size() == 0) {
-
-            try {
-                photo = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), mImageCaptureUri);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            rwTools.loadImageFromPath(getActivity().getApplicationContext(), mImageView, mNewPicName,
-                    R.drawable.default_dish, System.currentTimeMillis());
-            return;
-        }*/
         //set crop properties
         cropIntent.putExtra("crop", "true");
         //indicate aspect of desired crop
         cropIntent.putExtra("aspectX", 4);
         cropIntent.putExtra("aspectY", 3);
         //indicate output X and Y
-        cropIntent.putExtra("outputX", 400);
-        cropIntent.putExtra("outputY", 300);
+        cropIntent.putExtra("outputX", 200);
+        cropIntent.putExtra("outputY", 150);
         //retrieve data on return
-        cropIntent.putExtra("return-data", true);
+        cropIntent.putExtra("return-data", false);
+        mImageCropUri = Uri.fromFile(new File(rwTools.getOriginalStorageDir(getContext()),
+                RecetasCookeoConstants.TEMP_CROP_NAME + ".jpg"));
+        cropIntent.putExtra(MediaStore.EXTRA_OUTPUT, mImageCropUri);
         //start the activity - we handle returning in onActivityResult
         startActivityForResult(cropIntent, mode);
 
@@ -334,16 +325,13 @@ public class EditRecipePhotoFragment extends Fragment {
                 }
                 break;
             case CROP_FROM_FILE:
-                Bundle extras2 = data.getExtras();
-                if (extras2 != null) {
-                    photo = extras2.getParcelable("data");
-                    updateNameOfNewImage();
-                    mNewPicName = rwTools.saveBitmap(getActivity().getApplicationContext(), photo, getPictureNameFromFileName());
-                    //if(recipe.getState().compareTo(RecetasCookeoConstants.STATE_OWN) != 0)
-                    rwTools.loadImageFromPath(getActivity().getApplicationContext(),
-                            mImageView, mNewPicName,
-                            R.drawable.default_dish, System.currentTimeMillis());
-                }
+                photo = BitmapFactory.decodeFile(mImageCropUri.getPath());
+                updateNameOfNewImage();
+                mNewPicName = rwTools.saveBitmap(getActivity().getApplicationContext(), photo, getPictureNameFromFileName());
+                rwTools.deleteFile(mImageCropUri.getPath());
+                rwTools.loadImageFromPath(getActivity().getApplicationContext(),
+                        mImageView, mNewPicName,
+                        R.drawable.default_dish, System.currentTimeMillis());
                 break;
         }
     }

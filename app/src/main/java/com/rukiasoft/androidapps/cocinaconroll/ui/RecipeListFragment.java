@@ -138,7 +138,7 @@ public class RecipeListFragment extends Fragment implements
     List<RecipeReduced> mRecipes;
     private int savedScrollPosition = 0;
     private int columnCount = 10;
-    @State String lastFilter = null;
+    @State String lastFilter = RecetasCookeoConstants.FILTER_ALL_RECIPES;
     private InterstitialAd mInterstitialAd;
     @State RecipeComplete recipeToShow;
     private RecipeController mRecipeController;
@@ -305,10 +305,6 @@ public class RecipeListFragment extends Fragment implements
 
 
         boolean isDatabaseCreated = mTools.getBooleanFromPreferences(getContext(), RecetasCookeoConstants.PROPERTY_DATABASE_CREATED);
-
-        if(lastFilter == null){
-            lastFilter = RecetasCookeoConstants.FILTER_ALL_RECIPES;
-        }
 
         if(!isDatabaseCreated){
             downloadRecipesOnFirstLoad();
@@ -484,9 +480,10 @@ public class RecipeListFragment extends Fragment implements
             return;
         }
         if(filter == null || filter.isEmpty()) {
-            filter = RecetasCookeoConstants.FILTER_ALL_RECIPES;
+            filter = lastFilter;
+        }else {
+            lastFilter = filter;
         }
-        lastFilter = filter;
         String type = "";
         int iconResource = 0;
         Bundle bundle = new Bundle();
