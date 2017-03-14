@@ -309,20 +309,17 @@ public class EditRecipePhotoFragment extends Fragment {
                 doCrop(CROP_FROM_FILE);
                 break;
             case CROP_FROM_CAMERA:
-                Bundle extras = data.getExtras();
-                if (extras != null) {
-                    photo = extras.getParcelable("data");
-                    updateNameOfNewImage();
-                    mNewPicName = rwTools.saveBitmap(getActivity().getApplicationContext(), photo, getPictureNameFromFileName());
+                photo = BitmapFactory.decodeFile(mImageCropUri.getPath());
+                updateNameOfNewImage();
+                mNewPicName = rwTools.saveBitmap(getActivity().getApplicationContext(), photo, getPictureNameFromFileName());
+                rwTools.loadImageFromPath(getActivity().getApplicationContext(),
+                        mImageView, mNewPicName, R.drawable.default_dish, System.currentTimeMillis());
 
-                    rwTools.loadImageFromPath(getActivity().getApplicationContext(),
-                            mImageView, mNewPicName,
-                            R.drawable.default_dish, System.currentTimeMillis());
-                }
                 File f = new File(mImageCaptureUri.getPath());
                 if (f.exists()) {
                     f.delete();
                 }
+                rwTools.deleteFile(mImageCropUri.getPath());
                 break;
             case CROP_FROM_FILE:
                 photo = BitmapFactory.decodeFile(mImageCropUri.getPath());
