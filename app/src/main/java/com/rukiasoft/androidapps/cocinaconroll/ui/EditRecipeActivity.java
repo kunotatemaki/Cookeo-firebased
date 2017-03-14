@@ -218,6 +218,9 @@ public class EditRecipeActivity extends AppCompatActivity {
         recipeController.insertOrReplaceRecipe(getApplication(), recipeDb);
         FirebaseDbMethods firebaseDbMethods = new FirebaseDbMethods(recipeController);
         firebaseDbMethods.updateRecipesToPersonalStorage(getApplicationContext());
+        Intent resultIntent = new Intent();
+        resultIntent.putExtra(RecetasCookeoConstants.KEY_RECIPE, recipe);
+        setResult(RecetasCookeoConstants.RESULT_UPDATE_RECIPE, resultIntent);
         finish();
     }
 

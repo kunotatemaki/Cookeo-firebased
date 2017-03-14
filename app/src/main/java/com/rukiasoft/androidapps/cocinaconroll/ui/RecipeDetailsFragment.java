@@ -564,15 +564,5 @@ public class RecipeDetailsFragment extends Fragment implements
         builder.create().show();
     }
 
-    @SuppressLint("NewApi")
-    public void updateRecipe(RecipeComplete recipe) {
-        this.recipe = recipe;
-        loadRecipe();
-        // TODO: 7/3/17 revisar que actualiza los iconos
-        Boolean compatRequired = Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB;
-        if(!compatRequired)
-            getActivity().invalidateOptionsMenu();// creates call to onPrepareOptionsMenu()
-        else
-            getActivity().supportInvalidateOptionsMenu();
-    }
+
 }
