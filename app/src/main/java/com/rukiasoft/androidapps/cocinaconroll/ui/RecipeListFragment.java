@@ -626,7 +626,6 @@ public class RecipeListFragment extends Fragment implements
             for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
                 RecipeFirebase recipeFromFirebase = postSnapshot.getValue(RecipeFirebase.class);
                 if (recipeFromFirebase == null) continue;
-                //String key = dataSnapshot.getRef().getParent().getParent().getKey();
                 if (application == null) {
                     continue;
                 }

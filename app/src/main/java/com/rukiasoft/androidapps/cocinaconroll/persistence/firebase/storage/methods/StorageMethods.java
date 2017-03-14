@@ -87,6 +87,9 @@ public class StorageMethods {
     }
 
     private void uploadNextOldPic(){
+        if(mOldPics != null  && !mOldPics.isEmpty()) {
+            mOldPics.remove(0);
+        }
         if(mOldPics == null || mOldPics.isEmpty()){
             Logger.d("descargadas todas");
             uploadingOldPics = false;
