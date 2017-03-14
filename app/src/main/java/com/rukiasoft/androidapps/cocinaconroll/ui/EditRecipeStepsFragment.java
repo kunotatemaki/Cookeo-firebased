@@ -101,9 +101,7 @@ public class EditRecipeStepsFragment extends Fragment implements OnStartDragList
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(mAdapter);
-        mItemTouchHelper = new ItemTouchHelper(callback);
-        mItemTouchHelper.attachToRecyclerView(recyclerView);
+
     }
 
     @Override
@@ -118,6 +116,9 @@ public class EditRecipeStepsFragment extends Fragment implements OnStartDragList
             mAdapter = new EditRecipeRecyclerViewAdapter(steps, this);
         }
         recyclerView.setAdapter(mAdapter);
+        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(mAdapter);
+        mItemTouchHelper = new ItemTouchHelper(callback);
+        mItemTouchHelper.attachToRecyclerView(recyclerView);
     }
 
     @Override

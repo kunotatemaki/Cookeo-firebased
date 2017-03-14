@@ -85,9 +85,7 @@ public class EditRecipeIngredientsFragment extends Fragment implements OnStartDr
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(mAdapter);
-        mItemTouchHelper = new ItemTouchHelper(callback);
-        mItemTouchHelper.attachToRecyclerView(recyclerView);
+
     }
 
     @Override
@@ -106,6 +104,9 @@ public class EditRecipeIngredientsFragment extends Fragment implements OnStartDr
 
         }
         recyclerView.setAdapter(mAdapter);
+        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(mAdapter);
+        mItemTouchHelper = new ItemTouchHelper(callback);
+        mItemTouchHelper.attachToRecyclerView(recyclerView);
     }
 
     @Override
