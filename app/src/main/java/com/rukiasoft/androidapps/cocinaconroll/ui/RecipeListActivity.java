@@ -19,7 +19,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,14 +29,11 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GoogleApiAvailability;
 import com.karumi.dexter.Dexter;
 import com.rukiasoft.androidapps.cocinaconroll.BuildConfig;
 import com.rukiasoft.androidapps.cocinaconroll.R;
 import com.rukiasoft.androidapps.cocinaconroll.permissions.ErrorListener;
 import com.rukiasoft.androidapps.cocinaconroll.permissions.RecetasCookeoMultiplePermissionListener;
-import com.rukiasoft.androidapps.cocinaconroll.utilities.LogHelper;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.ReadWriteTools;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.Tools;
@@ -52,9 +48,6 @@ import butterknife.Unbinder;
 import icepick.State;
 
 public class RecipeListActivity extends ToolbarAndProgressActivity {
-
-    private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
-    private static final String TAG = LogHelper.makeLogTag(RecipeListActivity.class);
 
 
     @BindView(R.id.drawer_layout)
@@ -158,6 +151,8 @@ public class RecipeListActivity extends ToolbarAndProgressActivity {
 
     @Override
     public void onDestroy(){
+        recetasCookeoMultiplePermissionListener = null;
+        errorListener = null;
         super.onDestroy();
         mUnbinder.unbind();
     }
@@ -460,18 +455,6 @@ public class RecipeListActivity extends ToolbarAndProgressActivity {
         animate = false;
         if(mSearchMenuItem != null){
             MenuItemCompat.collapseActionView(mSearchMenuItem);
-        }
-    }
-
-    public void performClickInDrawerIfNecessary() {
-        if(mLastFilter.equals(RecetasCookeoConstants.FILTER_LATEST_RECIPES)){
-            navigationView.setCheckedItem(R.id.menu_last_downloaded);
-            RecipeListFragment mRecipeListFragment = (RecipeListFragment) getSupportFragmentManager().findFragmentById(R.id.list_recipes_fragment);
-            if(mRecipeListFragment != null) {
-                mRecipeListFragment.filterRecipes(RecetasCookeoConstants.FILTER_LATEST_RECIPES);
-            }
-        } else {
-            navigationView.setCheckedItem(R.id.menu_all_recipes);
         }
     }
 
