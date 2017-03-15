@@ -136,8 +136,8 @@
 
     <!-- Content Description for images -->
     <string name="desc_google_icon">Cooking with cookeo logo</string>
-    <string name="title_signing">Backup your recipe\nin your Drive Account</string>
-    <string name="body_signing">Sign in  with your Gmail account and get a Google Drive sincronization.\nAll your recipes will be available in all your devices!</string>
+    <string name="title_signing">Sign in with\nGoogle</string>
+    <string name="body_signing">Sign in  with your Gmail account to edit an create recipes.\nCooking with Cookeo doesn\'t store your information, but sign in is necessary to get all your own recipes available in all your devices!</string>
     <string name="exit">Exit</string>
     <string name="sign_out">Close session</string>
     <string name="loading">Loading…</string>

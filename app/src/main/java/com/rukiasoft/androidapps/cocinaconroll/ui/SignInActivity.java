@@ -242,17 +242,11 @@ public class SignInActivity extends ToolbarAndProgressActivity implements
         FirebaseAuth.getInstance().signOut();
 
         // Google revoke access
-        Auth.GoogleSignInApi.revokeAccess(mGoogleApiClient).setResultCallback(
-                new ResultCallback<Status>() {
-                    @Override
-                    public void onResult(@NonNull Status status) {
-                        /*Tools mTools = new Tools();
-                        mTools.savePreferences(getApplicationContext(), RecetasCookeoConstants.PROPERTY_DEVICE_OWNER_EMAIL, "");
-                        mTools.savePreferences(getApplicationContext(), RecetasCookeoConstants.PROPERTY_DEVICE_OWNER_NAME, "");
-                        mTools.savePreferences(getApplicationContext(), RecetasCookeoConstants.PROPERTY_AVOID_GOOGLE_SIGN_IN, true);*/
-                    }
-                });
-
+        try {
+            Auth.GoogleSignInApi.revokeAccess(mGoogleApiClient);
+        }catch(IllegalStateException e){
+            Logger.e(e.getMessage());
+        }
     }
 
     private void disableButtons(){

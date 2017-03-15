@@ -111,11 +111,11 @@
 
     <!-- Content Description for images -->
     <string name="desc_google_icon">Logo de Cocinando con mi Cookeo</string>
-    <string name="title_signing">Almacena tus recetas\nen la nube</string>
+    <string name="title_signing">Regístrate con\nGoogle</string>
     <string name="exit">Salir</string>
     <string name="loading">Cargando…</string>
     <string name="sign_out">Cerrar sesión</string>
-    <string name="body_signing">Identificate con tu cuenta de Gmail y mantén tus recetas sincronizadas en la nube.\n¡Todas tus creaciones estarán disponibles en todos tus dispositivos!</string>
+    <string name="body_signing">Si te identificas con Gmail podrás crear y editar recetas.\nCocinando con Cookeo no recopila información, pero es necesario que te registres para tener todas tus creaciones en cualquiera tus dispositivos.</string>
     <string name="anonymous">anónimo</string>
     <string name="camera_explanation">Este permiso es necesario para poder usar la cámara de tu dispositivo para adjuntar una foto de tu receta</string>
     <string name="crash_toast_text">¡Vaya! La aplicación ha fallado, pero se ha enviado un informe al desarrollador para corregir el fallo</string>
