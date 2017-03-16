@@ -99,8 +99,8 @@ public class RecipeListActivity extends ToolbarAndProgressActivity {
         mUnbinder = ButterKnife.bind(this);
 
         //Pido los permisos si procede
+        createPermissionListeners();
         if(mAskForPermission) {
-            createPermissionListeners();
             //Dexter.withActivity(this).continueRequestingPendingPermissions(recetasCookeoMultiplePermissionListener);
             askForAllPermissions();
             mAskForPermission = false;
