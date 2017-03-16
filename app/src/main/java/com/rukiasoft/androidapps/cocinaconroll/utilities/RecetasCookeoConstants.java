@@ -11,9 +11,7 @@ public class RecetasCookeoConstants {
 
     public static final Integer FLAG_ASSETS = 1;
     public static final Integer FLAG_ORIGINAL = 2;
-    public static final Integer FLAG_EDITED = 4;
     public static final Integer FLAG_EDITED_PICTURE = 8;
-    public static final Integer FLAG_OWN = 16;
 
     public static final String SEARCH_FIELD = "search_field";
     public static final String SEARCH_ICON_TYPE = "search_icon_type";
@@ -32,13 +30,10 @@ public class RecetasCookeoConstants {
     public static final String TYPE_DESSERTS = "dessert";
 
     public static final String KEY_RECIPE = RecetasCookeoConstants.PACKAGE_NAME + ".recipe";
-    public static final String KEY_DELETE_OLD_PICTURE = RecetasCookeoConstants.PACKAGE_NAME +  ".deleteoldpicture";
     public static final String KEY_TYPE = RecetasCookeoConstants.PACKAGE_NAME + ".type";
-    public static final String KEY_SIGN_OUT = RecetasCookeoConstants.PACKAGE_NAME + ".sign_out";
     public static final int REQUEST_DETAILS = 200;
     public static final int REQUEST_CREATE_RECIPE = 201;
     public static final int RESULT_UPDATE_RECIPE = 300;
-    public static final int RESULT_DELETE_RECIPE = 301;
 
     public static final String PROPERTY_DATABASE_CREATED = "database_created";
     public static final String PROPERTY_HIDE_SWIPE_DIALOG = "hide_swipe_dialog";
@@ -64,7 +59,6 @@ public class RecetasCookeoConstants {
     public static final String ALLOWED_RECIPES_NODE = "allowed_recipes";
     public static final String FORBIDDEN_RECIPES_NODE = "forbidden_recipes";
     public static final String PENDING_RECIPES_NODE = "pending_recipes";
-    public static final String RECIPE_LIST_NODE = "recipe_list";
     public static final String PERSONAL_RECIPES_NODE = "personal_recipes";
 
     public static final String DETAILED_RECIPES_NODE = "detailed_recipes";
@@ -94,9 +88,7 @@ public class RecetasCookeoConstants {
     public static final String EMAIL = "rukiasoft@gmail.com";
 
 
-    public static final int MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 11;
     public static final int MY_PERMISSIONS_REQUEST_CAMERA = 12;
-    public static final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 13;
 
 
     public static final String RECIPES_TABLE_NAME = "RECIPES";
@@ -105,7 +97,6 @@ public class RecetasCookeoConstants {
     public static final String FIELD_ICON = "icon";
     public static final String FIELD_NAME_NORMALIZED = "NORMALIZED_NAME";
 
-    public static final String STORAGE_PICTURES_NODE = "recipes";
     public static final String STORAGE_PERSONAL_NODE = "personal";
     public static final String STORAGE_PENDING_NODE = "pending";
     public static final String RUKIA_TAG = "RUKIA";

@@ -4,7 +4,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 /**
- * Created by rfeliz on 09/03/2017.
+ * Created by ruler on 09/03/2017.
  */
 
 public class Authentication {

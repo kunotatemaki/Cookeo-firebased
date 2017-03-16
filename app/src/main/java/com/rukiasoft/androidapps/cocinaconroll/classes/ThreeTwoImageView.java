@@ -7,7 +7,7 @@ import android.widget.ImageView;
 /**
  * Created by Raúl Feliz Alonso on 6/9/15.
  */
-public class ThreeTwoImageView extends ImageView {
+public class ThreeTwoImageView extends android.support.v7.widget.AppCompatImageView {
     public ThreeTwoImageView(Context context) {
         super(context);
     }

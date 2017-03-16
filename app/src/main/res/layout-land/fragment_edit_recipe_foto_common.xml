@@ -35,13 +35,13 @@
             android:paddingRight="10dp"
             android:paddingTop="2dp"
             android:paddingBottom="2dp"
-            android:singleLine="true"
             android:ellipsize="marquee"
             android:marqueeRepeatLimit="marquee_forever"
             android:scrollHorizontally="true"
             style="@style/TextAppearance.AppCompat.Subhead"
             android:textColor="@android:color/white"
-            android:text="@string/edit_recipe_picture_text"/>
+            android:text="@string/edit_recipe_picture_text"
+            android:maxLines="1" />
     </RelativeLayout>
 
     <RelativeLayout

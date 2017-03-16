@@ -92,17 +92,9 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback {
         if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
             // Fade out the view as it is swiped out of the parent's bounds
             float alpha = ALPHA_FULL - Math.abs(dX) / (float) viewHolder.itemView.getWidth();
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-                viewHolder.itemView.setAlpha(alpha);
-                viewHolder.itemView.setTranslationX(dX);
-            }else {
-                if(alpha > 1) alpha = 1;
-                if(alpha < 0) alpha = 0;
-                String color = Integer.toHexString((int) ((1 - alpha) * 255));
-                color = color.length() == 1? "#0" + color : "#" + color;
-                color = color.concat("FF0000");
-                viewHolder.itemView.setBackgroundColor(Color.parseColor(color));
-            }
+            viewHolder.itemView.setAlpha(alpha);
+            viewHolder.itemView.setTranslationX(dX);
+
         } else {
             super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
         }
@@ -126,11 +118,7 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback {
     public void clearView(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
         super.clearView(recyclerView, viewHolder);
 
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            viewHolder.itemView.setAlpha(ALPHA_FULL);
-        }else{
-            viewHolder.itemView.setBackgroundColor(Color.parseColor("#FFFFFF"));
-        }
+        viewHolder.itemView.setAlpha(ALPHA_FULL);
 
         if (viewHolder instanceof ItemTouchHelperViewHolder) {
             // Tell the view holder it's time to restore the idle state

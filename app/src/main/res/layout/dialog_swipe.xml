@@ -50,7 +50,6 @@
                 android:layout_marginLeft="5dip"
                 android:paddingTop="5dp"
                 android:paddingBottom="5dp"
-                android:singleLine="false"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                 android:text="@string/swipe_horizontal"/>
         </LinearLayout>
@@ -86,7 +85,6 @@
                 android:layout_marginLeft="5dip"
                 android:paddingTop="5dp"
                 android:paddingBottom="5dp"
-                android:singleLine="false"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                 android:text="@string/swipe_vertical"/>
         </LinearLayout>

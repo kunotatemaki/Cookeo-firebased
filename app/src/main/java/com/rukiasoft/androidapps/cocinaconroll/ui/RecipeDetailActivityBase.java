@@ -88,11 +88,6 @@ public class RecipeDetailActivityBase extends ToolbarAndProgressActivity {
     }
 
     @Override
-    public void onBackPressed(){
-        super.onBackPressed();
-    }
-
-    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent intentData) {
         if(requestCode == RecetasCookeoConstants.REQUEST_CREATE_RECIPE){
             if(resultCode == RecetasCookeoConstants.RESULT_UPDATE_RECIPE && intentData != null && intentData.hasExtra(RecetasCookeoConstants.KEY_RECIPE)){
@@ -103,7 +98,6 @@ public class RecipeDetailActivityBase extends ToolbarAndProgressActivity {
                         recipeDetailsFragment.setRecipe(tmpRecipe);
                     }
                 }
-
             }
         }
     }

@@ -9,7 +9,6 @@ import android.support.multidex.MultiDexApplication;
 
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
-import com.orhanobut.logger.LogLevel;
 import com.orhanobut.logger.Logger;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.model.DaoMaster;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.model.DaoSession;
@@ -36,26 +35,6 @@ public class CocinaConRollApplication  extends MultiDexApplication {
      */
     private Tracker tracker;
     private DaoSession daoSession;
-
-    /**
-     * Access to the global Analytics singleton. If this method returns null you forgot to either
-     * set android:name="&lt;this.class.name&gt;" attribute on your application element in
-     * AndroidManifest.xml or you are not setting this.analytics field in onCreate method override.
-     */
-    public GoogleAnalytics analytics() {
-        return analytics;
-    }
-
-    /**
-     * The default app tracker. If this method returns null you forgot to either set
-     * android:name="&lt;this.class.name&gt;" attribute on your application element in
-     * AndroidManifest.xml or you are not setting this.tracker field in onCreate method override.
-     */
-    public Tracker getTracker() {
-        return tracker;
-    }
-
-
 
 
     public static RefWatcher getRefWatcher(Context context) {

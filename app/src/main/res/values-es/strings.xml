@@ -122,7 +122,6 @@
     <string name="permissions_title">Permiso</string>
     <string name="write_external_denied">Las recetas creadas en versiones anteriores no estarán disponibles</string>
     <string name="write_external_explanation">Se necesita este permiso para cargar recetas creadas en versiones anteriores de la aplicación</string>
-    <string name="close">Cerrar</string>
     <string name="sign_in">Iniciar sesión</string>
     <string name="downloading_recipes">Descargando recetas… </string>
     <string name="downloading_recipes_first_load">Descargando recetas… Puede tardar unos minutos en el primer arranque.</string>

@@ -9,7 +9,7 @@
         android:id="@+id/toolbar_layout_in_edit_recipe"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-        <include layout="@layout/stardard_toolbar" />
+        <include layout="@layout/standard_toolbar" />
     </RelativeLayout>
     <FrameLayout
         android:id="@+id/edit_recipe_container"

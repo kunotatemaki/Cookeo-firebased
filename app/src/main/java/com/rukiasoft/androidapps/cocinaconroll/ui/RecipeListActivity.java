@@ -445,11 +445,6 @@ public class RecipeListActivity extends ToolbarAndProgressActivity {
         }
     }
 
-    @Override
-    public void onStop() {
-        super.onStop();
-    }
-
 
     public void closeSearchView(){
         animate = false;

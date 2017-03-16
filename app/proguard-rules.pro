@@ -70,14 +70,8 @@
   public *** get*();
   public void set*(***);
 }
--keep public class com.rukiasoft.androidapps.cocinaconroll.classes.RegistrationClass {
-  public *** get*();
-  public void set*(***);
-}
--keep public class com.rukiasoft.androidapps.cocinaconroll.classes.RegistrationResponse {
-  public *** get*();
-  public void set*(***);
-}
+
+
 
 -keepattributes *Annotation*,EnclosingMethod, Signature
 

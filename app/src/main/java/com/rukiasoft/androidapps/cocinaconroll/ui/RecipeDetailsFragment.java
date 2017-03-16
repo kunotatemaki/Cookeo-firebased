@@ -344,6 +344,9 @@ public class RecipeDetailsFragment extends Fragment implements
     private void clickOnHeartButton(){
         recipe = RecipeComplete.getRecipeFromDatabase(mRecipeController.switchFavourite(getActivity().getApplication(),
                 recipe.getId()));
+        if(recipe == null){
+            return;
+        }
         if (!recipe.getFavourite()) {
             recipeDescriptionFAB.setImageDrawable(ContextCompat.getDrawable(getActivity(),
                     R.drawable.ic_favorite_outline_white_24dp));

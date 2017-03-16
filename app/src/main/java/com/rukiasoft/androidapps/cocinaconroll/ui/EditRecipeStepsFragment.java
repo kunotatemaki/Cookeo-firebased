@@ -1,7 +1,6 @@
 package com.rukiasoft.androidapps.cocinaconroll.ui;
 
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -15,11 +14,10 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 
 import com.rukiasoft.androidapps.cocinaconroll.CocinaConRollApplication;
-import com.rukiasoft.androidapps.cocinaconroll.ui.model.RecipeComplete;
-import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 import com.rukiasoft.androidapps.cocinaconroll.R;
 import com.rukiasoft.androidapps.cocinaconroll.dragandswipehelper.OnStartDragListener;
 import com.rukiasoft.androidapps.cocinaconroll.dragandswipehelper.SimpleItemTouchHelperCallback;
+import com.rukiasoft.androidapps.cocinaconroll.ui.model.RecipeComplete;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.Tools;
 import com.squareup.leakcanary.RefWatcher;
 
@@ -33,7 +31,6 @@ import butterknife.Unbinder;
 
 public class EditRecipeStepsFragment extends Fragment implements OnStartDragListener {
 
-    private static final String KEY_ITEM_TO_ADD = RecetasCookeoConstants.PACKAGE_NAME + ".itemtoadd";
     @BindView(R.id.edit_recipe_add_item)EditText addItem;
     @BindView(R.id.edit_recipe_add_fab)FloatingActionButton fab;
     @BindView(R.id.edit_recipe_recycler_view) RecyclerView recyclerView;

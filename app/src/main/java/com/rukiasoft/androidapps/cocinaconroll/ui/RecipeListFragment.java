@@ -597,6 +597,9 @@ public class RecipeListFragment extends Fragment implements
         //descargo las recetas
         if(node.equals(RecetasCookeoConstants.PERSONAL_RECIPES_NODE)){
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            if(user == null){
+                return;
+            }
             node += "/" + user.getUid();
         }
         DatabaseReference mRecipeRefDetailed = FirebaseDatabase.getInstance()
@@ -667,6 +670,9 @@ public class RecipeListFragment extends Fragment implements
     private void connectToFirebaseForNewRecipes(String node){
         if(node.equals(RecetasCookeoConstants.PERSONAL_RECIPES_NODE)){
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            if(user == null){
+                return;
+            }
             node += "/" + user.getUid();
         }
         DatabaseReference mRecipeTimestamps = FirebaseDatabase.getInstance().getReference(node +

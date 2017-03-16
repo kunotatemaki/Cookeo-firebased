@@ -7,7 +7,6 @@ import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -42,7 +41,6 @@ import com.rukiasoft.androidapps.cocinaconroll.utilities.Tools;
 import com.squareup.leakcanary.RefWatcher;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,9 +53,8 @@ import icepick.State;
 public class EditRecipePhotoFragment extends Fragment {
 
     private Uri mImageCaptureUri;
-    
 
-    private Bitmap photo;
+
     private Tools mTools;
     private ReadWriteTools rwTools;
 
@@ -309,7 +306,7 @@ public class EditRecipePhotoFragment extends Fragment {
                 doCrop(CROP_FROM_FILE);
                 break;
             case CROP_FROM_CAMERA:
-                photo = BitmapFactory.decodeFile(mImageCropUri.getPath());
+                Bitmap photo = BitmapFactory.decodeFile(mImageCropUri.getPath());
                 updateNameOfNewImage();
                 mNewPicName = rwTools.saveBitmap(getActivity().getApplicationContext(), photo, getPictureNameFromFileName());
                 rwTools.loadImageFromPath(getActivity().getApplicationContext(),
@@ -365,20 +362,20 @@ public class EditRecipePhotoFragment extends Fragment {
         mTools.hideSoftKeyboard(getActivity());
         boolean ret = true;
         Integer min;
+
         try {
             min = Integer.valueOf(minutes.getText().toString());
         }catch (NumberFormatException e){
             min = 0;
-            minutes.setText(min.toString());
         }
+        minutes.setText(min.toString());
         Integer port;
         try {
             port = Integer.valueOf(portions.getText().toString());
         }catch (NumberFormatException e){
             port = 0;
-            portions.setText(port.toString());
         }
-
+        portions.setText(port.toString());
 
         //create case
         if(createRecipeNameLayout != null) {
@@ -408,14 +405,6 @@ public class EditRecipePhotoFragment extends Fragment {
         refWatcher.watch(this);
     }
 
-    @Override
-    public void onPause(){
-        if(createRecipeName != null) {
-            String name = createRecipeName.getText().toString();
-            //recipe.setName(name);
-        }
-        super.onPause();
-    }
 
     private String getPictureNameFromFileName(){
         return mTools.getCurrentDate(getActivity()).concat(".jpg");

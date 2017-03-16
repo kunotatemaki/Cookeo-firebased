@@ -1,7 +1,6 @@
 package com.rukiasoft.androidapps.cocinaconroll.ui;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -57,7 +56,6 @@ public class AnimationActivity extends AppCompatActivity {
     private Animation createAnim;
     private Animation rukiaAnim;
     private Animation softAnim;
-    Activity activity;
     private static final int REQUEST_CODE_SUPPORT = 89;
 
 
@@ -67,7 +65,6 @@ public class AnimationActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_animation);
         unbinder = ButterKnife.bind(this);
-        activity = this;
         //configure the screen
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         int currentApiVersion = android.os.Build.VERSION.SDK_INT;

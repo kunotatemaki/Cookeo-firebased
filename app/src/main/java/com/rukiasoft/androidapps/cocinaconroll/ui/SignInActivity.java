@@ -18,7 +18,6 @@ package com.rukiasoft.androidapps.cocinaconroll.ui;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -41,7 +40,6 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.orhanobut.logger.Logger;
 import com.rukiasoft.androidapps.cocinaconroll.R;
-import com.rukiasoft.androidapps.cocinaconroll.utilities.LogHelper;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.Tools;
 
@@ -64,7 +62,6 @@ public class SignInActivity extends ToolbarAndProgressActivity implements
 
     private GoogleApiClient mGoogleApiClient;
     private Unbinder unbinder;
-    private static final String TAG = LogHelper.makeLogTag(SignInActivity.class);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -167,7 +164,7 @@ public class SignInActivity extends ToolbarAndProgressActivity implements
                         // the auth state listener will be notified and logic to handle the
                         // signed in user can be handled in the listener.
                         if (!task.isSuccessful()) {
-                            Log.w(TAG, "signInWithCredential", task.getException());
+                            Logger.w("signInWithCredential", task.getException());
                             Toast.makeText(SignInActivity.this, getString(R.string.signed_in_err),
                                     Toast.LENGTH_SHORT).show();
                             revokeAccess();
@@ -204,7 +201,7 @@ public class SignInActivity extends ToolbarAndProgressActivity implements
                         // signed in user can be handled in the listener.
                         Tools tools = new Tools();
                         if (!task.isSuccessful()) {
-                            Log.w(TAG, "signInWithCredential", task.getException());
+                            Logger.w("signInWithCredential", task.getException());
                             Toast.makeText(SignInActivity.this, getString(R.string.signed_in_err),
                                     Toast.LENGTH_SHORT).show();
                             revokeAccess();

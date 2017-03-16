@@ -19,14 +19,6 @@ public class ProgressDialogActivity extends AppCompatActivity {
         mProgressDialog.show();
     }
 
-    public void changeMessage(String message){
-        if(mProgressDialog.isShowing()){
-            mProgressDialog.setMessage(message);
-        }else{
-            showProgressDialog(message);
-        }
-    }
-
     public void hideProgressDialog() {
         if (mProgressDialog != null && mProgressDialog.isShowing()) {
             mProgressDialog.dismiss();

@@ -8,7 +8,7 @@
               android:orientation="vertical"
               tools:context=".ui.SettingsActivity">
 
-    <include layout="@layout/stardard_toolbar"/>
+    <include layout="@layout/standard_toolbar"/>
 
     <FrameLayout
         android:id="@+id/settings_fragment_container"

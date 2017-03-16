@@ -15,7 +15,6 @@
         import com.rukiasoft.androidapps.cocinaconroll.persistence.model.RecipeDb;
         import com.rukiasoft.androidapps.cocinaconroll.persistence.model.RecipeDbDao;
         import com.rukiasoft.androidapps.cocinaconroll.persistence.model.StepDb;
-        import com.rukiasoft.androidapps.cocinaconroll.ui.model.RecipeComplete;
         import com.rukiasoft.androidapps.cocinaconroll.ui.model.RecipeReduced;
         import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 
