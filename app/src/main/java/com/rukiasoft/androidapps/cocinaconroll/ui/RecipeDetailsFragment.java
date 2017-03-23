@@ -68,7 +68,6 @@ public class RecipeDetailsFragment extends Fragment implements
         AppBarLayout.OnOffsetChangedListener{
     private static final float PERCENTAGE_TO_ELLIPSIZE_TITLE  = 0.1f;
 
-    private static final String KEY_SAVE_RECIPE = RecetasCookeoConstants.PACKAGE_NAME + "." + RecipeDetailsFragment.class.getSimpleName() + ".saverecipe";
 
 
     @BindView(R.id.recipe_details_icon_minutes) ImageView iconMinutes;
@@ -93,9 +92,6 @@ public class RecipeDetailsFragment extends Fragment implements
     @BindView(R.id.listview_steps_cardview)
     LinearLayout stepsList;
     private Unbinder unbinder;
-    @State
-    RecipeComplete recipe;
-    private boolean recipeLoaded = false;
     private ActionBar actionBar;
     @BindView(R.id.cardview_link_textview) TextView author;
     private boolean land;
@@ -111,7 +107,8 @@ public class RecipeDetailsFragment extends Fragment implements
             switch (which){
                 case DialogInterface.BUTTON_POSITIVE:
                     FirebaseDbMethods firebaseDbMethods = new FirebaseDbMethods(mRecipeController);
-                    firebaseDbMethods.share(getActivity().getApplication(), recipe.getId());
+                    firebaseDbMethods.share(getActivity().getApplication(),
+                            ((RecipeDetailActivityBase)getActivity()).getRecipeId());
                     break;
                 case DialogInterface.BUTTON_NEGATIVE:
                     break;
@@ -134,19 +131,9 @@ public class RecipeDetailsFragment extends Fragment implements
     }
 
     @Override
-    public void onSaveInstanceState(Bundle savedInstanceState) {
-        // Save recipe
-        recipeLoaded = false;
-        if (recipe != null) {
-            savedInstanceState.putParcelable(KEY_SAVE_RECIPE, recipe);
-        }
-        super.onSaveInstanceState(savedInstanceState);
-    }
-
-
-    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.recipe_description_menu, menu);
+        RecipeComplete recipe = ((RecipeDetailActivityBase)getActivity()).getRecipe();
         if(recipe != null) {
             menu.findItem(R.id.menu_item_remove).setVisible(recipe.getEdited() |
                     recipe.getOwner().equals(RecetasCookeoConstants.FLAG_PERSONAL_RECIPE));
@@ -163,6 +150,7 @@ public class RecipeDetailsFragment extends Fragment implements
         public void onClick(DialogInterface dialog, int which) {
             switch (which){
                 case DialogInterface.BUTTON_POSITIVE:
+                    RecipeComplete recipe = ((RecipeDetailActivityBase)getActivity()).getRecipe();
                     RecipeController recipeController = new RecipeController();
                     recipeController.setRecipeForDeleting(getActivity().getApplication(), recipe.getId());
                     FirebaseDbMethods firebaseDbMethods = new FirebaseDbMethods(recipeController);
@@ -181,6 +169,7 @@ public class RecipeDetailsFragment extends Fragment implements
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         Tools tools = new Tools();
+        RecipeComplete recipe = ((RecipeDetailActivityBase)getActivity()).getRecipe();
         switch (item.getItemId()) {
             case R.id.menu_item_edit_recipe:
                 if(tools.getBooleanFromPreferences(getContext().getApplicationContext(),
@@ -220,8 +209,8 @@ public class RecipeDetailsFragment extends Fragment implements
 
     public void editRecipe(){
         Intent intent = new Intent(getActivity(), EditRecipeActivity.class);
-        intent.putExtra(RecetasCookeoConstants.KEY_RECIPE, recipe);
-        getActivity().startActivityForResult(intent, RecetasCookeoConstants.REQUEST_CREATE_RECIPE);
+        intent.putExtra(RecetasCookeoConstants.KEY_RECIPE, ((RecipeDetailActivityBase)getActivity()).getRecipeId());
+        getActivity().startActivity(intent);
     }
 
     private final Runnable scaleIn = new Runnable() {
@@ -287,16 +276,10 @@ public class RecipeDetailsFragment extends Fragment implements
             });
         }
 
-        if(savedInstanceState != null){
-            if(savedInstanceState.containsKey(KEY_SAVE_RECIPE)) {
-                recipe = savedInstanceState.getParcelable(KEY_SAVE_RECIPE);
-            }
+        RecipeComplete recipe = ((RecipeDetailActivityBase)getActivity()).getRecipe();
 
-        }
+        loadRecipe(recipe);
 
-        if(recipe != null){
-            loadRecipe();
-        }
         if(animated){
             return mRootView;
         }
@@ -342,8 +325,8 @@ public class RecipeDetailsFragment extends Fragment implements
     }
 
     private void clickOnHeartButton(){
-        recipe = RecipeComplete.getRecipeFromDatabase(mRecipeController.switchFavourite(getActivity().getApplication(),
-                recipe.getId()));
+        RecipeComplete recipe = RecipeComplete.getRecipeFromDatabase(mRecipeController.switchFavourite(getActivity().getApplication(),
+                ((RecipeDetailActivityBase)getActivity()).getRecipeId()));
         if(recipe == null){
             return;
         }
@@ -385,19 +368,13 @@ public class RecipeDetailsFragment extends Fragment implements
         }
     }
 
-    public void setRecipe(RecipeComplete recipe) {
-        this.recipe = recipe;
-        loadRecipe();
-    }
-
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
     }
 
-    private void loadRecipe() {
-        if (recipeLoaded) return;
+    private void loadRecipe(RecipeComplete recipe) {
 
         if (recipeName != null) {
             recipeName.setText(recipe.getName());
@@ -504,7 +481,6 @@ public class RecipeDetailsFragment extends Fragment implements
             cardTip.setVisibility(View.GONE);
         }
 
-        recipeLoaded = true;
     }
 
     private void applyPalette(Bitmap bitmap){

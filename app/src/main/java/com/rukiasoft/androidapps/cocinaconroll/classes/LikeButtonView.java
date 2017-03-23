@@ -71,7 +71,7 @@ public class LikeButtonView extends FrameLayout {
             @Override
             public void onClick(View v) {
                 RecipeController recipeController = new RecipeController();
-                recipeItem = RecipeReduced.getRecipeFromDatabase(
+                recipeItem = RecipeReduced.getFromDatabase(
                         recipeController.switchFavourite((Application)getContext().getApplicationContext(), recipeItem.getId())
                 );
                 favoriteIcon.setVisibility(recipeItem.getFavourite()? VISIBLE : GONE);

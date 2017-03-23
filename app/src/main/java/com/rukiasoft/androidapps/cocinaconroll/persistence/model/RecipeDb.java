@@ -1,7 +1,12 @@
 package com.rukiasoft.androidapps.cocinaconroll.persistence.model;
 
+import android.app.Application;
+import android.database.Cursor;
+
+import com.rukiasoft.androidapps.cocinaconroll.persistence.controllers.CommonController;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.database.model.RecipeFirebase;
 import com.rukiasoft.androidapps.cocinaconroll.ui.model.RecipeComplete;
+import com.rukiasoft.androidapps.cocinaconroll.ui.model.RecipeReduced;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.Tools;
 
@@ -70,6 +75,12 @@ public class RecipeDb {
     private transient RecipeDbDao myDao;
 
     public RecipeDb() {
+    }
+
+    public static RecipeDb getFromCursor(Application application, Cursor cursor){
+        DaoSession session = CommonController.getDaosessionFromApplication(application, "RecipeDb");
+        RecipeDbDao recipeDao = session.getRecipeDbDao();
+        return recipeDao.readEntity(cursor, 0);
     }
 
     @Generated(hash = 1012747291)

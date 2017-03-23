@@ -20,6 +20,8 @@ import android.animation.Animator;
 import android.animation.AnimatorInflater;
 import android.animation.AnimatorSet;
 import android.annotation.TargetApi;
+import android.app.Application;
+import android.database.Cursor;
 import android.os.Build;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -40,23 +42,21 @@ import com.rukiasoft.androidapps.cocinaconroll.ui.model.RecipeReduced;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.ReadWriteTools;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 class RecipeListRecyclerViewAdapter extends RecyclerView.Adapter<RecipeListRecyclerViewAdapter.RecipeViewHolder>
         implements View.OnClickListener, View.OnLongClickListener {
 
-    private final List<RecipeReduced> mItems;
     private OnCardClickListener onCardClickListener;
     private View frontCard = null;
     private View backCard = null;
+    private Cursor mCursor;
+    private Application application;
 
 
-    RecipeListRecyclerViewAdapter(List<RecipeReduced> items) {
-        this.mItems = new ArrayList<>(items);
+    RecipeListRecyclerViewAdapter(Application _application) {
+        this.application = _application;
     }
 
     void setOnCardClickListener(OnCardClickListener onCardClickListener) {
@@ -83,9 +83,12 @@ class RecipeListRecyclerViewAdapter extends RecyclerView.Adapter<RecipeListRecyc
 
     @Override
     public void onBindViewHolder(RecipeViewHolder holder, int position) {
-        RecipeReduced item = mItems.get(position);
+        RecipeReduced item = getItem(position);
+        if(item == null){
+            return;
+        }
         holder.bindRecipe(item);
-        holder.itemView.setTag(item);
+        holder.itemView.setTag(item.getId());
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
             if (holder.cardView.getRotationY() != 0) {
                 setFrontAndBack(holder.cardView);
@@ -95,12 +98,21 @@ class RecipeListRecyclerViewAdapter extends RecyclerView.Adapter<RecipeListRecyc
 
     }
 
-    @Override public int getItemCount() {
-        return mItems.size();
+    @Override
+    public int getItemCount() {
+        return (mCursor != null) ? mCursor.getCount() : 0;
     }
 
-    @Override public long getItemId(int position){
-        return mItems.get(position).hashCode();
+    private RecipeReduced getItem(int position){
+        if (!mCursor.moveToPosition(position)) {
+            throw new IllegalStateException("Invalid item position requested");
+        }
+        return RecipeReduced.getFromCursor(application, mCursor);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return getItem(position).getId();
     }
 
     @Override
@@ -117,7 +129,7 @@ class RecipeListRecyclerViewAdapter extends RecyclerView.Adapter<RecipeListRecyc
         if (onCardClickListener != null) {
             new Handler().postDelayed(new Runnable() {
                 @Override public void run() {
-                    onCardClickListener.onCardClick(v, (RecipeReduced) v.getTag());
+                    onCardClickListener.onCardClick(v, (Long) v.getTag());
                 }
             }, 200);
         }
@@ -264,8 +276,14 @@ class RecipeListRecyclerViewAdapter extends RecyclerView.Adapter<RecipeListRecyc
     }
 
     interface OnCardClickListener {
-        void onCardClick(View view, RecipeReduced recipeItemOld);
+        void onCardClick(View view, Long id);
     }
 
-
+    public void swapCursor(Cursor cursor) {
+        if (mCursor != null) {
+            mCursor.close();
+        }
+        mCursor = cursor;
+        notifyDataSetChanged();
+    }
 }

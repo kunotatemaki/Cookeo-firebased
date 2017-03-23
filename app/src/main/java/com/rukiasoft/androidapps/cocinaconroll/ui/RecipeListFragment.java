@@ -2,6 +2,7 @@ package com.rukiasoft.androidapps.cocinaconroll.ui;
 
 
 import android.app.Application;
+import android.content.ContentUris;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -54,9 +55,9 @@ import com.google.firebase.storage.StorageReference;
 import com.orhanobut.logger.Logger;
 import com.rukiasoft.androidapps.cocinaconroll.BuildConfig;
 import com.rukiasoft.androidapps.cocinaconroll.R;
-import com.rukiasoft.androidapps.cocinaconroll.database.CocinaConRollContentProvider;
 import com.rukiasoft.androidapps.cocinaconroll.fastscroller.FastScroller;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.controllers.RecipeController;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.database.CocinaConRollContentProvider;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.Authentication;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.database.methods.FirebaseDbMethods;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.database.model.RecipeFirebase;
@@ -90,8 +91,6 @@ public class RecipeListFragment extends Fragment implements
         AppBarLayout.OnOffsetChangedListener{
 
     private static final String KEY_SCROLL_POSITION = RecetasCookeoConstants.PACKAGE_NAME + ".scrollposition";
-    private static final String KEY_RECIPE_LIST = RecetasCookeoConstants.PACKAGE_NAME + ".recipelist";
-
 
     @Nullable
     @BindView(R.id.toolbar_recipe_list_fragment) Toolbar mToolbarRecipeListFragment;
@@ -110,7 +109,6 @@ public class RecipeListFragment extends Fragment implements
     RelativeLayout numberAndTypeBar;
     @BindView(R.id.add_recipe_fab)
     FloatingActionButton addRecipeButtonFAB;
-    @BindView(R.id.init_database_text) TextView initDatabaseText;
     private Unbinder unbinder;
     @State Boolean isDownloadingRecipes = false;    //Para controlar si está descargando o no
     @State Boolean isDownloadingPics = false;
@@ -131,19 +129,18 @@ public class RecipeListFragment extends Fragment implements
     //Push de recetas a subir
     @State ObjectQeue pushItems;
 
-    @State Boolean needToRefresh = false;
-
     //private SlideInBottomAnimationAdapter slideAdapter;
     //private RecipeListRecyclerViewAdapter adapter;
-    List<RecipeReduced> mRecipes;
     private int savedScrollPosition = 0;
     private int columnCount = 10;
     @State String lastFilter = RecetasCookeoConstants.FILTER_ALL_RECIPES;
     private InterstitialAd mInterstitialAd;
-    @State RecipeComplete recipeToShow;
+    @State Uri recipeToShow;
     private RecipeController mRecipeController;
     @State int numRecipesDownloaded;
     @State int numNodesOnInitDatabase;
+
+    RecipeListRecyclerViewAdapter mAdapter;
 
     Application application;
     @State boolean isDeletingRecipes = false;
@@ -228,9 +225,6 @@ public class RecipeListFragment extends Fragment implements
             if(savedInstanceState.containsKey(KEY_SCROLL_POSITION)){
                 savedScrollPosition = savedInstanceState.getInt(KEY_SCROLL_POSITION);
             }
-            if(savedInstanceState.containsKey(KEY_RECIPE_LIST)){
-                mRecipes = savedInstanceState.getParcelableArrayList(KEY_RECIPE_LIST);
-            }
         }
 
 
@@ -251,11 +245,12 @@ public class RecipeListFragment extends Fragment implements
                     }else{
                         requestSignInForNewRecipe();
                     }
-
-
                 }
             });
         }
+
+        setRecycler();
+
         return view;
     }
 
@@ -316,11 +311,8 @@ public class RecipeListFragment extends Fragment implements
             firebaseDbMethods.updateOldRecipesToPersonalStorage(getActivity().getApplicationContext());
             firebaseDbMethods.updateRecipesToPersonalStorage(getActivity().getApplicationContext());
             deletePendingRecipes();
-        }else if(mRecipes == null || mRecipes.size() == 0 || needToRefresh) {
-            needToRefresh = false;
-            filterRecipes(lastFilter);
         }else{
-            setData();
+            filterRecipes(lastFilter);
         }
     }
 
@@ -339,9 +331,6 @@ public class RecipeListFragment extends Fragment implements
         }catch (NullPointerException e){
             e.printStackTrace();
         }
-        if(mRecipes != null) {
-            savedInstanceState.putParcelableArrayList(KEY_RECIPE_LIST, (ArrayList<RecipeReduced>) mRecipes);
-        }
         super.onSaveInstanceState(savedInstanceState);
     }
 
@@ -356,44 +345,26 @@ public class RecipeListFragment extends Fragment implements
 
 
     @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        if(mRecipes == null){
-            mRecipes = new ArrayList<>();
-        }else {
-            mRecipes.clear();
-        }
-        List<RecipeDb> recipeDbList = RecipeController.getRecipesFromCursor(getActivity().getApplication(), data);
-        if(recipeDbList != null){
-            for(RecipeDb recipeDb : recipeDbList){
-                RecipeReduced recipe = RecipeReduced.getRecipeFromDatabase(recipeDb);
-                if(recipe != null) {
-                    mRecipes.add(recipe);
-                }
-            }
-        }
-
-        setData();
-
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        mAdapter.swapCursor(cursor);
+        setNumberRecipes(cursor);
+        navigateToSavedScroll();
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        if(mRecyclerView != null) {
-            mRecyclerView.setAdapter(null);
-            //tools.hideRefreshLayout(getActivity());
-        }
+        Logger.d("reset loader");
+        mAdapter.swapCursor(null);
     }
 
 
-    private void setData(){
-        initDatabaseText.setVisibility(View.GONE);
+    private void setRecycler(){
 
-        RecipeListRecyclerViewAdapter adapter = new RecipeListRecyclerViewAdapter(mRecipes);
-        adapter.setHasStableIds(true);
-        adapter.setOnCardClickListener(this);
+        mAdapter = new RecipeListRecyclerViewAdapter(getActivity().getApplication());
+        mAdapter.setOnCardClickListener(this);
         mRecyclerView.setHasFixedSize(true);
 
-        SlideInBottomAnimationAdapter slideAdapter = wrapAdapter(adapter);
+        SlideInBottomAnimationAdapter slideAdapter = wrapAdapter(mAdapter);
         mRecyclerView.setAdapter(slideAdapter);
 
         //mRecyclerView.setAdapter(adapter);
@@ -403,7 +374,6 @@ public class RecipeListFragment extends Fragment implements
 
 
         mRecyclerView.setLayoutManager(sglm);
-        mRecyclerView.scrollToPosition(savedScrollPosition);
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener(){
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy){
@@ -418,9 +388,15 @@ public class RecipeListFragment extends Fragment implements
             fastScroller.setRecyclerView(mRecyclerView);
         }
 
+    }
 
+    private void navigateToSavedScroll(){
+        mRecyclerView.scrollToPosition(savedScrollPosition);
+    }
+
+    private void setNumberRecipes(Cursor cursor){
         //set the number of recipes
-        String nRecipes = String.format(getResources().getString(R.string.recipes), mRecipes.size());
+        String nRecipes = String.format(getResources().getString(R.string.recipes), cursor.getCount());
         nRecipesInRecipeList.setText(nRecipes);
     }
 
@@ -432,20 +408,20 @@ public class RecipeListFragment extends Fragment implements
     }
 
     @Override
-    public void onCardClick(View view, RecipeReduced recipeReduced) {
-        showRecipeDetails(recipeReduced);
+    public void onCardClick(View view, Long id) {
+        showRecipeDetails(id);
     }
 
 
 
-    private void showRecipeDetails(RecipeReduced recipeReduced){
+    private void showRecipeDetails(Long id){
         //interstitial
         int number = mTools.getIntegerFromPreferences(getActivity().getApplicationContext(), RecetasCookeoConstants.PREFERENCE_INTERSTITIAL);
         if(number<0 || number> RecetasCookeoConstants.N_RECIPES_TO_INTERSTICIAL){
             number = 0;
         }
-        RecipeDb recipeDb = mRecipeController.getRecipeById(getActivity().getApplication(), recipeReduced.getId());
-        recipeToShow = RecipeComplete.getRecipeFromDatabase(recipeDb);
+        recipeToShow = CocinaConRollContentProvider.getUriForRecipe(id);
+
         if(number != RecetasCookeoConstants.N_RECIPES_TO_INTERSTICIAL) {
             launchActivityDetails();
         }else if(mInterstitialAd.isLoaded()) {
@@ -462,10 +438,7 @@ public class RecipeListFragment extends Fragment implements
 
     private void launchActivityDetails(){
         Intent intent = new Intent(getActivity(), RecipeDetailActivityBase.class);
-        Bundle bundle = new Bundle();
-
-        bundle.putParcelable(RecetasCookeoConstants.KEY_RECIPE, recipeToShow);
-        intent.putExtras(bundle);
+        intent.setData(recipeToShow);
         ActivityOptionsCompat activityOptions = makeSceneTransitionAnimation(getActivity());
         // Now we can start the Activity, providing the activity options as a bundle
         ActivityCompat.startActivityForResult(getActivity(), intent, RecetasCookeoConstants.REQUEST_DETAILS, activityOptions.toBundle());
@@ -561,11 +534,8 @@ public class RecipeListFragment extends Fragment implements
         }
         if(id < 0){
             filterRecipes(null);
-        }
-        RecipeController recipeController = new RecipeController();
-        RecipeDb recipe = recipeController.getRecipeById(application, id);
-        if(recipe != null){
-            showRecipeDetails(RecipeReduced.getRecipeFromDatabase(recipe));
+        }else{
+            showRecipeDetails(id);
         }
     }
 
@@ -958,4 +928,6 @@ public class RecipeListFragment extends Fragment implements
 }
 
 
+// TODO: 22/3/17 pasar la recipe a details solo por la uri
+// TODO: 22/3/17 actualizar el content resolver cuando añada, edite o borre
 

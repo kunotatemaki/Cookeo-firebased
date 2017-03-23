@@ -1,27 +1,27 @@
 
 
-        package com.rukiasoft.androidapps.cocinaconroll.persistence.controllers;
+package com.rukiasoft.androidapps.cocinaconroll.persistence.controllers;
 
 
-        import android.app.Application;
-        import android.database.Cursor;
+import android.app.Application;
+import android.database.Cursor;
 
-        import com.google.firebase.database.DataSnapshot;
-        import com.rukiasoft.androidapps.cocinaconroll.persistence.daoqueries.RecipeQueries;
-        import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.database.methods.FirebaseDbMethods;
-        import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.database.model.RecipeFirebase;
-        import com.rukiasoft.androidapps.cocinaconroll.persistence.model.DaoSession;
-        import com.rukiasoft.androidapps.cocinaconroll.persistence.model.IngredientDb;
-        import com.rukiasoft.androidapps.cocinaconroll.persistence.model.RecipeDb;
-        import com.rukiasoft.androidapps.cocinaconroll.persistence.model.RecipeDbDao;
-        import com.rukiasoft.androidapps.cocinaconroll.persistence.model.StepDb;
-        import com.rukiasoft.androidapps.cocinaconroll.ui.model.RecipeReduced;
-        import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
+import com.google.firebase.database.DataSnapshot;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.daoqueries.RecipeQueries;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.database.methods.FirebaseDbMethods;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.database.model.RecipeFirebase;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.model.DaoSession;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.model.IngredientDb;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.model.RecipeDb;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.model.RecipeDbDao;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.model.StepDb;
+import com.rukiasoft.androidapps.cocinaconroll.ui.model.RecipeReduced;
+import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 
-        import org.greenrobot.greendao.query.Query;
+import org.greenrobot.greendao.query.Query;
 
-        import java.util.ArrayList;
-        import java.util.List;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by iRoll on 9/2/17.
@@ -87,7 +87,7 @@ public class RecipeController {
         List<RecipeReduced> listReduced = new ArrayList<>();
         if(listDb != null) {
             for (RecipeDb recipeDb : listDb) {
-                RecipeReduced recipeReduced = RecipeReduced.getRecipeFromDatabase(recipeDb);
+                RecipeReduced recipeReduced = RecipeReduced.getFromDatabase(recipeDb);
                 listReduced.add(recipeReduced);
             }
         }
@@ -123,7 +123,7 @@ public class RecipeController {
         return recipeDb;
     }
 
-    public List<RecipeDb> getListBothRecipeAndPicturesToDownload(Application application){
+   public List<RecipeDb> getListBothRecipeAndPicturesToDownload(Application application){
         DaoSession session = CommonController.getDaosessionFromApplication(application, "RecipeDb");
         return RecipeQueries.getQueryBothRecipesAndPicturesToDownload(session).list();
     }
@@ -194,7 +194,7 @@ public class RecipeController {
 
     }
 
-    public RecipeDb insertRecipeFromFirebase(Application application, DataSnapshot dataSnapshot, RecipeFirebase recipeFromFirebase) {
+    public void insertRecipeFromFirebase(Application application, DataSnapshot dataSnapshot, RecipeFirebase recipeFromFirebase) {
         Integer flag = FirebaseDbMethods.getRecipeFlagFromNodeName(dataSnapshot.getRef().getParent().getParent().getKey());
         RecipeDb recipeDb = new RecipeDb(recipeFromFirebase, dataSnapshot.getKey(), flag);
 
@@ -202,7 +202,7 @@ public class RecipeController {
         insertOrReplaceRecipe(application, recipeDb);
 
         //devuelvo la receta que he grabado
-        return getRecipeByKey(application, dataSnapshot.getKey());
+        //return getRecipeByKey(application, dataSnapshot.getKey());
     }
 
     private void insertOrReplaceRecipeIngredients(Application application, RecipeDb recipeDb){

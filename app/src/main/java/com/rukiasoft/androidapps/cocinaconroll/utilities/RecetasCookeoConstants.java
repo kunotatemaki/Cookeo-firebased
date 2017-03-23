@@ -24,6 +24,8 @@ public class RecetasCookeoConstants {
     public static final String SEARCH_FAVOURITES = "search_favourites";
     public static final String SEARCH_OWN = "search_own";
     public static final String SEARCH_LATEST = "search_latest";
+    public static final String SEARCH_RECIPE = "search_recipe";
+    public static final String INSERT_RECIPE = "insert_recipe";
 
     public static final String TYPE_STARTERS = "starter";
     public static final String TYPE_MAIN = "main";

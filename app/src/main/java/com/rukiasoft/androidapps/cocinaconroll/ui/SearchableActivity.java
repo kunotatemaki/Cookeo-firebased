@@ -16,7 +16,7 @@ import android.view.View;
 import com.orhanobut.logger.Logger;
 import com.rukiasoft.androidapps.cocinaconroll.R;
 import com.rukiasoft.androidapps.cocinaconroll.classes.SimpleDividerItemDecoration;
-import com.rukiasoft.androidapps.cocinaconroll.database.CocinaConRollContentProvider;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.database.CocinaConRollContentProvider;
 import com.rukiasoft.androidapps.cocinaconroll.ui.model.RecipeSearch;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 

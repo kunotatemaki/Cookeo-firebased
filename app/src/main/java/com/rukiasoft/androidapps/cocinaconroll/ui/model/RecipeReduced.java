@@ -1,9 +1,14 @@
 package com.rukiasoft.androidapps.cocinaconroll.ui.model;
 
+import android.app.Application;
+import android.database.Cursor;
 import android.os.Parcelable;
 
 import com.google.auto.value.AutoValue;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.controllers.CommonController;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.model.DaoSession;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.model.RecipeDb;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.model.RecipeDbDao;
 
 /**
  * Created by iRoll on 19/2/17.
@@ -38,7 +43,11 @@ public abstract class RecipeReduced implements Parcelable{
         abstract RecipeReduced build();
     }
 
-    public static RecipeReduced getRecipeFromDatabase(RecipeDb recipeDb) {
+    public static RecipeReduced getFromCursor(Application application, Cursor cursor){
+        return getFromDatabase(RecipeDb.getFromCursor(application, cursor));
+    }
+
+    public static RecipeReduced getFromDatabase(RecipeDb recipeDb) {
         try {
             return RecipeReduced.builder()
                     .setId(recipeDb.getId())

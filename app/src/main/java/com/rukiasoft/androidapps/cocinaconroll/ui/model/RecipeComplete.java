@@ -1,9 +1,14 @@
 package com.rukiasoft.androidapps.cocinaconroll.ui.model;
 
+import android.app.Application;
+import android.content.Context;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
 
 import com.google.auto.value.AutoValue;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.database.CocinaConRollContentProvider;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.model.RecipeDb;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.Tools;

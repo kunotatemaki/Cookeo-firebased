@@ -1,8 +1,9 @@
-package com.rukiasoft.androidapps.cocinaconroll.database;
+package com.rukiasoft.androidapps.cocinaconroll.persistence.database;
 
 import android.app.Application;
 import android.app.SearchManager;
 import android.content.ContentProvider;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
@@ -15,7 +16,7 @@ import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 public class CocinaConRollContentProvider extends ContentProvider {
 
 
-	public static final String AUTHORITY = "com.rukiasoft.androidapps.cocinaconroll.database.cocinaconrollcontentprovider";
+	public static final String AUTHORITY = "com.rukiasoft.androidapps.cocinaconroll.persistence.database.cocinaconrollcontentprovider";
 	public static final Uri CONTENT_URI_SUGGESTIONS_WHEN_KEYBOARD_GO = Uri.parse("content://" + AUTHORITY + "/suggestions");
 
     private RecipesDB mRecipesDB = null;
@@ -40,6 +41,15 @@ public class CocinaConRollContentProvider extends ContentProvider {
         return Uri.parse("content://" + AUTHORITY + "/" + lastPaht);
     }
 
+    public static Uri getUriForRecipe(long id) {
+
+        Uri uri = new Uri.Builder().scheme("content")
+                .authority(AUTHORITY)
+                .appendPath(RecetasCookeoConstants.SEARCH_RECIPE)
+                .build();
+        return ContentUris.withAppendedId(uri, id);
+    }
+
     private UriMatcher buildUriMatcher(){
         UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
@@ -62,7 +72,7 @@ public class CocinaConRollContentProvider extends ContentProvider {
         uriMatcher.addURI(AUTHORITY, RecetasCookeoConstants.SEARCH_LATEST, GET_LATEST);
 
         // This URI is invoked, when user selects a suggestion from search dialog or an item from the listview
-        uriMatcher.addURI(AUTHORITY, RecetasCookeoConstants.RECIPES_TABLE_NAME + "/#", GET_RECIPE);
+        //uriMatcher.addURI(AUTHORITY, RecetasCookeoConstants.RECIPES_TABLE_NAME + "/#", GET_RECIPE);
 
         return uriMatcher;
     }
@@ -121,6 +131,9 @@ public class CocinaConRollContentProvider extends ContentProvider {
             case GET_LATEST:
                 c = recipeController.getLatestRecipesInCursorFormat((Application)getContext().getApplicationContext());
                 break;
+        }
+        if(c != null && getContext() != null) {
+            c.setNotificationUri(getContext().getContentResolver(), uri);
         }
         return c;
     }

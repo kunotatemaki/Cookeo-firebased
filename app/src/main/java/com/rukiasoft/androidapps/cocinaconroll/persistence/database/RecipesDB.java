@@ -1,4 +1,4 @@
-package com.rukiasoft.androidapps.cocinaconroll.database;
+package com.rukiasoft.androidapps.cocinaconroll.persistence.database;
 
 import android.app.SearchManager;
 import android.content.Context;
