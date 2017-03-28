@@ -1,12 +1,11 @@
 package com.rukiasoft.androidapps.cocinaconroll.persistence.model;
 
 import android.app.Application;
+import android.content.ContentValues;
 import android.database.Cursor;
 
 import com.rukiasoft.androidapps.cocinaconroll.persistence.controllers.CommonController;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.database.model.RecipeFirebase;
-import com.rukiasoft.androidapps.cocinaconroll.ui.model.RecipeComplete;
-import com.rukiasoft.androidapps.cocinaconroll.ui.model.RecipeReduced;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.Tools;
 
@@ -362,31 +361,49 @@ public class RecipeDb {
         myDao.update(this);
     }
 
-    public static RecipeDb fromRecipeComplete(RecipeComplete recipeComplete){
+    public static RecipeDb fromContentValues(ContentValues recipe){
         RecipeDb recipeDb = new RecipeDb();
-        recipeDb.setId(recipeComplete.getId());
-        recipeDb.setKey(recipeComplete.getKey());
-        recipeDb.setName(recipeComplete.getName());
+        recipeDb.setId(recipe.getAsLong(RecetasCookeoConstants.RECIPE_COMPLETE_ID));
+        recipeDb.setKey(recipe.getAsString(RecetasCookeoConstants.RECIPE_COMPLETE_KEY));
+        recipeDb.setName(recipe.getAsString(RecetasCookeoConstants.RECIPE_COMPLETE_NAME));
         Tools tools = new Tools();
-        recipeDb.setNormalizedName(tools.getNormalizedString(recipeComplete.getName()));
-        recipeDb.setType(recipeComplete.getType());
-        recipeDb.setIcon(recipeComplete.getIcon());
-        recipeDb.setPicture(recipeComplete.getPicture());
-        recipeDb.setFavourite(recipeComplete.getFavourite());
-        recipeDb.setVegetarian(recipeComplete.getVegetarian());
-        recipeDb.setMinutes(recipeComplete.getMinutes());
-        recipeDb.setPortions(recipeComplete.getPortions());
-        recipeDb.setLanguage(recipeComplete.getLanguage());
-        recipeDb.setAuthor(recipeComplete.getAuthor());
-        recipeDb.setLink(recipeComplete.getLink());
-        recipeDb.setTip(recipeComplete.getTip());
-        recipeDb.setOwner(recipeComplete.getOwner());
-        recipeDb.setIngredients(RecipeDb.addIngredients(recipeComplete.getIngredients(), recipeComplete.getKey()));
-        recipeDb.setSteps(RecipeDb.addSteps(recipeComplete.getSteps(), recipeComplete.getKey()));
+        recipeDb.setNormalizedName(tools.getNormalizedString(recipe.getAsString(RecetasCookeoConstants.RECIPE_COMPLETE_NAME)));
+        recipeDb.setType(recipe.getAsString(RecetasCookeoConstants.RECIPE_COMPLETE_TYPE));
+        recipeDb.setIcon(recipe.getAsInteger(RecetasCookeoConstants.RECIPE_COMPLETE_ICON));
+        recipeDb.setPicture(recipe.getAsString(RecetasCookeoConstants.RECIPE_COMPLETE_PICTURE));
+        recipeDb.setFavourite(recipe.getAsBoolean(RecetasCookeoConstants.RECIPE_COMPLETE_FAVOURITE));
+        recipeDb.setVegetarian(recipe.getAsBoolean(RecetasCookeoConstants.RECIPE_COMPLETE_VEGETARIAN));
+        recipeDb.setMinutes(recipe.getAsInteger(RecetasCookeoConstants.RECIPE_COMPLETE_MINUTES));
+        recipeDb.setPortions(recipe.getAsInteger(RecetasCookeoConstants.RECIPE_COMPLETE_PORTIONS));
+        recipeDb.setLanguage(recipe.getAsInteger(RecetasCookeoConstants.RECIPE_COMPLETE_LANGUAGE));
+        recipeDb.setAuthor(recipe.getAsString(RecetasCookeoConstants.RECIPE_COMPLETE_AUTHOR));
+        recipeDb.setLink(recipe.getAsString(RecetasCookeoConstants.RECIPE_COMPLETE_LINK));
+        recipeDb.setTip(recipe.getAsString(RecetasCookeoConstants.RECIPE_COMPLETE_TIP));
+        recipeDb.setOwner(recipe.getAsInteger(RecetasCookeoConstants.RECIPE_COMPLETE_OWNER));
         recipeDb.setTimestamp(System.currentTimeMillis());
-        recipeDb.setEdited(recipeComplete.getEdited());
+        recipeDb.setEdited(recipe.getAsBoolean(RecetasCookeoConstants.RECIPE_COMPLETE_EDITED));
         recipeDb.setUpdateRecipe(0);
         recipeDb.setUpdatePicture(0);
+        int i = 0;
+        List<String> ingredients = new ArrayList<>();
+        while(recipe.containsKey(RecetasCookeoConstants.RECIPE_COMPLETE_INGREDIENT + i)){
+            String ingredient = recipe.getAsString(RecetasCookeoConstants.RECIPE_COMPLETE_INGREDIENT + i);
+            ingredients.add(ingredient);
+            i++;
+        }
+        recipeDb.setIngredients(
+                RecipeDb.getIngredientsFromList(ingredients, recipe.getAsString(RecetasCookeoConstants.RECIPE_COMPLETE_KEY))
+        );
+        i = 0;
+        List<String> steps = new ArrayList<>();
+        while(recipe.containsKey(RecetasCookeoConstants.RECIPE_COMPLETE_STEP + i)){
+            String step = recipe.getAsString(RecetasCookeoConstants.RECIPE_COMPLETE_STEP + i);
+            steps.add(step);
+            i++;
+        }
+        recipeDb.setSteps(
+                RecipeDb.getStepsFromList(steps, recipe.getAsString(RecetasCookeoConstants.RECIPE_COMPLETE_KEY))
+        );
         return recipeDb;
     }
 
@@ -413,12 +430,12 @@ public class RecipeDb {
         this.link = recipe.getLink();
         this.edited = false;
         if(recipe.getIngredients() != null) {
-            this.ingredients = RecipeDb.addIngredients(recipe.getIngredients(), this.key);
+            this.ingredients = RecipeDb.getIngredientsFromList(recipe.getIngredients(), this.key);
         }else{
             this.ingredients = new ArrayList<>();
         }
         if(recipe.getSteps() != null) {
-            this.steps = RecipeDb.addSteps(recipe.getSteps(), this.key);
+            this.steps = RecipeDb.getStepsFromList(recipe.getSteps(), this.key);
         }else{
             this.steps = new ArrayList<>();
         }
@@ -427,7 +444,7 @@ public class RecipeDb {
 
 
 
-    private static List<IngredientDb> addIngredients(List<String> ingredients, String key){
+    private static List<IngredientDb> getIngredientsFromList(List<String> ingredients, String key){
         List<IngredientDb> mIngredients = new ArrayList<>();
         for(int i=0; i<ingredients.size(); i++){
             IngredientDb ingredientDb = new IngredientDb();
@@ -439,7 +456,7 @@ public class RecipeDb {
         return mIngredients;
     }
 
-    private static List<StepDb> addSteps(List<String> steps, String key){
+    private static List<StepDb> getStepsFromList(List<String> steps, String key){
         List<StepDb> mSteps = new ArrayList<>();
         for(int i=0; i<steps.size(); i++){
             StepDb stepDb = new StepDb();

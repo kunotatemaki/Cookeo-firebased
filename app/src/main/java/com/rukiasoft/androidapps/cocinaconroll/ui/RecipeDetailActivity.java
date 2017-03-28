@@ -1,7 +1,6 @@
 package com.rukiasoft.androidapps.cocinaconroll.ui;
 
 import android.content.ContentUris;
-import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -12,23 +11,19 @@ import com.rukiasoft.androidapps.cocinaconroll.BuildConfig;
 import com.rukiasoft.androidapps.cocinaconroll.R;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.controllers.RecipeController;
 import com.rukiasoft.androidapps.cocinaconroll.ui.model.RecipeComplete;
-import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.Tools;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
-import icepick.State;
 
-public class RecipeDetailActivityBase extends ToolbarAndProgressActivity {
+public class RecipeDetailActivity extends ToolbarAndProgressActivity {
 
 
 
     @BindView(R.id.adview_details)
     AdView mAdViewDetails;
     private Unbinder unbinder;
-    @State
-    long id;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,9 +52,8 @@ public class RecipeDetailActivityBase extends ToolbarAndProgressActivity {
     }
 
     public RecipeComplete getRecipe(){
-        id = getRecipeId();
         RecipeComplete recipeComplete =  RecipeComplete.getRecipeFromDatabase(
-                new RecipeController().getRecipeById(getApplication(), id)
+                new RecipeController().getRecipeById(getApplication(), getRecipeId())
         );
         if(recipeComplete == null){
             finish();

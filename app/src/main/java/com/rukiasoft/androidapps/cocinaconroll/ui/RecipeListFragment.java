@@ -2,7 +2,6 @@ package com.rukiasoft.androidapps.cocinaconroll.ui;
 
 
 import android.app.Application;
-import android.content.ContentUris;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -64,8 +63,6 @@ import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.database.mod
 import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.database.model.TimestampFirebase;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.local.ObjectQeue;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.model.RecipeDb;
-import com.rukiasoft.androidapps.cocinaconroll.ui.model.RecipeComplete;
-import com.rukiasoft.androidapps.cocinaconroll.ui.model.RecipeReduced;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.ReadWriteTools;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.Tools;
@@ -437,7 +434,7 @@ public class RecipeListFragment extends Fragment implements
     }
 
     private void launchActivityDetails(){
-        Intent intent = new Intent(getActivity(), RecipeDetailActivityBase.class);
+        Intent intent = new Intent(getActivity(), RecipeDetailActivity.class);
         intent.setData(recipeToShow);
         ActivityOptionsCompat activityOptions = makeSceneTransitionAnimation(getActivity());
         // Now we can start the Activity, providing the activity options as a bundle

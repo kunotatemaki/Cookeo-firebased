@@ -108,7 +108,7 @@ public class RecipeDetailsFragment extends Fragment implements
                 case DialogInterface.BUTTON_POSITIVE:
                     FirebaseDbMethods firebaseDbMethods = new FirebaseDbMethods(mRecipeController);
                     firebaseDbMethods.share(getActivity().getApplication(),
-                            ((RecipeDetailActivityBase)getActivity()).getRecipeId());
+                            ((RecipeDetailActivity)getActivity()).getRecipeId());
                     break;
                 case DialogInterface.BUTTON_NEGATIVE:
                     break;
@@ -133,7 +133,7 @@ public class RecipeDetailsFragment extends Fragment implements
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.recipe_description_menu, menu);
-        RecipeComplete recipe = ((RecipeDetailActivityBase)getActivity()).getRecipe();
+        RecipeComplete recipe = ((RecipeDetailActivity)getActivity()).getRecipe();
         if(recipe != null) {
             menu.findItem(R.id.menu_item_remove).setVisible(recipe.getEdited() |
                     recipe.getOwner().equals(RecetasCookeoConstants.FLAG_PERSONAL_RECIPE));
@@ -150,7 +150,7 @@ public class RecipeDetailsFragment extends Fragment implements
         public void onClick(DialogInterface dialog, int which) {
             switch (which){
                 case DialogInterface.BUTTON_POSITIVE:
-                    RecipeComplete recipe = ((RecipeDetailActivityBase)getActivity()).getRecipe();
+                    RecipeComplete recipe = ((RecipeDetailActivity)getActivity()).getRecipe();
                     RecipeController recipeController = new RecipeController();
                     recipeController.setRecipeForDeleting(getActivity().getApplication(), recipe.getId());
                     FirebaseDbMethods firebaseDbMethods = new FirebaseDbMethods(recipeController);
@@ -169,7 +169,7 @@ public class RecipeDetailsFragment extends Fragment implements
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         Tools tools = new Tools();
-        RecipeComplete recipe = ((RecipeDetailActivityBase)getActivity()).getRecipe();
+        RecipeComplete recipe = ((RecipeDetailActivity)getActivity()).getRecipe();
         switch (item.getItemId()) {
             case R.id.menu_item_edit_recipe:
                 if(tools.getBooleanFromPreferences(getContext().getApplicationContext(),
@@ -209,7 +209,7 @@ public class RecipeDetailsFragment extends Fragment implements
 
     public void editRecipe(){
         Intent intent = new Intent(getActivity(), EditRecipeActivity.class);
-        intent.putExtra(RecetasCookeoConstants.KEY_RECIPE, ((RecipeDetailActivityBase)getActivity()).getRecipeId());
+        intent.putExtra(RecetasCookeoConstants.KEY_RECIPE, ((RecipeDetailActivity)getActivity()).getRecipeId());
         getActivity().startActivity(intent);
     }
 
@@ -276,7 +276,7 @@ public class RecipeDetailsFragment extends Fragment implements
             });
         }
 
-        RecipeComplete recipe = ((RecipeDetailActivityBase)getActivity()).getRecipe();
+        RecipeComplete recipe = ((RecipeDetailActivity)getActivity()).getRecipe();
 
         loadRecipe(recipe);
 
@@ -326,7 +326,7 @@ public class RecipeDetailsFragment extends Fragment implements
 
     private void clickOnHeartButton(){
         RecipeComplete recipe = RecipeComplete.getRecipeFromDatabase(mRecipeController.switchFavourite(getActivity().getApplication(),
-                ((RecipeDetailActivityBase)getActivity()).getRecipeId()));
+                ((RecipeDetailActivity)getActivity()).getRecipeId()));
         if(recipe == null){
             return;
         }

@@ -1,6 +1,8 @@
 package com.rukiasoft.androidapps.cocinaconroll.utilities;
 
 
+import java.util.List;
+
 public class RecetasCookeoConstants {
     public static final String PACKAGE_NAME = "com.rukiasoft.androidapps.cocinaconroll";
 
@@ -124,6 +126,27 @@ public class RecetasCookeoConstants {
     public static final int FLAG_DOWNLOAD_PICTURE = 1;
     public static final int FLAG_UPLOAD_PICTURE = 2;
     public static final int FLAG_DELETE_PICTURE = 3;
+
+    public static final String RECIPE_COMPLETE_ID = "id";
+    public static final String RECIPE_COMPLETE_KEY = "key";
+    public static final String RECIPE_COMPLETE_NAME = "name";
+    public static final String RECIPE_COMPLETE_TYPE = "type";
+    public static final String RECIPE_COMPLETE_ICON = "icon";
+    public static final String RECIPE_COMPLETE_PICTURE = "picture";
+    public static final String RECIPE_COMPLETE_VEGETARIAN = "vegetarian";
+    public static final String RECIPE_COMPLETE_FAVOURITE = "favourite";
+    public static final String RECIPE_COMPLETE_MINUTES = "minutes";
+    public static final String RECIPE_COMPLETE_PORTIONS = "portions";
+    public static final String RECIPE_COMPLETE_LANGUAGE = "language";
+    public static final String RECIPE_COMPLETE_AUTHOR = "author";
+    public static final String RECIPE_COMPLETE_LINK = "link";
+    public static final String RECIPE_COMPLETE_TIP = "tip";
+    public static final String RECIPE_COMPLETE_OWNER = "owner";
+    public static final String RECIPE_COMPLETE_EDITED = "edited";
+    public static final String RECIPE_COMPLETE_TIMESTAMP = "timestamp";
+    public static final String RECIPE_COMPLETE_INGREDIENT = "ingredient_";
+    public static final String RECIPE_COMPLETE_STEP = "step_";
+
 
 
 }

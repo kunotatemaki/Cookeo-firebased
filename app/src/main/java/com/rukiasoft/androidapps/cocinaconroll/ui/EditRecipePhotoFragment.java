@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -28,13 +29,8 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.rukiasoft.androidapps.cocinaconroll.CocinaConRollApplication;
 import com.rukiasoft.androidapps.cocinaconroll.R;
-import com.rukiasoft.androidapps.cocinaconroll.ui.model.RecipeComplete;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.ReadWriteTools;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.Tools;
@@ -83,7 +79,7 @@ public class EditRecipePhotoFragment extends Fragment {
     }
 
     public String getNameOfNewImage() {
-        return mNewPicName != null? mNewPicName : "";
+        return mNewPicName != null? mNewPicName : RecetasCookeoConstants.DEFAULT_PICTURE_NAME;
     }
 
     @Override
@@ -100,11 +96,11 @@ public class EditRecipePhotoFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        if(getActivity().isFinishing()){
+        if (getActivity().isFinishing()) {
             return null;
         }
         View view;
-        RecipeComplete recipe = ((EditRecipeActivity) getActivity()).getRecipe();
+        ContentValues recipeCV = ((EditRecipeActivity) getActivity()).getRecipeCV();
 
         view = inflater.inflate(R.layout.fragment_edit_recipe_foto_create, container, false);
 
@@ -124,42 +120,55 @@ public class EditRecipePhotoFragment extends Fragment {
         spinner.setAdapter(dataAdapter);
 
         int currentApiVersion = Build.VERSION.SDK_INT;
-        if (currentApiVersion <= Build.VERSION_CODES.JELLY_BEAN){
+        if (currentApiVersion <= Build.VERSION_CODES.JELLY_BEAN) {
             final float scale = this.getResources().getDisplayMetrics().density;
-            checkBox.setPadding(checkBox.getPaddingLeft() + (int)(20.0f * scale + 0.5f),
+            checkBox.setPadding(checkBox.getPaddingLeft() + (int) (20.0f * scale + 0.5f),
                     checkBox.getPaddingTop(),
                     checkBox.getPaddingRight(),
                     checkBox.getPaddingBottom());
         }
 
-        if (recipe != null && recipe.getName() != null) {
-            mEdited = true;
-            createRecipeName.setText(recipe.getName());
+        if (recipeCV.containsKey(RecetasCookeoConstants.RECIPE_COMPLETE_NAME)) {
+            createRecipeName.setText(recipeCV.getAsString(RecetasCookeoConstants.RECIPE_COMPLETE_NAME));
+        }
+        if (recipeCV.containsKey(RecetasCookeoConstants.RECIPE_COMPLETE_PICTURE)) {
             rwTools.loadImageFromPath(getActivity().getApplicationContext(), mImageView,
-                    recipe.getPicture(),
-                    R.drawable.default_dish, recipe.getTimestamp());
+                    recipeCV.getAsString(RecetasCookeoConstants.RECIPE_COMPLETE_PICTURE),
+                    R.drawable.default_dish, recipeCV.getAsLong(RecetasCookeoConstants.RECIPE_COMPLETE_TIMESTAMP));
+        }
 
-            if(recipe.getMinutes()>0)
-                minutes.setText(recipe.getMinutes().toString());
-            else
-                minutes.setText("0");
+        if (recipeCV.containsKey(RecetasCookeoConstants.RECIPE_COMPLETE_MINUTES)) {
+            minutes.setText(recipeCV.getAsString(RecetasCookeoConstants.RECIPE_COMPLETE_MINUTES));
+        } else {
+            minutes.setText("0");
+        }
+        if (recipeCV.containsKey(RecetasCookeoConstants.RECIPE_COMPLETE_PORTIONS)) {
+            portions.setText(recipeCV.getAsString(RecetasCookeoConstants.RECIPE_COMPLETE_PORTIONS));
+        } else {
+            portions.setText("0");
+        }
 
-            if(recipe.getPortions()>0)
-                portions.setText(recipe.getPortions().toString());
-            else
-                portions.setText("0");
+        if (recipeCV.containsKey(RecetasCookeoConstants.RECIPE_COMPLETE_VEGETARIAN)) {
+            checkBox.setChecked(recipeCV.getAsBoolean(RecetasCookeoConstants.RECIPE_COMPLETE_VEGETARIAN));
+        }
 
-            checkBox.setChecked(recipe.getVegetarian());
-
+        if (recipeCV.containsKey(RecetasCookeoConstants.RECIPE_COMPLETE_TYPE)) {
             String type = "";
-            if(recipe.getType().compareTo(RecetasCookeoConstants.TYPE_STARTERS) == 0)
-                type = getResources().getString(R.string.starters);
-            else if(recipe.getType().compareTo(RecetasCookeoConstants.TYPE_MAIN) == 0)
-                type = getResources().getString(R.string.main_courses);
-            else if(recipe.getType().compareTo(RecetasCookeoConstants.TYPE_DESSERTS) == 0)
-                type = getResources().getString(R.string.desserts);
+            String typeCV = recipeCV.getAsString(RecetasCookeoConstants.RECIPE_COMPLETE_TYPE);
+            switch (typeCV) {
+                case RecetasCookeoConstants.TYPE_STARTERS:
+                    type = getResources().getString(R.string.starters);
+                    break;
+                case RecetasCookeoConstants.TYPE_MAIN:
+                    type = getResources().getString(R.string.main_courses);
+                    break;
+                case RecetasCookeoConstants.TYPE_DESSERTS:
+                    type = getResources().getString(R.string.desserts);
+                    break;
+            }
             spinner.setSelection(dataAdapter.getPosition(type));
         }
+
 
         mImageView.setOnClickListener(new View.OnClickListener() {
 
@@ -390,8 +399,8 @@ public class EditRecipePhotoFragment extends Fragment {
         }
 
         if(ret){
-            RecipeComplete recipe = getRecipeFromParams();
-            ((EditRecipeActivity)getActivity()).setRecipe(recipe);
+            ContentValues recipeCV = getValuesFromParams();
+            ((EditRecipeActivity)getActivity()).setRecipeCV(recipeCV);
 
         }
         return ret;
@@ -410,32 +419,17 @@ public class EditRecipePhotoFragment extends Fragment {
         return mTools.getCurrentDate(getActivity()).concat(".jpg");
     }
 
-    private String getKey(String uid){
-        RecipeComplete recipe = ((EditRecipeActivity)getActivity()).getRecipe();
-        if(recipe == null || recipe.getKey() == null || recipe.getKey().isEmpty()){
-            DatabaseReference ref = FirebaseDatabase
-                    .getInstance()
-                    .getReference(RecetasCookeoConstants.PERSONAL_RECIPES_NODE);
-            return ref.child(uid).push().getKey();
-        }else{
-            return recipe.getKey();
-        }
-    }
+    private ContentValues getValuesFromParams(){
 
-    private RecipeComplete getRecipeFromParams(){
-        RecipeComplete recipe = ((EditRecipeActivity)getActivity()).getRecipe();
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        String author;
-        if(user != null) {
-            author = user.getDisplayName();
-        }else{
-            return null;
-        }
+        ContentValues recipeCV = ((EditRecipeActivity)getActivity()).getRecipeCV();
+        recipeCV.put(RecetasCookeoConstants.RECIPE_COMPLETE_NAME, createRecipeName.getText().toString());
+        recipeCV.put(RecetasCookeoConstants.RECIPE_COMPLETE_PICTURE, getNameOfNewImage());
+        recipeCV.put(RecetasCookeoConstants.RECIPE_COMPLETE_MINUTES, Integer.valueOf(minutes.getText().toString()));
+        recipeCV.put(RecetasCookeoConstants.RECIPE_COMPLETE_PORTIONS, Integer.valueOf(portions.getText().toString()));
+        recipeCV.put(RecetasCookeoConstants.RECIPE_COMPLETE_TYPE, getTypeFromSpinner());
+        recipeCV.put(RecetasCookeoConstants.RECIPE_COMPLETE_VEGETARIAN, checkBox.isChecked());
+        return recipeCV;
 
-        String key = getKey(user.getUid());
-        return RecipeComplete.getRecipeFrom1Screen(recipe, key, createRecipeName.getText().toString(),
-                getNameOfNewImage(), checkBox.isChecked(), getTypeFromSpinner(), Integer.valueOf(minutes.getText().toString()),
-                Integer.valueOf(portions.getText().toString()), author, mEdited);
     }
 
     private String getTypeFromSpinner(){

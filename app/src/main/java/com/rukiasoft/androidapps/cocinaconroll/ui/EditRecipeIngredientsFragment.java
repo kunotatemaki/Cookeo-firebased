@@ -1,6 +1,7 @@
 package com.rukiasoft.androidapps.cocinaconroll.ui;
 
 
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -20,7 +21,6 @@ import com.rukiasoft.androidapps.cocinaconroll.CocinaConRollApplication;
 import com.rukiasoft.androidapps.cocinaconroll.R;
 import com.rukiasoft.androidapps.cocinaconroll.dragandswipehelper.OnStartDragListener;
 import com.rukiasoft.androidapps.cocinaconroll.dragandswipehelper.SimpleItemTouchHelperCallback;
-import com.rukiasoft.androidapps.cocinaconroll.ui.model.RecipeComplete;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.Tools;
 import com.squareup.leakcanary.RefWatcher;
@@ -92,14 +92,14 @@ public class EditRecipeIngredientsFragment extends Fragment implements OnStartDr
         super.onActivityCreated(savedInstanceState);
 
         if(mAdapter == null) {
-            RecipeComplete recipe = ((EditRecipeActivity) getActivity()).getRecipe();
+            ContentValues recipeCV = ((EditRecipeActivity) getActivity()).getRecipeCV();
             List<String> ingredients = new ArrayList<>();
-            if (recipe.getIngredients() != null) {
-                ingredients = recipe.getIngredients();
+            int i=0;
+            while(recipeCV.containsKey(RecetasCookeoConstants.RECIPE_COMPLETE_INGREDIENT + i)){
+                ingredients.add(recipeCV.getAsString(RecetasCookeoConstants.RECIPE_COMPLETE_INGREDIENT + i));
+                i++;
             }
             mAdapter = new EditRecipeRecyclerViewAdapter(ingredients, this);
-
-            //recyclerView.setHasFixedSize(true);
 
         }
         recyclerView.setAdapter(mAdapter);
@@ -115,9 +115,13 @@ public class EditRecipeIngredientsFragment extends Fragment implements OnStartDr
 
 
 
-    public RecipeComplete saveData(){
-        RecipeComplete recipe = ((EditRecipeActivity)getActivity()).getRecipe();
-        return RecipeComplete.getRecipeFrom2Screen(recipe, mAdapter.getItems());
+    public ContentValues saveData(){
+        List<String> ingredients = mAdapter.getItems();
+        ContentValues recipeCV = ((EditRecipeActivity)getActivity()).getRecipeCV();
+        for(int i=0; i<ingredients.size(); i++){
+            recipeCV.put(RecetasCookeoConstants.RECIPE_COMPLETE_INGREDIENT + i, ingredients.get(i));
+        }
+        return recipeCV;
     }
 
 

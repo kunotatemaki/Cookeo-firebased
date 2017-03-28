@@ -1,6 +1,7 @@
 package com.rukiasoft.androidapps.cocinaconroll.ui;
 
 
+import android.content.ContentValues;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -17,7 +18,7 @@ import com.rukiasoft.androidapps.cocinaconroll.CocinaConRollApplication;
 import com.rukiasoft.androidapps.cocinaconroll.R;
 import com.rukiasoft.androidapps.cocinaconroll.dragandswipehelper.OnStartDragListener;
 import com.rukiasoft.androidapps.cocinaconroll.dragandswipehelper.SimpleItemTouchHelperCallback;
-import com.rukiasoft.androidapps.cocinaconroll.ui.model.RecipeComplete;
+import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.Tools;
 import com.squareup.leakcanary.RefWatcher;
 
@@ -91,9 +92,9 @@ public class EditRecipeStepsFragment extends Fragment implements OnStartDragList
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        RecipeComplete recipe = ((EditRecipeActivity)getActivity()).getRecipe();
-        if(tip.getText().toString().isEmpty() && recipe != null) {
-            tip.setText(recipe.getTip());
+        ContentValues recipeCV = ((EditRecipeActivity)getActivity()).getRecipeCV();
+        if(recipeCV.containsKey(RecetasCookeoConstants.RECIPE_COMPLETE_TIP)){
+            tip.setText(recipeCV.getAsString(RecetasCookeoConstants.RECIPE_COMPLETE_TIP));
         }
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -105,12 +106,15 @@ public class EditRecipeStepsFragment extends Fragment implements OnStartDragList
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         if(mAdapter == null) {
-            RecipeComplete recipe = ((EditRecipeActivity) getActivity()).getRecipe();
+            ContentValues recipeCV = ((EditRecipeActivity) getActivity()).getRecipeCV();
             List<String> steps = new ArrayList<>();
-            if (recipe.getSteps() != null) {
-                steps = recipe.getSteps();
+            int i=0;
+            while(recipeCV.containsKey(RecetasCookeoConstants.RECIPE_COMPLETE_STEP + i)){
+                steps.add(recipeCV.getAsString(RecetasCookeoConstants.RECIPE_COMPLETE_STEP + i));
+                i++;
             }
             mAdapter = new EditRecipeRecyclerViewAdapter(steps, this);
+
         }
         recyclerView.setAdapter(mAdapter);
         ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(mAdapter);
@@ -125,10 +129,13 @@ public class EditRecipeStepsFragment extends Fragment implements OnStartDragList
 
 
 
-    public RecipeComplete saveData(){
-        RecipeComplete recipe = ((EditRecipeActivity)getActivity()).getRecipe();
-        String sTip = tip.getText() != null? tip.getText().toString() : "";
-        return RecipeComplete.getRecipeFrom3Screen(recipe, mAdapter.getItems(), sTip);
+    public ContentValues saveData(){
+        List<String> steps = mAdapter.getItems();
+        ContentValues recipeCV = ((EditRecipeActivity)getActivity()).getRecipeCV();
+        for(int i=0; i<steps.size(); i++){
+            recipeCV.put(RecetasCookeoConstants.RECIPE_COMPLETE_STEP + i, steps.get(i));
+        }
+        return recipeCV;
     }
 
 }

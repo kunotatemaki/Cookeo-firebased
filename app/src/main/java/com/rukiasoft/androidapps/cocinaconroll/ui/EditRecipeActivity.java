@@ -1,8 +1,11 @@
 package com.rukiasoft.androidapps.cocinaconroll.ui;
 
+import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
@@ -13,6 +16,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.rukiasoft.androidapps.cocinaconroll.R;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.controllers.RecipeController;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.database.methods.FirebaseDbMethods;
@@ -35,7 +42,8 @@ public class EditRecipeActivity extends AppCompatActivity {
     private EditRecipePhotoFragment editRecipePhotoFragment;
     private EditRecipeIngredientsFragment editRecipeIngredientsFragment;
     private EditRecipeStepsFragment editRecipeStepsFragment;
-    RecipeComplete recipe;
+    @State
+    ContentValues recipeCV;
     @State String title;
     @BindView(R.id.standard_toolbar) Toolbar mToolbar;
     @State String oldPicture;
@@ -46,22 +54,43 @@ public class EditRecipeActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         //Log.d(TAG, "onCreate");
-        if(recipe == null && getIntent() != null && getIntent().hasExtra(RecetasCookeoConstants.KEY_RECIPE)) {
-            recipe = getIntent().getExtras().getParcelable(RecetasCookeoConstants.KEY_RECIPE);
-            //check if the picture is previosly edited, to delete the old picture
-            if(recipe == null){
-                setResult(RESULT_CANCELED);
-                finish();
-            }
-            if(recipe.getOwner().equals(RecetasCookeoConstants.FLAG_PERSONAL_RECIPE)){
-                oldPicture = recipe.getPicture();
-            }
-            title = getResources().getString(R.string.edit_recipe);
-        }else{
-            title = getResources().getString(R.string.create_recipe);
+        if(getIntent() == null){
+            setResult(RESULT_CANCELED);
+            finish();
+            return;
         }
 
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_edit_recipe);
+        unbinder = ButterKnife.bind(this);
+
+        String author;
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if(user != null) {
+            author = user.getDisplayName();
+        }else{
+            setResult(RESULT_CANCELED);
+            finish();
+            return;
+        }
+
+        if(getIntent().getData() != null) {
+//            RecipeComplete recipe = getRecipe();
+//
+//            if(recipe.getOwner().equals(RecetasCookeoConstants.FLAG_PERSONAL_RECIPE)){
+//                oldPicture = recipe.getPicture();
+//            }
+            title = getResources().getString(R.string.edit_recipe);
+            if(recipeCV == null){
+                recipeCV = RecipeComplete.getContentValues(getRecipe());
+            }
+        }else{
+            title = getResources().getString(R.string.create_recipe);
+            if(recipeCV == null){
+                recipeCV = RecipeComplete.getEmptyPersonalValues(getKey(user.getUid()), author, false);
+            }
+        }
+
 
         if(savedInstanceState != null) {
             editRecipeIngredientsFragment = (EditRecipeIngredientsFragment) getSupportFragmentManager().findFragmentByTag(EditRecipeIngredientsFragment.class.getSimpleName());
@@ -69,8 +98,6 @@ public class EditRecipeActivity extends AppCompatActivity {
             editRecipePhotoFragment = (EditRecipePhotoFragment) getSupportFragmentManager().findFragmentByTag(EditRecipePhotoFragment.class.getSimpleName());
         }
 
-        setContentView(R.layout.activity_edit_recipe);
-        unbinder = ButterKnife.bind(this);
 
         if (mToolbar != null) {
             setSupportActionBar(mToolbar);
@@ -95,7 +122,6 @@ public class EditRecipeActivity extends AppCompatActivity {
                 titleTextView.setSelected(true);
                 titleTextView.setMarqueeRepeatLimit(-1);
             }
-
         } catch (NoSuchFieldException e){
             e.printStackTrace();
         } catch (IllegalAccessException e) {
@@ -112,6 +138,34 @@ public class EditRecipeActivity extends AppCompatActivity {
             }
             getSupportFragmentManager().executePendingTransactions();
         }
+    }
+
+    private String getKey(String uid){
+        RecipeComplete recipe = getRecipe();
+        if(recipe == null || recipe.getKey() == null || recipe.getKey().isEmpty()){
+            DatabaseReference ref = FirebaseDatabase
+                    .getInstance()
+                    .getReference(RecetasCookeoConstants.PERSONAL_RECIPES_NODE);
+            return ref.child(uid).push().getKey();
+        }else{
+            return recipe.getKey();
+        }
+    }
+
+    public long getRecipeId(){
+        Uri uri = getIntent().getData();
+        return ContentUris.parseId(uri);
+    }
+
+    private RecipeComplete getRecipe(){
+        RecipeComplete recipeComplete =  RecipeComplete.getRecipeFromDatabase(
+                new RecipeController().getRecipeById(getApplication(), getRecipeId())
+        );
+        if(recipeComplete == null){
+            finish();
+            return null;
+        }
+        return recipeComplete;
     }
 
     @Override
@@ -140,7 +194,7 @@ public class EditRecipeActivity extends AppCompatActivity {
                     getSupportFragmentManager().executePendingTransactions();
                 } else if (f instanceof EditRecipeIngredientsFragment) {
                     //editRecipeStepsFragment = (EditRecipeStepsFragment) getSupportFragmentManager().findFragmentByTag(EditRecipeStepsFragment.class.getSimpleName());
-                    setRecipe(editRecipeIngredientsFragment.saveData());
+                    setRecipeCV(editRecipeIngredientsFragment.saveData());
                     editRecipeIngredientsFragment = null;
                     if(editRecipeStepsFragment == null) {
                         editRecipeStepsFragment = new EditRecipeStepsFragment();
@@ -151,7 +205,7 @@ public class EditRecipeActivity extends AppCompatActivity {
                             .commit();
                     getSupportFragmentManager().executePendingTransactions();
                 } else if (f instanceof EditRecipeStepsFragment) {
-                    setRecipe(editRecipeStepsFragment.saveData());
+                    setRecipeCV(editRecipeStepsFragment.saveData());
                     setResultData();
                 }
                 invalidateOptionsMenu();// creates call to onPrepareOptionsMenu()
@@ -210,16 +264,16 @@ public class EditRecipeActivity extends AppCompatActivity {
     }
     private void setResultData(){
         RecipeController recipeController = new RecipeController();
-        RecipeDb recipeDb = RecipeDb.fromRecipeComplete(recipe);
+        RecipeDb recipeDb = RecipeDb.fromContentValues(recipeCV);
         recipeDb.setUpdateRecipe(RecetasCookeoConstants.FLAG_UPLOAD_RECIPE);
-        if(!recipe.getPicture().equals(RecetasCookeoConstants.DEFAULT_PICTURE_NAME)){
+        if(!recipeCV.get(RecetasCookeoConstants.RECIPE_COMPLETE_PICTURE).equals(RecetasCookeoConstants.DEFAULT_PICTURE_NAME)){
             recipeDb.setUpdatePicture(RecetasCookeoConstants.FLAG_UPLOAD_PICTURE);
         }
         recipeController.insertOrReplaceRecipe(getApplication(), recipeDb);
         FirebaseDbMethods firebaseDbMethods = new FirebaseDbMethods(recipeController);
         firebaseDbMethods.updateRecipesToPersonalStorage(getApplicationContext());
         Intent resultIntent = new Intent();
-        resultIntent.putExtra(RecetasCookeoConstants.KEY_RECIPE, recipe);
+        resultIntent.putExtra(RecetasCookeoConstants.KEY_RECIPE, recipeCV.getAsLong(RecetasCookeoConstants.RECIPE_COMPLETE_ID));
         setResult(RecetasCookeoConstants.RESULT_UPDATE_RECIPE, resultIntent);
         finish();
     }
@@ -237,12 +291,12 @@ public class EditRecipeActivity extends AppCompatActivity {
         }
     };
 
-    public RecipeComplete getRecipe() {
-        return recipe;
+    public ContentValues getRecipeCV() {
+        return recipeCV;
     }
 
-    public void setRecipe(RecipeComplete recipe) {
-        this.recipe = recipe;
+    public void setRecipeCV(ContentValues recipeCV) {
+        this.recipeCV = recipeCV;
     }
 
     private void performPressBack(){
@@ -280,20 +334,6 @@ public class EditRecipeActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        if(recipe != null){
-            outState.putParcelable(RecetasCookeoConstants.KEY_RECIPE, recipe);
-        }
-        super.onSaveInstanceState(outState);
-    }
 
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        if(savedInstanceState.containsKey(RecetasCookeoConstants.KEY_RECIPE)){
-            recipe = savedInstanceState.getParcelable(RecetasCookeoConstants.KEY_RECIPE);
-        }
-    }
 }
 
