@@ -169,10 +169,7 @@ public class EditRecipeActivity extends AppCompatActivity {
                     new RecipeController().getRecipeById(getApplication(), getRecipeId())
             );
         }
-        if(recipeComplete == null){
-            finish();
-            return null;
-        }
+
         return recipeComplete;
     }
 
@@ -277,11 +274,11 @@ public class EditRecipeActivity extends AppCompatActivity {
         if(!recipeCV.get(RecetasCookeoConstants.RECIPE_COMPLETE_PICTURE).equals(RecetasCookeoConstants.DEFAULT_PICTURE_NAME)){
             recipeDb.setUpdatePicture(RecetasCookeoConstants.FLAG_UPLOAD_PICTURE);
         }
-        recipeController.insertOrReplaceRecipe(getApplication(), recipeDb);
+        recipeDb = recipeController.insertOrReplaceRecipe(getApplication(), recipeDb);
         FirebaseDbMethods firebaseDbMethods = new FirebaseDbMethods(recipeController);
         firebaseDbMethods.updateRecipesToPersonalStorage(getApplicationContext());
         Intent resultIntent = new Intent();
-        resultIntent.setData(CocinaConRollContentProvider.getUriForRecipe(recipeCV.getAsLong(RecetasCookeoConstants.RECIPE_COMPLETE_ID)));
+        resultIntent.setData(CocinaConRollContentProvider.getUriForRecipe(recipeDb.getId()));
         setResult(RESULT_OK, resultIntent);
         finish();
     }

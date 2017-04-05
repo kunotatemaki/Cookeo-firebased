@@ -135,6 +135,7 @@ public class EditRecipeStepsFragment extends Fragment implements OnStartDragList
         for(int i=0; i<steps.size(); i++){
             recipeCV.put(RecetasCookeoConstants.RECIPE_COMPLETE_STEP + i, steps.get(i));
         }
+        recipeCV.put(RecetasCookeoConstants.RECIPE_COMPLETE_TIP, tip.getText().toString());
         return recipeCV;
     }
 

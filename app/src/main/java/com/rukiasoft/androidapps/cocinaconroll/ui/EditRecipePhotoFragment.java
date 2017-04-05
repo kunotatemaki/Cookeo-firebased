@@ -427,6 +427,7 @@ public class EditRecipePhotoFragment extends Fragment {
         recipeCV.put(RecetasCookeoConstants.RECIPE_COMPLETE_MINUTES, Integer.valueOf(minutes.getText().toString()));
         recipeCV.put(RecetasCookeoConstants.RECIPE_COMPLETE_PORTIONS, Integer.valueOf(portions.getText().toString()));
         recipeCV.put(RecetasCookeoConstants.RECIPE_COMPLETE_TYPE, getTypeFromSpinner());
+        recipeCV.put(RecetasCookeoConstants.RECIPE_COMPLETE_ICON, Tools.getIconFromType(getTypeFromSpinner()));
         recipeCV.put(RecetasCookeoConstants.RECIPE_COMPLETE_VEGETARIAN, checkBox.isChecked());
         return recipeCV;
 
@@ -451,5 +452,7 @@ public class EditRecipePhotoFragment extends Fragment {
         return type;
 
     }
+
+
 }
 
