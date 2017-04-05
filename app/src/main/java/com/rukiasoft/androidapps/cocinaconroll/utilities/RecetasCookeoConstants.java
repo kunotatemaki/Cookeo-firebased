@@ -37,7 +37,7 @@ public class RecetasCookeoConstants {
     public static final String KEY_TYPE = RecetasCookeoConstants.PACKAGE_NAME + ".type";
     public static final int REQUEST_DETAILS = 200;
     public static final int REQUEST_CREATE_RECIPE = 201;
-    public static final int RESULT_UPDATE_RECIPE = 300;
+    //public static final int RESULT_UPDATE_RECIPE = 300;
 
     public static final String PROPERTY_DATABASE_CREATED = "database_created";
     public static final String PROPERTY_HIDE_SWIPE_DIALOG = "hide_swipe_dialog";
@@ -113,6 +113,7 @@ public class RecetasCookeoConstants {
     public static final int REQUEST_CODE_SIGNING_FROM_SPLASH = 103;
     public static final int REQUEST_CODE_SIGNING_FROM_RECIPELIST = 104;
     public static final int REQUEST_CODE_GOOGLE_SIGN_IN = 104;
+    public static final int REQUEST_EDIT_RECIPE = 9;
 
     public static final int FLAG_ALLOWED_RECIPE = 1;
     public static final int FLAG_FORBIDDEN_RECIPE = 2;

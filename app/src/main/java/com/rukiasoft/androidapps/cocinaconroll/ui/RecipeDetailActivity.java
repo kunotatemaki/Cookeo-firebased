@@ -1,6 +1,8 @@
 package com.rukiasoft.androidapps.cocinaconroll.ui;
 
+import android.app.Activity;
 import android.content.ContentUris;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -11,6 +13,7 @@ import com.rukiasoft.androidapps.cocinaconroll.BuildConfig;
 import com.rukiasoft.androidapps.cocinaconroll.R;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.controllers.RecipeController;
 import com.rukiasoft.androidapps.cocinaconroll.ui.model.RecipeComplete;
+import com.rukiasoft.androidapps.cocinaconroll.utilities.RecetasCookeoConstants;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.Tools;
 
 import butterknife.BindView;
@@ -18,6 +21,7 @@ import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
 public class RecipeDetailActivity extends ToolbarAndProgressActivity {
+
 
 
 
@@ -61,6 +65,23 @@ public class RecipeDetailActivity extends ToolbarAndProgressActivity {
         }
         return recipeComplete;
     }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case RecetasCookeoConstants.REQUEST_EDIT_RECIPE:
+                if(resultCode == Activity.RESULT_OK){
+                    RecipeComplete recipe = getRecipe();
+                    RecipeDetailsFragment recipeDetailsFragment = (RecipeDetailsFragment) getSupportFragmentManager().findFragmentById(R.id.details_recipes_fragment);
+
+                    recipeDetailsFragment.loadRecipe(recipe);
+                }
+                break;
+            default:
+                super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
 
     @Override
     protected void onDestroy() {

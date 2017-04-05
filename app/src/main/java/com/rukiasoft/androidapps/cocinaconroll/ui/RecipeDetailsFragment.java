@@ -13,6 +13,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -51,6 +52,7 @@ import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.rukiasoft.androidapps.cocinaconroll.CocinaConRollApplication;
 import com.rukiasoft.androidapps.cocinaconroll.R;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.controllers.RecipeController;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.database.CocinaConRollContentProvider;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.database.methods.FirebaseDbMethods;
 import com.rukiasoft.androidapps.cocinaconroll.ui.model.RecipeComplete;
 import com.rukiasoft.androidapps.cocinaconroll.utilities.ReadWriteTools;
@@ -67,7 +69,6 @@ import icepick.State;
 public class RecipeDetailsFragment extends Fragment implements
         AppBarLayout.OnOffsetChangedListener{
     private static final float PERCENTAGE_TO_ELLIPSIZE_TITLE  = 0.1f;
-
 
 
     @BindView(R.id.recipe_details_icon_minutes) ImageView iconMinutes;
@@ -143,6 +144,7 @@ public class RecipeDetailsFragment extends Fragment implements
 
     }
 
+
     private final DialogInterface.OnClickListener removeDialogClickListener = new DialogInterface.OnClickListener() {
 
 
@@ -209,8 +211,9 @@ public class RecipeDetailsFragment extends Fragment implements
 
     public void editRecipe(){
         Intent intent = new Intent(getActivity(), EditRecipeActivity.class);
-        intent.putExtra(RecetasCookeoConstants.KEY_RECIPE, ((RecipeDetailActivity)getActivity()).getRecipeId());
-        getActivity().startActivity(intent);
+        Uri uri = CocinaConRollContentProvider.getUriForRecipe(((RecipeDetailActivity) getActivity()).getRecipeId());
+        intent.setData(uri);
+        getActivity().startActivityForResult(intent, RecetasCookeoConstants.REQUEST_EDIT_RECIPE);
     }
 
     private final Runnable scaleIn = new Runnable() {
@@ -337,7 +340,7 @@ public class RecipeDetailsFragment extends Fragment implements
             recipeDescriptionFAB.setImageDrawable(ContextCompat.getDrawable(getActivity(),
                     R.drawable.ic_favorite_white_24dp));
         }
-        getActivity().setResult(RecetasCookeoConstants.RESULT_UPDATE_RECIPE);
+        getActivity().setResult(Activity.RESULT_OK);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
             scaleIn.run();
         }
@@ -374,7 +377,7 @@ public class RecipeDetailsFragment extends Fragment implements
         unbinder.unbind();
     }
 
-    private void loadRecipe(RecipeComplete recipe) {
+    public void loadRecipe(RecipeComplete recipe) {
 
         if (recipeName != null) {
             recipeName.setText(recipe.getName());

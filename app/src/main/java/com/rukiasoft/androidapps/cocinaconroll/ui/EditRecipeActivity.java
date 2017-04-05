@@ -22,6 +22,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.rukiasoft.androidapps.cocinaconroll.R;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.controllers.RecipeController;
+import com.rukiasoft.androidapps.cocinaconroll.persistence.database.CocinaConRollContentProvider;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.database.methods.FirebaseDbMethods;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.model.RecipeDb;
 import com.rukiasoft.androidapps.cocinaconroll.ui.model.RecipeComplete;
@@ -152,15 +153,22 @@ public class EditRecipeActivity extends AppCompatActivity {
         }
     }
 
-    public long getRecipeId(){
+    public Long getRecipeId(){
         Uri uri = getIntent().getData();
-        return ContentUris.parseId(uri);
+        if(uri == null){
+            return null;
+        }else {
+            return ContentUris.parseId(uri);
+        }
     }
 
     private RecipeComplete getRecipe(){
-        RecipeComplete recipeComplete =  RecipeComplete.getRecipeFromDatabase(
-                new RecipeController().getRecipeById(getApplication(), getRecipeId())
-        );
+        RecipeComplete recipeComplete =  null;
+        if(getRecipeId() != null ) {
+            RecipeComplete.getRecipeFromDatabase(
+                    new RecipeController().getRecipeById(getApplication(), getRecipeId())
+            );
+        }
         if(recipeComplete == null){
             finish();
             return null;
@@ -273,8 +281,8 @@ public class EditRecipeActivity extends AppCompatActivity {
         FirebaseDbMethods firebaseDbMethods = new FirebaseDbMethods(recipeController);
         firebaseDbMethods.updateRecipesToPersonalStorage(getApplicationContext());
         Intent resultIntent = new Intent();
-        resultIntent.putExtra(RecetasCookeoConstants.KEY_RECIPE, recipeCV.getAsLong(RecetasCookeoConstants.RECIPE_COMPLETE_ID));
-        setResult(RecetasCookeoConstants.RESULT_UPDATE_RECIPE, resultIntent);
+        resultIntent.setData(CocinaConRollContentProvider.getUriForRecipe(recipeCV.getAsLong(RecetasCookeoConstants.RECIPE_COMPLETE_ID)));
+        setResult(RESULT_OK, resultIntent);
         finish();
     }
 
