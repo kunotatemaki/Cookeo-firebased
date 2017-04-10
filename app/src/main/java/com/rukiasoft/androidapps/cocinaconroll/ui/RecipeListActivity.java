@@ -120,11 +120,7 @@ public class RecipeListActivity extends ToolbarAndProgressActivity {
 
 
         //Set default values for preferences
-        if (mTools.hasVibrator(getApplicationContext())) {
-            setDefaultValuesForOptions(R.xml.options);
-        }else{
-            setDefaultValuesForOptions(R.xml.options_not_vibrate);
-        }
+        setDefaultValuesForOptions(R.xml.options);
 
         setupDrawerLayout();
 

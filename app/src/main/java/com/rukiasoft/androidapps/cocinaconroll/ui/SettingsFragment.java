@@ -22,11 +22,8 @@ public class SettingsFragment extends PreferenceFragment implements Serializable
     public void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        Tools mTools = new Tools();
-        if (mTools.hasVibrator(getActivity().getApplicationContext()))
-            addPreferencesFromResource(R.xml.options);
-        else
-            addPreferencesFromResource(R.xml.options_not_vibrate);
+        addPreferencesFromResource(R.xml.options);
+
     }
 }
 
