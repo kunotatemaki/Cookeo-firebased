@@ -925,6 +925,4 @@ public class RecipeListFragment extends Fragment implements
 }
 
 
-// TODO: 22/3/17 pasar la recipe a details solo por la uri
-// TODO: 22/3/17 actualizar el content resolver cuando añada, edite o borre
 

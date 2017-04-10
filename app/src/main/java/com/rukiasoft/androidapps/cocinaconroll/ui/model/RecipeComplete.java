@@ -38,31 +38,34 @@ public class RecipeComplete{
 
     public static RecipeComplete getRecipeFromDatabase(RecipeDb recipeDb) {
         RecipeComplete recipe = new RecipeComplete();
-
-        recipe.setId(recipeDb.getId());
-        recipe.setKey(recipeDb.getKey());
-        recipe.setName(recipeDb.getName());
-        recipe.setIcon(recipeDb.getIcon());
-        recipe.setPicture(recipeDb.getPicture());
-        recipe.setTimestamp(recipeDb.getTimestamp());
-        recipe.setVegetarian(recipeDb.getVegetarian());
-        recipe.setFavourite(recipeDb.getFavourite());
-        recipe.setOwner(recipeDb.getOwner());
-        recipe.setTimestamp(recipeDb.getTimestamp());
-        recipe.setType(recipeDb.getType());
-        recipe.setMinutes(recipeDb.getMinutes());
-        recipe.setPortions(recipeDb.getPortions());
-        recipe.setAuthor(recipeDb.getAuthor());
-        recipe.setLink(recipeDb.getLink());
-        recipe.setTip(recipeDb.getTip());
-        recipe.setLanguage(recipeDb.getLanguage());
-        recipe.setIngredients(recipeDb.getIngredientsAsStringList());
-        recipe.setSteps(recipeDb.getStepsAsStringList());
-        recipe.setEdited(recipeDb.getEdited());
+        try {
+            recipe.setId(recipeDb.getId());
+            recipe.setKey(recipeDb.getKey());
+            recipe.setName(recipeDb.getName());
+            recipe.setIcon(recipeDb.getIcon());
+            recipe.setPicture(recipeDb.getPicture());
+            recipe.setTimestamp(recipeDb.getTimestamp());
+            recipe.setVegetarian(recipeDb.getVegetarian());
+            recipe.setFavourite(recipeDb.getFavourite());
+            recipe.setOwner(recipeDb.getOwner());
+            recipe.setTimestamp(recipeDb.getTimestamp());
+            recipe.setType(recipeDb.getType());
+            recipe.setMinutes(recipeDb.getMinutes());
+            recipe.setPortions(recipeDb.getPortions());
+            recipe.setAuthor(recipeDb.getAuthor());
+            recipe.setLink(recipeDb.getLink());
+            recipe.setTip(recipeDb.getTip());
+            recipe.setLanguage(recipeDb.getLanguage());
+            recipe.setIngredients(recipeDb.getIngredientsAsStringList());
+            recipe.setSteps(recipeDb.getStepsAsStringList());
+            recipe.setEdited(recipeDb.getEdited());
+        }catch (NullPointerException e){
+            e.printStackTrace();
+            return null;
+        }
         return recipe;
     }
 
-    // TODO: 26/3/17 poner la receta a  int owner = RecetasCookeoConstants.FLAG_PERSONAL_RECIPE;
     // mantener id, favourite, owner
     public static ContentValues getContentValues(RecipeComplete recipe){
         ContentValues content = new ContentValues();
@@ -80,7 +83,7 @@ public class RecipeComplete{
         content.put(RecetasCookeoConstants.RECIPE_COMPLETE_AUTHOR, recipe.getAuthor());
         content.put(RecetasCookeoConstants.RECIPE_COMPLETE_LINK, recipe.getLink());
         content.put(RecetasCookeoConstants.RECIPE_COMPLETE_TIP, recipe.getTip());
-        content.put(RecetasCookeoConstants.RECIPE_COMPLETE_OWNER, recipe.getOwner());
+        content.put(RecetasCookeoConstants.RECIPE_COMPLETE_OWNER, RecetasCookeoConstants.FLAG_PERSONAL_RECIPE);
         content.put(RecetasCookeoConstants.RECIPE_COMPLETE_EDITED, true);
         content.put(RecetasCookeoConstants.RECIPE_COMPLETE_TIMESTAMP, recipe.getTimestamp());
         if(recipe.getIngredients() != null){

@@ -2,6 +2,7 @@ package com.rukiasoft.androidapps.cocinaconroll.classes;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.widget.ImageView;
 
 /**
@@ -21,8 +22,8 @@ public class ThreeOneImageView extends android.support.v7.widget.AppCompatImageV
     }
 
     @Override
-    public void onMeasure(int widthSpec, int heightSpec){
-        int threeOneHeight = MeasureSpec.getSize(widthSpec)/3;
+    public void onMeasure(int widthSpec, int heightSpec) {
+        int threeOneHeight = MeasureSpec.getSize(widthSpec) / 3;
         int threeOneHeightSpec = MeasureSpec.makeMeasureSpec(threeOneHeight, MeasureSpec.EXACTLY);
         super.onMeasure(widthSpec, threeOneHeightSpec);
     }

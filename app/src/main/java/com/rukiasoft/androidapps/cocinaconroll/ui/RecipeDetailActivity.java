@@ -9,6 +9,7 @@ import android.view.MenuItem;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
+import com.orhanobut.logger.Logger;
 import com.rukiasoft.androidapps.cocinaconroll.BuildConfig;
 import com.rukiasoft.androidapps.cocinaconroll.R;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.controllers.RecipeController;
@@ -52,6 +53,7 @@ public class RecipeDetailActivity extends ToolbarAndProgressActivity {
 
     public long getRecipeId(){
         Uri uri = getIntent().getData();
+        Logger.d("URI: " + uri);
         return ContentUris.parseId(uri);
     }
 

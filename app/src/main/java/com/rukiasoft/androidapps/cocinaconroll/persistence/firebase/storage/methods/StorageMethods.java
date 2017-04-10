@@ -44,7 +44,9 @@ public class StorageMethods {
 
 
         mOldPics = pictureNames;
-        uploadNextOldPic();
+        if(mOldPics.size()>0){
+            uploadOldPictureToPersonalStorage(mOldPics.get(0));
+        }
     }
 
     private void uploadOldPictureToPersonalStorage(final String name) {

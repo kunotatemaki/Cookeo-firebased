@@ -129,7 +129,9 @@ public class SignInActivity extends ToolbarAndProgressActivity implements
                 firebaseAuthWithGoogle(account);
             } else {
                 // Google Sign In failed, update UI appropriately
+                hideProgressDialog();
                 tools.savePreferences(getApplicationContext(), RecetasCookeoConstants.PROPERTY_SIGNED_IN, false);
+                Toast.makeText(getApplicationContext(), getString(R.string.signed_in_err), Toast.LENGTH_LONG);
                 revokeAccess();
                 enableButtons();
             }

@@ -11,8 +11,8 @@ android {
         applicationId "com.rukiasoft.androidapps.cocinaconroll"
         minSdkVersion 14
         targetSdkVersion 25
-        versionCode 321
-        versionName "3.2.1"
+        versionCode 330
+        versionName "3.3.0"
         //Enabling multidex support.
         multiDexEnabled true
 
@@ -45,6 +45,13 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_7
         targetCompatibility JavaVersion.VERSION_1_7
+    }
+
+    signingConfigs {
+        release {
+
+            v2SigningEnabled false
+        }
     }
 }
 
