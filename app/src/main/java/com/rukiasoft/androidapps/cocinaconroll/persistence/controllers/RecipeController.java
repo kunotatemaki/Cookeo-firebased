@@ -5,8 +5,10 @@ package com.rukiasoft.androidapps.cocinaconroll.persistence.controllers;
 
 import android.app.Application;
 import android.database.Cursor;
+import android.util.Log;
 
 import com.google.firebase.database.DataSnapshot;
+import com.orhanobut.logger.Logger;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.daoqueries.RecipeQueries;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.database.methods.FirebaseDbMethods;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.database.model.RecipeFirebase;
@@ -119,6 +121,9 @@ public class RecipeController {
         if(recipeDb != null) {
             recipeDb.getIngredients();
             recipeDb.getSteps();
+            Logger.d("Recipebyid: " + recipeDb.toString());
+        }else{
+            Logger.d("recioebyid: devuelve null: " + id);
         }
         return recipeDb;
     }

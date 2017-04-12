@@ -33,8 +33,30 @@ public class RecipeComplete{
     private List<String> steps;
 
 
-
-
+    @Override
+    public String toString() {
+        return "RecipeComplete{" +
+                "id=" + id +
+                ", key='" + key + '\'' +
+                ", name='" + name + '\'' +
+                ", type='" + type + '\'' +
+                ", icon=" + icon +
+                ", picture='" + picture + '\'' +
+                ", vegetarian=" + vegetarian +
+                ", favourite=" + favourite +
+                ", minutes=" + minutes +
+                ", portions=" + portions +
+                ", language=" + language +
+                ", author='" + author + '\'' +
+                ", link='" + link + '\'' +
+                ", tip='" + tip + '\'' +
+                ", owner=" + owner +
+                ", edited=" + edited +
+                ", timestamp=" + timestamp +
+                ", ingredients=" + ingredients +
+                ", steps=" + steps +
+                '}';
+    }
 
     public static RecipeComplete getRecipeFromDatabase(RecipeDb recipeDb) {
         RecipeComplete recipe = new RecipeComplete();

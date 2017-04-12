@@ -39,6 +39,37 @@ public class RecipeDb {
     private String type;
     private Integer icon;
     private String picture;
+
+    @Override
+    public String toString() {
+        return "RecipeDb{" +
+                "id=" + id +
+                ", key='" + key + '\'' +
+                ", name='" + name + '\'' +
+                ", normalizedName='" + normalizedName + '\'' +
+                ", type='" + type + '\'' +
+                ", icon=" + icon +
+                ", picture='" + picture + '\'' +
+                ", vegetarian=" + vegetarian +
+                ", favourite=" + favourite +
+                ", minutes=" + minutes +
+                ", portions=" + portions +
+                ", language=" + language +
+                ", author='" + author + '\'' +
+                ", link='" + link + '\'' +
+                ", tip='" + tip + '\'' +
+                ", owner=" + owner +
+                ", edited=" + edited +
+                ", timestamp=" + timestamp +
+                ", updateRecipe=" + updateRecipe +
+                ", updatePicture=" + updatePicture +
+                ", ingredients=" + ingredients +
+                ", steps=" + steps +
+                ", daoSession=" + daoSession +
+                ", myDao=" + myDao +
+                '}';
+    }
+
     private Boolean vegetarian;
     private Boolean favourite;
     private Integer minutes;

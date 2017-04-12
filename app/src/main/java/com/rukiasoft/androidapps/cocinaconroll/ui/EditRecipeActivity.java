@@ -20,6 +20,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.orhanobut.logger.Logger;
 import com.rukiasoft.androidapps.cocinaconroll.R;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.controllers.RecipeController;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.database.CocinaConRollContentProvider;
@@ -165,7 +166,7 @@ public class EditRecipeActivity extends AppCompatActivity {
     private RecipeComplete getRecipe(){
         RecipeComplete recipeComplete =  null;
         if(getRecipeId() != null ) {
-            RecipeComplete.getRecipeFromDatabase(
+            recipeComplete = RecipeComplete.getRecipeFromDatabase(
                     new RecipeController().getRecipeById(getApplication(), getRecipeId())
             );
         }
