@@ -9,6 +9,7 @@ import android.support.multidex.MultiDexApplication;
 
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
+import com.orhanobut.logger.LogLevel;
 import com.orhanobut.logger.Logger;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.model.DaoMaster;
 import com.rukiasoft.androidapps.cocinaconroll.persistence.model.DaoSession;
@@ -89,7 +90,7 @@ public class CocinaConRollApplication  extends MultiDexApplication {
                 .init(RecetasCookeoConstants.RUKIA_TAG)                 // default PRETTYLOGGER or use just init()
                 //.methodCount(3)                 // default 2
                 .hideThreadInfo()               // default shown
-                //.logLevel(LogLevel.NONE)        // default LogLevel.FULL
+                .logLevel(LogLevel.NONE)        // default LogLevel.FULL
                 //.methodOffset(2)                // default 0
                 //.logAdapter(new AndroidLogAdapter()) //default AndroidLogAdapter
         ;
