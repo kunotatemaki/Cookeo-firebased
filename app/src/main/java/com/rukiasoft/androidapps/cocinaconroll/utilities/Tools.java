@@ -148,6 +148,9 @@ public class Tools {
     }
 
     public String getNormalizedString(String input){
+        if(input == null){
+            return "";
+        }
         String normalized;
         normalized = Normalizer.normalize(input, Normalizer.Form.NFD);
         input = normalized.replaceAll("[^\\p{ASCII}]", "");

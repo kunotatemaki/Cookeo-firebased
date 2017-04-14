@@ -118,6 +118,12 @@ public class RecipeDetailActivity extends ToolbarAndProgressActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+
+    }
+
+    public void launchSignInActivity(){
+        Intent intent = new Intent(RecipeDetailActivity.this, SignInActivity.class);
+        startActivity(intent);
     }
 
 }

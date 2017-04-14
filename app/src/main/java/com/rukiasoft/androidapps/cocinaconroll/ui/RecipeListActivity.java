@@ -509,7 +509,7 @@ public class RecipeListActivity extends ToolbarAndProgressActivity {
 
     public void launchSignInActivity(){
         Intent intent = new Intent(RecipeListActivity.this, SignInActivity.class);
-        startActivityForResult(intent, RecetasCookeoConstants.REQUEST_CODE_SIGNING_FROM_RECIPELIST);
+        startActivity(intent);
     }
 
 }

@@ -532,7 +532,7 @@ public class RecipeDetailsFragment extends Fragment implements
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 dialog.cancel();
-                                ((RecipeListActivity) getActivity()).launchSignInActivity();
+                                ((RecipeDetailActivity) getActivity()).launchSignInActivity();
                             }
                         })
                 .setNegativeButton(getResources().getString(R.string.cancel),
