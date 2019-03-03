@@ -1,4 +1,4 @@
-package com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.database.methods;
+spackage com.rukiasoft.androidapps.cocinaconroll.persistence.firebase.database.methods;
 
 import android.app.Application;
 import android.content.Context;

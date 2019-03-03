@@ -22,7 +22,7 @@
       </configuration>
     </facet>
   </component>
-  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_7" inherit-compiler-output="false">
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_7">
     <output url="file://$MODULE_DIR$/build/intermediates/classes/debug" />
     <output-test url="file://$MODULE_DIR$/build/intermediates/classes/test/debug" />
     <exclude-output />
@@ -65,13 +65,6 @@
       <sourceFolder url="file://$MODULE_DIR$/src/main/java" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/main/rs" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/main/shaders" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/res" type="java-test-resource" />
-      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/resources" type="java-test-resource" />
-      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/assets" type="java-test-resource" />
-      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/aidl" isTestSource="true" />
-      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/java" isTestSource="true" />
-      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/rs" isTestSource="true" />
-      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/shaders" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/test/res" type="java-test-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/test/resources" type="java-test-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/test/assets" type="java-test-resource" />
@@ -79,6 +72,13 @@
       <sourceFolder url="file://$MODULE_DIR$/src/test/java" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/test/rs" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/test/shaders" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/res" type="java-test-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/resources" type="java-test-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/assets" type="java-test-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/aidl" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/java" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/rs" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/shaders" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/build/cache" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/assets" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/blame" />
@@ -94,8 +94,6 @@
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/jniLibs" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/manifests" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/multi-dex" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/pre-dexed" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/proguard-rules" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/reload-dex" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/res" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/restart-dex" />
@@ -105,84 +103,83 @@
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/symbols" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/transforms" />
       <excludeFolder url="file://$MODULE_DIR$/build/outputs" />
-      <excludeFolder url="file://$MODULE_DIR$/build/reports" />
       <excludeFolder url="file://$MODULE_DIR$/build/tmp" />
     </content>
     <orderEntry type="jdk" jdkName="Android API 25 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" exported="" name="commons-io-2.4" level="project" />
-    <orderEntry type="library" exported="" name="icepick-3.2.0" level="project" />
-    <orderEntry type="library" exported="" name="firebase-core-10.2.0" level="project" />
-    <orderEntry type="library" exported="" name="play-services-auth-base-10.2.0" level="project" />
-    <orderEntry type="library" exported="" name="play-services-tagmanager-v4-impl-10.2.0" level="project" />
-    <orderEntry type="library" exported="" name="recyclerview-animators-2.2.3" level="project" />
-    <orderEntry type="library" exported="" name="design-25.2.0" level="project" />
-    <orderEntry type="library" exported="" name="data.priority-map-0.0.2" level="project" />
-    <orderEntry type="library" exported="" name="play-services-gass-10.2.0" level="project" />
-    <orderEntry type="library" exported="" name="cardview-v7-25.2.0" level="project" />
-    <orderEntry type="library" exported="" name="support-core-ui-25.2.0" level="project" />
-    <orderEntry type="library" exported="" name="greendao-3.2.0" level="project" />
-    <orderEntry type="library" exported="" name="okio-1.0.0" level="project" />
-    <orderEntry type="library" exported="" name="palette-v7-25.2.0" level="project" />
-    <orderEntry type="library" exported="" name="firebase-crash-10.2.0" level="project" />
-    <orderEntry type="library" exported="" name="core.cache-0.6.3" level="project" />
-    <orderEntry type="library" exported="" name="support-core-utils-25.2.0" level="project" />
-    <orderEntry type="library" exported="" name="support-fragment-25.2.0" level="project" />
-    <orderEntry type="library" exported="" scope="TEST" name="multidex-instrumentation-1.0.1" level="project" />
-    <orderEntry type="library" exported="" scope="TEST" name="leakcanary-android-no-op-1.4-beta2" level="project" />
-    <orderEntry type="library" exported="" name="guava-18.0" level="project" />
-    <orderEntry type="library" exported="" name="icepick-processor-3.2.0" level="project" />
-    <orderEntry type="library" exported="" name="auto-service-1.0-rc2" level="project" />
-    <orderEntry type="library" exported="" name="firebase-common-10.2.0" level="project" />
-    <orderEntry type="library" exported="" name="play-services-analytics-impl-10.2.0" level="project" />
-    <orderEntry type="library" exported="" name="stencil-0.3.5" level="project" />
-    <orderEntry type="library" exported="" name="play-services-basement-10.2.0" level="project" />
-    <orderEntry type="library" exported="" name="firebase-database-10.2.0" level="project" />
-    <orderEntry type="library" exported="" name="appcompat-v7-25.2.0" level="project" />
-    <orderEntry type="library" exported="" name="butterknife-annotations-8.4.0" level="project" />
-    <orderEntry type="library" exported="" name="leakcanary-watcher-1.4-beta2" level="project" />
-    <orderEntry type="library" exported="" name="butterknife-8.4.0" level="project" />
-    <orderEntry type="library" exported="" name="recyclerview-v7-25.2.0" level="project" />
-    <orderEntry type="library" exported="" name="animated-vector-drawable-25.2.0" level="project" />
-    <orderEntry type="library" exported="" name="play-services-gcm-10.2.0" level="project" />
-    <orderEntry type="library" exported="" name="firebase-auth-10.2.0" level="project" />
-    <orderEntry type="library" exported="" name="firebase-analytics-10.2.0" level="project" />
-    <orderEntry type="library" exported="" name="gson-2.8.0" level="project" />
-    <orderEntry type="library" exported="" name="haha-2.0.2" level="project" />
-    <orderEntry type="library" exported="" name="play-services-tasks-10.2.0" level="project" />
-    <orderEntry type="library" exported="" name="dexter-3.0.1" level="project" />
-    <orderEntry type="library" exported="" name="play-services-base-10.2.0" level="project" />
-    <orderEntry type="library" exported="" name="transition-25.2.0" level="project" />
-    <orderEntry type="library" exported="" name="slingshot-0.10.3" level="project" />
-    <orderEntry type="library" exported="" name="auto-common-0.3" level="project" />
-    <orderEntry type="library" exported="" name="play-services-auth-10.2.0" level="project" />
-    <orderEntry type="library" exported="" name="okhttp-2.0.0" level="project" />
-    <orderEntry type="library" exported="" name="play-services-clearcut-10.2.0" level="project" />
-    <orderEntry type="library" exported="" name="firebase-storage-common-10.2.0" level="project" />
-    <orderEntry type="library" exported="" name="play-services-ads-lite-10.2.0" level="project" />
-    <orderEntry type="library" exported="" name="firebase-iid-10.2.0" level="project" />
-    <orderEntry type="library" exported="" name="firebase-database-connection-10.2.0" level="project" />
-    <orderEntry type="library" exported="" name="glide-3.7.0" level="project" />
-    <orderEntry type="library" exported="" name="firebase-storage-10.2.0" level="project" />
-    <orderEntry type="library" exported="" name="leakcanary-android-1.4-beta2" level="project" />
-    <orderEntry type="library" exported="" name="play-services-ads-10.2.0" level="project" />
-    <orderEntry type="library" exported="" name="quoin-0.1.2" level="project" />
-    <orderEntry type="library" exported="" name="leakcanary-analyzer-1.4-beta2" level="project" />
-    <orderEntry type="library" exported="" name="scout-0.1.0" level="project" />
-    <orderEntry type="library" exported="" name="firebase-analytics-impl-10.2.0" level="project" />
-    <orderEntry type="library" exported="" name="play-services-iid-10.2.0" level="project" />
-    <orderEntry type="library" exported="" name="support-v4-25.2.0" level="project" />
-    <orderEntry type="library" exported="" name="support-compat-25.2.0" level="project" />
-    <orderEntry type="library" exported="" name="multidex-1.0.1" level="project" />
-    <orderEntry type="library" exported="" name="support-media-compat-25.2.0" level="project" />
-    <orderEntry type="library" exported="" name="play-services-analytics-10.2.0" level="project" />
-    <orderEntry type="library" exported="" name="greendao-api-3.2.0" level="project" />
-    <orderEntry type="library" exported="" name="clojure-1.7.0" level="project" />
-    <orderEntry type="library" exported="" name="play-services-drive-10.2.0" level="project" />
-    <orderEntry type="library" exported="" name="logger-1.15" level="project" />
-    <orderEntry type="library" exported="" name="simple-xml-2.7.1" level="project" />
-    <orderEntry type="library" exported="" name="auto-value-1.2" level="project" />
-    <orderEntry type="library" exported="" name="support-annotations-25.2.0" level="project" />
-    <orderEntry type="library" exported="" name="support-vector-drawable-25.2.0" level="project" />
+    <orderEntry type="library" exported="" name="com.google.android.gms:play-services-base-10.2.0" level="project" />
+    <orderEntry type="library" exported="" name="com.android.support:multidex-1.0.1" level="project" />
+    <orderEntry type="library" exported="" name="frankiesardo:icepick:3.2.0@jar" level="project" />
+    <orderEntry type="library" exported="" name="com.google.code.gson:gson:2.8.0@jar" level="project" />
+    <orderEntry type="library" exported="" name="com.google.android.gms:play-services-tagmanager-v4-impl-10.2.0" level="project" />
+    <orderEntry type="library" exported="" name="com.orhanobut:logger-1.15" level="project" />
+    <orderEntry type="library" exported="" name="com.squareup.leakcanary:leakcanary-android-1.4-beta2" level="project" />
+    <orderEntry type="library" exported="" name="com.google.firebase:firebase-analytics-impl-10.2.0" level="project" />
+    <orderEntry type="library" exported="" name="com.jakewharton:butterknife-annotations:8.4.0@jar" level="project" />
+    <orderEntry type="library" exported="" name="com.google.firebase:firebase-iid-10.2.0" level="project" />
+    <orderEntry type="library" exported="" name="org.clojure:clojure:1.7.0@jar" level="project" />
+    <orderEntry type="library" exported="" name="com.google.android.gms:play-services-drive-10.2.0" level="project" />
+    <orderEntry type="library" exported="" name="com.google.firebase:firebase-auth-10.2.0" level="project" />
+    <orderEntry type="library" exported="" name="com.google.android.gms:play-services-gcm-10.2.0" level="project" />
+    <orderEntry type="library" exported="" name="com.karumi:dexter-3.0.1" level="project" />
+    <orderEntry type="library" exported="" name="jp.wasabeef:recyclerview-animators-2.2.3" level="project" />
+    <orderEntry type="library" exported="" name="com.google.guava:guava:18.0@jar" level="project" />
+    <orderEntry type="library" exported="" name="org.clojure:core.cache:0.6.3@jar" level="project" />
+    <orderEntry type="library" exported="" name="com.android.support:support-fragment-25.2.0" level="project" />
+    <orderEntry type="library" exported="" name="com.google.android.gms:play-services-ads-10.2.0" level="project" />
+    <orderEntry type="library" exported="" name="com.google.android.gms:play-services-tasks-10.2.0" level="project" />
+    <orderEntry type="library" exported="" name="com.google.firebase:firebase-database-connection-10.2.0" level="project" />
+    <orderEntry type="library" exported="" name="com.google.android.gms:play-services-analytics-impl-10.2.0" level="project" />
+    <orderEntry type="library" exported="" name="com.google.firebase:firebase-common-10.2.0" level="project" />
+    <orderEntry type="library" exported="" name="com.android.support:support-core-utils-25.2.0" level="project" />
+    <orderEntry type="library" exported="" name="com.android.support:animated-vector-drawable-25.2.0" level="project" />
+    <orderEntry type="library" exported="" name="slingshot:slingshot:0.10.3@jar" level="project" />
+    <orderEntry type="library" exported="" name="com.android.support:appcompat-v7-25.2.0" level="project" />
+    <orderEntry type="library" exported="" name="com.google.auto:auto-common:0.3@jar" level="project" />
+    <orderEntry type="library" exported="" name="com.android.support:support-annotations:25.2.0@jar" level="project" />
+    <orderEntry type="library" exported="" name="com.google.android.gms:play-services-auth-10.2.0" level="project" />
+    <orderEntry type="library" exported="" name="com.android.support:palette-v7-25.2.0" level="project" />
+    <orderEntry type="library" exported="" name="com.google.firebase:firebase-core-10.2.0" level="project" />
+    <orderEntry type="library" exported="" name="com.squareup.leakcanary:leakcanary-analyzer:1.4-beta2@jar" level="project" />
+    <orderEntry type="library" exported="" name="com.google.firebase:firebase-analytics-10.2.0" level="project" />
+    <orderEntry type="library" exported="" name="com.google.android.gms:play-services-clearcut-10.2.0" level="project" />
+    <orderEntry type="library" exported="" name="com.google.android.gms:play-services-analytics-10.2.0" level="project" />
+    <orderEntry type="library" exported="" name="frankiesardo:icepick-processor:3.2.0@jar" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="com.android.support:multidex-instrumentation-1.0.1" level="project" />
+    <orderEntry type="library" exported="" name="com.squareup.okhttp:okhttp:2.0.0@jar" level="project" />
+    <orderEntry type="library" exported="" name="com.android.support:support-core-ui-25.2.0" level="project" />
+    <orderEntry type="library" exported="" name="scout:scout:0.1.0@jar" level="project" />
+    <orderEntry type="library" exported="" name="com.android.support:cardview-v7-25.2.0" level="project" />
+    <orderEntry type="library" exported="" name="com.squareup.okio:okio:1.0.0@jar" level="project" />
+    <orderEntry type="library" exported="" name="com.google.auto.service:auto-service:1.0-rc2@jar" level="project" />
+    <orderEntry type="library" exported="" name="com.google.android.gms:play-services-gass-10.2.0" level="project" />
+    <orderEntry type="library" exported="" name="com.android.support:support-media-compat-25.2.0" level="project" />
+    <orderEntry type="library" exported="" name="com.google.firebase:firebase-database-10.2.0" level="project" />
+    <orderEntry type="library" exported="" name="com.google.auto.value:auto-value:1.2@jar" level="project" />
+    <orderEntry type="library" exported="" name="com.google.android.gms:play-services-auth-base-10.2.0" level="project" />
+    <orderEntry type="library" exported="" name="org.greenrobot:greendao-api:3.2.0@jar" level="project" />
+    <orderEntry type="library" exported="" name="stencil:stencil:0.3.5@jar" level="project" />
+    <orderEntry type="library" exported="" name="com.google.android.gms:play-services-ads-lite-10.2.0" level="project" />
+    <orderEntry type="library" exported="" name="com.squareup.haha:haha:2.0.2@jar" level="project" />
+    <orderEntry type="library" exported="" name="com.google.firebase:firebase-storage-10.2.0" level="project" />
+    <orderEntry type="library" exported="" name="com.android.support:support-v4-25.2.0" level="project" />
+    <orderEntry type="library" exported="" name="com.google.firebase:firebase-storage-common-10.2.0" level="project" />
+    <orderEntry type="library" exported="" name="org.simpleframework:simple-xml:2.7.1@jar" level="project" />
+    <orderEntry type="library" exported="" name="com.squareup.leakcanary:leakcanary-watcher:1.4-beta2@jar" level="project" />
+    <orderEntry type="library" exported="" name="commons-io:commons-io:2.4@jar" level="project" />
+    <orderEntry type="library" exported="" name="com.google.android.gms:play-services-basement-10.2.0" level="project" />
+    <orderEntry type="library" exported="" name="com.jakewharton:butterknife-8.4.0" level="project" />
+    <orderEntry type="library" exported="" name="com.google.android.gms:play-services-iid-10.2.0" level="project" />
+    <orderEntry type="library" exported="" name="com.android.support:design-25.2.0" level="project" />
+    <orderEntry type="library" exported="" name="com.android.support:transition-25.2.0" level="project" />
+    <orderEntry type="library" exported="" name="com.android.support:support-compat-25.2.0" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="com.squareup.leakcanary:leakcanary-android-no-op-1.4-beta2" level="project" />
+    <orderEntry type="library" exported="" name="com.google.firebase:firebase-crash-10.2.0" level="project" />
+    <orderEntry type="library" exported="" name="com.android.support:recyclerview-v7-25.2.0" level="project" />
+    <orderEntry type="library" exported="" name="org.greenrobot:greendao:3.2.0@jar" level="project" />
+    <orderEntry type="library" exported="" name="com.android.support:support-vector-drawable-25.2.0" level="project" />
+    <orderEntry type="library" exported="" name="com.github.bumptech.glide:glide:3.7.0@jar" level="project" />
+    <orderEntry type="library" exported="" name="quoin:quoin:0.1.2@jar" level="project" />
+    <orderEntry type="library" exported="" name="org.clojure:data.priority-map:0.0.2@jar" level="project" />
   </component>
 </module>

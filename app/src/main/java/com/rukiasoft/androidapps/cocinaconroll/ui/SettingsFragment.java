@@ -10,8 +10,7 @@ import com.rukiasoft.androidapps.cocinaconroll.utilities.Tools;
 import java.io.Serializable;
 
 
-@SuppressLint("NewApi")
-public class SettingsFragment extends PreferenceFragment implements Serializable {
+public class SettingsFragment extends PreferenceFragmentcom{
 
     /**
      *
